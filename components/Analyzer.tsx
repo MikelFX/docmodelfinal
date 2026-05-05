@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { UserButton } from '@clerk/nextjs'
 import { UserButton, useUser } from '@clerk/nextjs'
 import styles from './Analyzer.module.css'
 
