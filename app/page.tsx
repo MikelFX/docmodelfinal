@@ -12,7 +12,7 @@ export default function LandingPage() {
       <nav className={styles.nav}>
         <div className={styles.logo}>
           <div className={styles.logoDot} />
-          docmind
+          docthink
         </div>
         <div className={styles.navRight}>
           <SignedOut>
@@ -20,7 +20,7 @@ export default function LandingPage() {
             <button className={styles.ctaBtn} onClick={() => router.push('/sign-up')}>Začít zdarma →</button>
           </SignedOut>
           <SignedIn>
-            <button className={styles.ctaBtn} onClick={() => router.push('/app')}>Otevřít DocMind →</button>
+            <button className={styles.ctaBtn} onClick={() => router.push('/app')}>Otevřít DocThink →</button>
             <UserButton afterSignOutUrl='/' />
           </SignedIn>
         </div>
@@ -93,9 +93,9 @@ export default function LandingPage() {
       </div>
 
       <footer className={styles.footer}>
-        <div className={styles.logo}><div className={styles.logoDot} />docmind</div>
+        <div className={styles.logo}><div className={styles.logoDot} />docthink</div>
         <div className={styles.footerLinks}>
-          <span>© 2025 DocMind</span>
+          <span>© 2025 DocThink</span>
         </div>
       </footer>
     </div>

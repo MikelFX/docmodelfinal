@@ -6,7 +6,7 @@ import './globals.css'
 const geist = Geist({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'DocMind — AI analyzátor dokumentů',
+  title: 'DocThink — AI analyzátor dokumentů',
   description: 'Nahraj dokument a získej shrnutí, akční body a rizika pomocí AI.',
   viewport: 'width=device-width, initial-scale=1',
 }

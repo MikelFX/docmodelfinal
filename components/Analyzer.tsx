@@ -102,7 +102,7 @@ export default function Analyzer() {
     const res = await fetch('/api/credits', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ delta: -cost }),
+      body: JSON.stringify({ action: 'spend', amount: cost }),
     })
     const data = await res.json()
     if (data.error) { router.push('/koupit'); return false }
@@ -114,7 +114,7 @@ export default function Analyzer() {
     const res = await fetch('/api/credits', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ delta: cost }),
+      body: JSON.stringify({ action: 'add', amount: cost }),
     })
     const data = await res.json()
     if (data.credits !== undefined) setCredits(data.credits)
@@ -351,13 +351,13 @@ export default function Analyzer() {
       : result
     const win = window.open('', '_blank')
     if (!win) return
-    win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>DocMind</title>
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>DocThink</title>
       <style>body{font-family:Arial,sans-serif;max-width:700px;margin:40px auto;color:#1a1a1a;line-height:1.7}
       .header{border-bottom:2px solid #7F77DD;padding-bottom:12px;margin-bottom:24px}
       .logo{color:#7F77DD;font-size:20px;font-weight:bold}
       .meta{color:#888;font-size:13px;margin-top:4px}h4{color:#534AB7}</style>
       </head><body>
-      <div class="header"><div class="logo">● docmind</div>
+      <div class="header"><div class="logo">◆ docthink</div>
       <div class="meta">${currentMode.label} · ${fileName || 'demo'} · ${new Date().toLocaleDateString('cs-CZ')}</div></div>
       ${content}</body></html>`)
     win.document.close()
@@ -371,13 +371,12 @@ export default function Analyzer() {
   return (
     <div className={styles.wrap}>
       <nav className={styles.nav}>
-        <div className={styles.logo}><div className={styles.logoDot} />docmind</div>
+        <div className={styles.logo}><div className={styles.logoDot} />docthink</div>
         <div className={styles.navRight}>
           <div className={styles.credits}>
             <span className={styles.creditsN}>{credits}</span> kredity
           </div>
           <button className={styles.buyBtn} onClick={() => router.push('/koupit')}>Koupit kredity</button>
-          <UserButton afterSignOutUrl='/sign-in' />
           <UserButton afterSignOutUrl='/' />
         </div>
       </nav>

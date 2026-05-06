@@ -34,7 +34,7 @@ function SuccessContent() {
           {total !== null && <> Celkem máš nyní <strong>{total} kreditů</strong>.</>}
         </p>
         <button className={styles.btn} onClick={() => router.push('/app')}>
-          Zpět do DocMind →
+          Zpět do DocThink →
         </button>
       </div>
     </div>

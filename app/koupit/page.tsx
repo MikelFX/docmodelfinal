@@ -70,7 +70,7 @@ export default function KoupitPage() {
           </svg>
           Zpět
         </button>
-        <div className={styles.logo}><div className={styles.logoDot} />docmind</div>
+        <div className={styles.logo}><div className={styles.logoDot} />docthink</div>
         <div style={{ width: 80 }} />
       </nav>
 
@@ -143,7 +143,7 @@ export default function KoupitPage() {
             <div className={styles.faqA}>Ne, kredity jsou trvalé a nevyprší.</div>
           </div>
           <div className={styles.faqItem}>
-            <div className={styles.faqQ}>Jaké dokumenty DocMind podporuje?</div>
+            <div className={styles.faqQ}>Jaké dokumenty DocThink podporuje?</div>
             <div className={styles.faqA}>PDF, Word (.docx) a textové soubory (.txt).</div>
           </div>
           <div className={styles.faqItem}>
