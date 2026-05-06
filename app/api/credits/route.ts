@@ -1,14 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
+import { kv } from '@vercel/kv'
 
-// Jednoduchý in-memory store — nahradit databází (Vercel KV, Supabase...)
-const userCredits: Record<string, number> = {}
+const DEFAULT_CREDITS = 5
 
 export async function GET() {
   const { userId } = await auth()
   if (!userId) return NextResponse.json({ error: 'Nepřihlášen' }, { status: 401 })
 
-  const credits = userCredits[userId] ?? 5 // 5 kreditů zdarma při registraci
+  const credits = await kv.get<number>(`credits:${userId}`)
+
+  // První přihlášení — nastav výchozí kredity
+  if (credits === null) {
+    await kv.set(`credits:${userId}`, DEFAULT_CREDITS)
+    return NextResponse.json({ credits: DEFAULT_CREDITS })
+  }
+
   return NextResponse.json({ credits })
 }
 
@@ -18,13 +25,22 @@ export async function POST(req: NextRequest) {
 
   const { action, amount } = await req.json()
 
+  const current = await kv.get<number>(`credits:${userId}`) ?? DEFAULT_CREDITS
+
   if (action === 'add') {
-    userCredits[userId] = (userCredits[userId] ?? 5) + amount
-  } else if (action === 'spend') {
-    const current = userCredits[userId] ?? 5
-    if (current < amount) return NextResponse.json({ error: 'Nedostatek kreditů' }, { status: 400 })
-    userCredits[userId] = current - amount
+    const newVal = current + amount
+    await kv.set(`credits:${userId}`, newVal)
+    return NextResponse.json({ credits: newVal })
   }
 
-  return NextResponse.json({ credits: userCredits[userId] })
+  if (action === 'spend') {
+    if (current < amount) {
+      return NextResponse.json({ error: 'Nedostatek kreditů' }, { status: 400 })
+    }
+    const newVal = current - amount
+    await kv.set(`credits:${userId}`, newVal)
+    return NextResponse.json({ credits: newVal })
+  }
+
+  return NextResponse.json({ error: 'Neznámá akce' }, { status: 400 })
 }
