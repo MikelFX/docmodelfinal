@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { UserButton, useUser } from '@clerk/nextjs'
 import styles from './Analyzer.module.css'
 
-type Mode = 'summary' | 'actions' | 'risks' | 'qa' | 'rewrite' | 'translate' | 'template' | 'interview'
+type Mode = 'chat' | 'summary' | 'actions' | 'risks' | 'qa' | 'rewrite' | 'translate' | 'template' | 'interview'
 
 interface HistoryItem {
   id: string
@@ -16,9 +16,11 @@ interface HistoryItem {
 }
 
 interface ChatMsg { role: 'ai' | 'user'; text: string }
+interface ChatMessage { role: 'user' | 'assistant'; content: string; streaming?: boolean }
 
-const MODES: { id: Mode; label: string; icon: string; credits: number; group: 'analyze' | 'tools' }[] = [
-  { id: 'summary',   label: 'Shrnutí',           icon: '📋', credits: 1, group: 'analyze' },
+const MODES: { id: Mode; label: string; icon: string; credits: number; group: 'chat' | 'analyze' | 'tools' }[] = [
+  { id: 'chat',      label: 'AI Chat',            icon: '✨', credits: 0, group: 'chat'    },
+  { id: 'summary',   label: 'Shrnutí',            icon: '📋', credits: 1, group: 'analyze' },
   { id: 'actions',   label: 'Akční body',         icon: '✅', credits: 1, group: 'analyze' },
   { id: 'risks',     label: 'Rizika',             icon: '⚠️', credits: 1, group: 'analyze' },
   { id: 'qa',        label: 'Q & A',              icon: '💬', credits: 1, group: 'analyze' },
@@ -36,6 +38,13 @@ Rizika: závislost na externím dodavateli, možné zpoždění o 2-3 týdny.
 Rozpočet: 450 000 Kč, aktuálně proinvestováno 280 000 Kč.
 Závěr: projekt je v plánu, nutné sledovat rizika dodavatele.`
 
+const CHAT_SUGGESTIONS = [
+  'Co je to NDA smlouva a kdy ji použít?',
+  'Napiš mi profesionální email pro klienta',
+  'Jaké jsou rozdíly mezi s.r.o. a a.s.?',
+  'Pomoz mi připravit body pro obchodní jednání',
+]
+
 const TRANSLATE_LANGS = [
   { code: 'en', label: '🇬🇧 Angličtina' },
   { code: 'de', label: '🇩🇪 Němčina' },
@@ -51,7 +60,7 @@ function stripHtml(html: string) {
 }
 
 export default function Analyzer() {
-  const [mode, setMode] = useState<Mode>('summary')
+  const [mode, setMode] = useState<Mode>('chat')
   const [fileContent, setFileContent] = useState('')
   const [fileName, setFileName] = useState('')
   const [fileSize, setFileSize] = useState('')
@@ -84,18 +93,28 @@ export default function Analyzer() {
   const [interviewDoc, setInterviewDoc] = useState('')
   const [interviewLoading, setInterviewLoading] = useState(false)
 
+  // Chat state
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
+  const [chatHistory, setChatHistory] = useState<{ role: string; content: string }[]>([])
+  const [chatInput, setChatInput] = useState('')
+  const [chatLoading, setChatLoading] = useState(false)
+
   const fileRef = useRef<HTMLInputElement>(null)
+  const chatBottomRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const { user } = useUser()
 
   useEffect(() => {
     const saved = localStorage.getItem('docmind_history')
     if (saved) setHistory(JSON.parse(saved))
-    // Načti kredity ze serveru
     fetch('/api/credits').then(r => r.json()).then(d => {
       if (d.credits !== undefined) setCredits(d.credits)
     })
   }, [user])
+
+  useEffect(() => {
+    chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [chatMessages])
 
   async function spendCredits(cost: number): Promise<boolean> {
     if (credits < cost) { router.push('/koupit'); return false }
@@ -304,6 +323,87 @@ export default function Analyzer() {
     }
   }
 
+  // ── CHAT ──
+  async function sendChatMessage(text?: string) {
+    const msg = (text ?? chatInput).trim()
+    if (!msg || chatLoading) return
+    setChatInput('')
+
+    const newHistory = [...chatHistory, { role: 'user', content: msg }]
+    setChatHistory(newHistory)
+    setChatMessages(prev => [
+      ...prev,
+      { role: 'user', content: msg },
+      { role: 'assistant', content: '', streaming: true },
+    ])
+    setChatLoading(true)
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: newHistory }),
+      })
+
+      if (!res.body) throw new Error('Žádný stream')
+
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let rawContent = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const chunk = decoder.decode(value, { stream: true })
+        for (const line of chunk.split('\n')) {
+          if (!line.startsWith('data: ')) continue
+          const data = line.slice(6).trim()
+          if (data === '[DONE]') continue
+          try {
+            const json = JSON.parse(data)
+            const delta = json.choices?.[0]?.delta?.content
+            if (delta) {
+              rawContent += delta
+              const display = rawContent
+                .replace(/<think>[\s\S]*?<\/think>/g, '')
+                .replace(/<think>[\s\S]*/g, '')
+                .trimStart()
+              setChatMessages(prev => {
+                const u = [...prev]
+                u[u.length - 1] = { role: 'assistant', content: display, streaming: true }
+                return u
+              })
+            }
+          } catch { /* přeskočit poškozené SSE */ }
+        }
+      }
+
+      const finalDisplay = rawContent
+        .replace(/<think>[\s\S]*?<\/think>/g, '')
+        .replace(/<think>[\s\S]*/g, '')
+        .trimStart()
+
+      setChatMessages(prev => {
+        const u = [...prev]
+        u[u.length - 1] = {
+          role: 'assistant',
+          content: finalDisplay || 'Omlouvám se, nepodařilo se získat odpověď.',
+          streaming: false,
+        }
+        return u
+      })
+      setChatHistory([...newHistory, { role: 'assistant', content: finalDisplay }])
+    } catch {
+      setChatMessages(prev => {
+        const u = [...prev]
+        u[u.length - 1] = { role: 'assistant', content: 'Chyba připojení. Zkus znovu.', streaming: false }
+        return u
+      })
+    } finally {
+      setChatLoading(false)
+    }
+  }
+
   // ── Q&A follow-up ──
   async function askQuestion() {
     if (!question.trim() || !result) return
@@ -383,7 +483,16 @@ export default function Analyzer() {
 
       <div className={styles.main}>
         <aside className={styles.sidebar}>
-          <div className={styles.sidebarLabel}>Analýza dokumentu</div>
+          <div className={styles.sidebarLabel}>AI asistent</div>
+          {MODES.filter(m => m.group === 'chat').map(m => (
+            <button key={m.id} className={`${styles.modeBtn} ${mode === m.id ? styles.modeBtnActive : ''}`} onClick={() => { setMode(m.id); setResult(''); setAnswers([]) }}>
+              <span className={styles.modeIcon}>{m.icon}</span>
+              <span className={styles.modeLabelText}>{m.label}</span>
+              <span className={styles.modeCredits} style={{ color: '#5DCAA5', background: 'rgba(93,202,165,0.08)' }}>zdarma</span>
+            </button>
+          ))}
+
+          <div className={styles.sidebarLabel} style={{ marginTop: 16 }}>Analýza dokumentu</div>
           {MODES.filter(m => m.group === 'analyze').map(m => (
             <button key={m.id} className={`${styles.modeBtn} ${mode === m.id ? styles.modeBtnActive : ''}`} onClick={() => { setMode(m.id); setResult(''); setAnswers([]) }}>
               <span className={styles.modeIcon}>{m.icon}</span>
@@ -415,6 +524,83 @@ export default function Analyzer() {
         </aside>
 
         <div className={styles.content}>
+          {/* CHAT */}
+          {mode === 'chat' && (
+            <div className={styles.chatWrap}>
+              {chatMessages.length === 0 ? (
+                <div className={styles.chatWelcome}>
+                  <div className={styles.chatWelcomeIcon}>
+                    <div className={styles.chatWelcomeDot} />
+                  </div>
+                  <h2 className={styles.chatWelcomeTitle}>Jak ti mohu pomoci?</h2>
+                  <p className={styles.chatWelcomeSub}>AI Chat je zdarma — bez kreditů, kdykoli.</p>
+                  <div className={styles.chatSuggestions}>
+                    {CHAT_SUGGESTIONS.map((s, i) => (
+                      <button key={i} className={styles.chatSuggestion} style={{ animationDelay: `${i * 0.07}s` }} onClick={() => sendChatMessage(s)}>
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className={styles.chatThread}>
+                  {chatMessages.map((msg, i) => (
+                    <div key={i} className={msg.role === 'assistant' ? styles.chatRowAi : styles.chatRowUser}>
+                      {msg.role === 'assistant' && (
+                        <div className={styles.chatAvatar}><div className={styles.chatAvatarDot} /></div>
+                      )}
+                      <div className={msg.role === 'assistant' ? styles.chatBubbleAi : styles.chatBubbleUser}>
+                        {msg.content === '' && msg.streaming ? (
+                          <div className={styles.chatTyping}><span /><span /><span /></div>
+                        ) : (
+                          <>
+                            {msg.content}
+                            {msg.streaming && <span className={styles.chatCursor} />}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={chatBottomRef} />
+                </div>
+              )}
+
+              <div className={styles.chatInputWrap}>
+                {chatMessages.length > 0 && (
+                  <button className={styles.chatClearBtn} onClick={() => { setChatMessages([]); setChatHistory([]) }}>
+                    + Nový rozhovor
+                  </button>
+                )}
+                <div className={styles.chatInputRow}>
+                  <input
+                    className={styles.chatInput}
+                    placeholder="Napiš zprávu… (Enter pro odeslání)"
+                    value={chatInput}
+                    onChange={e => setChatInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !chatLoading) { e.preventDefault(); sendChatMessage() } }}
+                    disabled={chatLoading}
+                    autoFocus
+                  />
+                  <button
+                    className={styles.chatSendBtn}
+                    onClick={() => sendChatMessage()}
+                    disabled={chatLoading || !chatInput.trim()}
+                  >
+                    {chatLoading ? (
+                      <div className={styles.chatSendDots}><span /><span /><span /></div>
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"/>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                      </svg>
+                    )}
+                  </button>
+                </div>
+                <p className={styles.chatHint}>DocThink AI · zdarma · bez kreditů</p>
+              </div>
+            </div>
+          )}
+
           {/* UPLOAD */}
           {showUpload && (
             <>
