@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Geist } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
+import { LanguageProvider } from '@/contexts/LanguageContext'
+import LanguageSwitcher from '@/components/LanguageSwitcher'
 import './globals.css'
 
 const geist = Geist({ subsets: ['latin'] })
@@ -15,7 +17,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <ClerkProvider>
       <html lang="cs">
-        <body className={geist.className}>{children}</body>
+        <body className={geist.className}>
+          <LanguageProvider>
+            {children}
+            <LanguageSwitcher />
+          </LanguageProvider>
+        </body>
       </html>
     </ClerkProvider>
   )

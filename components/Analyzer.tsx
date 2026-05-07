@@ -3,9 +3,10 @@
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { UserButton, useUser } from '@clerk/nextjs'
+import { useLanguage } from '@/contexts/LanguageContext'
 import styles from './Analyzer.module.css'
 
-type Mode = 'chat' | 'summary' | 'actions' | 'risks' | 'qa' | 'rewrite' | 'translate' | 'template' | 'interview'
+type Mode = 'chat' | 'summary' | 'actions' | 'risks' | 'qa' | 'rewrite' | 'translate' | 'template' | 'interview' | 'imagine'
 
 interface HistoryItem {
   id: string
@@ -18,32 +19,34 @@ interface HistoryItem {
 interface ChatMsg { role: 'ai' | 'user'; text: string }
 interface ChatMessage { role: 'user' | 'assistant'; content: string; streaming?: boolean }
 
-const MODES: { id: Mode; label: string; icon: string; credits: number; group: 'chat' | 'analyze' | 'tools' }[] = [
-  { id: 'chat',      label: 'AI Chat',            icon: '✨', credits: 0, group: 'chat'    },
-  { id: 'summary',   label: 'Shrnutí',            icon: '📋', credits: 1, group: 'analyze' },
-  { id: 'actions',   label: 'Akční body',         icon: '✅', credits: 1, group: 'analyze' },
-  { id: 'risks',     label: 'Rizika',             icon: '⚠️', credits: 1, group: 'analyze' },
-  { id: 'qa',        label: 'Q & A',              icon: '💬', credits: 1, group: 'analyze' },
-  { id: 'rewrite',   label: 'Přepisovač',         icon: '✍️', credits: 2, group: 'tools' },
-  { id: 'translate', label: 'Překladač',          icon: '🌍', credits: 2, group: 'tools' },
-  { id: 'template',  label: 'Generátor šablon',   icon: '📝', credits: 2, group: 'tools' },
-  { id: 'interview', label: 'AI Tazatel',         icon: '🤖', credits: 5, group: 'tools' },
+const MODES: { id: Mode; icon: string; credits: number; group: 'chat' | 'analyze' | 'tools' }[] = [
+  { id: 'chat',      icon: '✨', credits: 0, group: 'chat'    },
+  { id: 'summary',   icon: '📋', credits: 1, group: 'analyze' },
+  { id: 'actions',   icon: '✅', credits: 1, group: 'analyze' },
+  { id: 'risks',     icon: '⚠️', credits: 1, group: 'analyze' },
+  { id: 'qa',        icon: '💬', credits: 1, group: 'analyze' },
+  { id: 'rewrite',   icon: '✍️', credits: 2, group: 'tools'   },
+  { id: 'translate', icon: '🌍', credits: 2, group: 'tools'   },
+  { id: 'template',  icon: '📝', credits: 2, group: 'tools'   },
+  { id: 'interview', icon: '🤖', credits: 5, group: 'tools'   },
+  { id: 'imagine',   icon: '🎨', credits: 1, group: 'tools'   },
 ]
 
-const DEMO_TEXT = `DocMind Demo: Toto je ukázkový analytický dokument.
+const IMAGINE_STYLES = [
+  { id: 'realistic',    suffix: 'photorealistic, 8k, sharp, detailed' },
+  { id: 'artistic',     suffix: 'digital art, vibrant colors, artistic' },
+  { id: 'illustration', suffix: 'illustration, vector art, clean lines' },
+  { id: 'cinematic',    suffix: 'cinematic, dramatic lighting, movie still, 35mm' },
+  { id: 'minimal',      suffix: 'minimalist, clean, simple, white background' },
+]
+
+const DEMO_TEXT = `DocThink Demo: Toto je ukázkový analytický dokument.
 Projekt: Implementace CRM systému Q3 2025.
 Zodpovědná osoba: Jana Nováková (PM), deadline 15.9.2025.
 Úkoly: dokončit API integraci, otestovat import dat, školení týmu.
 Rizika: závislost na externím dodavateli, možné zpoždění o 2-3 týdny.
 Rozpočet: 450 000 Kč, aktuálně proinvestováno 280 000 Kč.
 Závěr: projekt je v plánu, nutné sledovat rizika dodavatele.`
-
-const CHAT_SUGGESTIONS = [
-  'Co je to NDA smlouva a kdy ji použít?',
-  'Napiš mi profesionální email pro klienta',
-  'Jaké jsou rozdíly mezi s.r.o. a a.s.?',
-  'Pomoz mi připravit body pro obchodní jednání',
-]
 
 const TRANSLATE_LANGS = [
   { code: 'en', label: '🇬🇧 Angličtina' },
@@ -60,6 +63,8 @@ function stripHtml(html: string) {
 }
 
 export default function Analyzer() {
+  const { t } = useLanguage()
+
   const [mode, setMode] = useState<Mode>('chat')
   const [fileContent, setFileContent] = useState('')
   const [fileName, setFileName] = useState('')
@@ -74,17 +79,11 @@ export default function Analyzer() {
   const [history, setHistory] = useState<HistoryItem[]>([])
   const [copied, setCopied] = useState(false)
 
-  // Rewrite
   const [rewriteStyle, setRewriteStyle] = useState<'formal' | 'simple'>('formal')
-
-  // Translate
   const [targetLang, setTargetLang] = useState('en')
-
-  // Template
   const [templateDesc, setTemplateDesc] = useState('')
   const [templateLang, setTemplateLang] = useState('cs')
 
-  // Interview
   const [interviewType, setInterviewType] = useState('')
   const [interviewStarted, setInterviewStarted] = useState(false)
   const [interviewChat, setInterviewChat] = useState<ChatMsg[]>([])
@@ -93,11 +92,18 @@ export default function Analyzer() {
   const [interviewDoc, setInterviewDoc] = useState('')
   const [interviewLoading, setInterviewLoading] = useState(false)
 
-  // Chat state
+  // Chat
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
   const [chatHistory, setChatHistory] = useState<{ role: string; content: string }[]>([])
   const [chatInput, setChatInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
+
+  // Imagine
+  const [imaginePrompt, setImaginePrompt] = useState('')
+  const [imagineStyle, setImagineStyle] = useState('realistic')
+  const [imagineUrl, setImagineUrl] = useState('')
+  const [imagineLoading, setImagineLoading] = useState(false)
+  const [imagineError, setImagineError] = useState('')
 
   const fileRef = useRef<HTMLInputElement>(null)
   const chatBottomRef = useRef<HTMLDivElement>(null)
@@ -142,7 +148,7 @@ export default function Analyzer() {
   function saveToHistory(res: string, fname: string, m: Mode) {
     const item: HistoryItem = {
       id: Date.now().toString(),
-      fileName: fname || 'demo text',
+      fileName: fname || t.result.demoText,
       mode: m,
       result: res,
       date: new Date().toLocaleDateString('cs-CZ', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
@@ -190,6 +196,7 @@ export default function Analyzer() {
 
   const currentMode = MODES.find(m => m.id === mode)!
   const needsFile = ['summary', 'actions', 'risks', 'qa', 'rewrite', 'translate'].includes(mode)
+  const showAnalyzeBtn = ['summary', 'actions', 'risks', 'qa', 'rewrite', 'translate'].includes(mode)
 
   // ── ANALYZE ──
   async function analyze() {
@@ -310,7 +317,7 @@ export default function Analyzer() {
       if (data.error) throw new Error(data.error)
       if (data.isFinished && data.document) {
         setInterviewDoc(data.document)
-        setInterviewChat([...newChat, { role: 'ai', text: '✅ Dokument je hotov! Viz výsledek níže.' }])
+        setInterviewChat([...newChat, { role: 'ai', text: t.interview.start.includes('🚀') ? '✅ Dokument je hotov! Viz výsledek níže.' : '✅ Document ready! See result below.' }])
         saveToHistory(data.document, interviewType, mode)
       } else if (data.question) {
         setInterviewChat([...newChat, { role: 'ai', text: data.question }])
@@ -374,7 +381,7 @@ export default function Analyzer() {
                 return u
               })
             }
-          } catch { /* přeskočit poškozené SSE */ }
+          } catch { /* skip */ }
         }
       }
 
@@ -402,6 +409,31 @@ export default function Analyzer() {
     } finally {
       setChatLoading(false)
     }
+  }
+
+  // ── IMAGINE ──
+  async function generateImage() {
+    const prompt = imaginePrompt.trim()
+    if (!prompt) return
+    if (!(await spendCredits(1))) return
+
+    const style = IMAGINE_STYLES.find(s => s.id === imagineStyle)
+    const fullPrompt = `${prompt}, ${style?.suffix ?? ''}`
+    const seed = Math.floor(Math.random() * 99999)
+    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(fullPrompt)}?width=832&height=512&nologo=true&enhance=true&seed=${seed}`
+
+    setImagineLoading(true)
+    setImagineUrl('')
+    setImagineError('')
+
+    const img = new window.Image()
+    img.onload = () => { setImagineUrl(url); setImagineLoading(false) }
+    img.onerror = () => {
+      setImagineError(t.imagine.error)
+      setImagineLoading(false)
+      restoreCredits(1)
+    }
+    img.src = url
   }
 
   // ── Q&A follow-up ──
@@ -440,7 +472,7 @@ export default function Analyzer() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `docmind-${mode}-${Date.now()}.txt`
+    a.download = `docthink-${mode}-${Date.now()}.txt`
     a.click()
     URL.revokeObjectURL(url)
   }
@@ -451,6 +483,7 @@ export default function Analyzer() {
       : result
     const win = window.open('', '_blank')
     if (!win) return
+    const modeName = (t.modes as any)[mode] || mode
     win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>DocThink</title>
       <style>body{font-family:Arial,sans-serif;max-width:700px;margin:40px auto;color:#1a1a1a;line-height:1.7}
       .header{border-bottom:2px solid #7F77DD;padding-bottom:12px;margin-bottom:24px}
@@ -458,7 +491,7 @@ export default function Analyzer() {
       .meta{color:#888;font-size:13px;margin-top:4px}h4{color:#534AB7}</style>
       </head><body>
       <div class="header"><div class="logo">◆ docthink</div>
-      <div class="meta">${currentMode.label} · ${fileName || 'demo'} · ${new Date().toLocaleDateString('cs-CZ')}</div></div>
+      <div class="meta">${modeName} · ${fileName || t.result.demoText} · ${new Date().toLocaleDateString('cs-CZ')}</div></div>
       ${content}</body></html>`)
     win.document.close()
     setTimeout(() => { win.print(); win.close() }, 500)
@@ -466,7 +499,6 @@ export default function Analyzer() {
 
   const hasResult = result || (mode === 'interview' && interviewDoc)
   const showUpload = needsFile
-  const showAnalyzeBtn = ['summary', 'actions', 'risks', 'qa', 'rewrite', 'translate'].includes(mode)
 
   return (
     <div className={styles.wrap}>
@@ -474,47 +506,52 @@ export default function Analyzer() {
         <div className={styles.logo}><div className={styles.logoDot} />docthink</div>
         <div className={styles.navRight}>
           <div className={styles.credits}>
-            <span className={styles.creditsN}>{credits}</span> kredity
+            <span className={styles.creditsN}>{credits}</span> {t.nav.credits}
           </div>
-          <button className={styles.buyBtn} onClick={() => router.push('/koupit')}>Koupit kredity</button>
+          <button className={styles.buyBtn} onClick={() => router.push('/koupit')}>{t.nav.buy}</button>
           <UserButton afterSignOutUrl='/' />
         </div>
       </nav>
 
       <div className={styles.main}>
         <aside className={styles.sidebar}>
-          <div className={styles.sidebarLabel}>AI asistent</div>
+          <div className={styles.sidebarLabel}>{t.sidebar.aiAssistant}</div>
           {MODES.filter(m => m.group === 'chat').map(m => (
-            <button key={m.id} className={`${styles.modeBtn} ${mode === m.id ? styles.modeBtnActive : ''}`} onClick={() => { setMode(m.id); setResult(''); setAnswers([]) }}>
+            <button key={m.id} className={`${styles.modeBtn} ${mode === m.id ? styles.modeBtnActive : ''}`}
+              onClick={() => { setMode(m.id); setResult(''); setAnswers([]) }}>
               <span className={styles.modeIcon}>{m.icon}</span>
-              <span className={styles.modeLabelText}>{m.label}</span>
-              <span className={styles.modeCredits} style={{ color: '#5DCAA5', background: 'rgba(93,202,165,0.08)' }}>zdarma</span>
+              <span className={styles.modeLabelText}>{(t.modes as any)[m.id]}</span>
+              <span className={styles.modeCredits} style={{ color: '#5DCAA5', background: 'rgba(93,202,165,0.08)' }}>{t.sidebar.free}</span>
             </button>
           ))}
 
-          <div className={styles.sidebarLabel} style={{ marginTop: 16 }}>Analýza dokumentu</div>
+          <div className={styles.sidebarLabel} style={{ marginTop: 16 }}>{t.sidebar.docAnalysis}</div>
           {MODES.filter(m => m.group === 'analyze').map(m => (
-            <button key={m.id} className={`${styles.modeBtn} ${mode === m.id ? styles.modeBtnActive : ''}`} onClick={() => { setMode(m.id); setResult(''); setAnswers([]) }}>
+            <button key={m.id} className={`${styles.modeBtn} ${mode === m.id ? styles.modeBtnActive : ''}`}
+              onClick={() => { setMode(m.id); setResult(''); setAnswers([]) }}>
               <span className={styles.modeIcon}>{m.icon}</span>
-              <span className={styles.modeLabelText}>{m.label}</span>
+              <span className={styles.modeLabelText}>{(t.modes as any)[m.id]}</span>
               <span className={styles.modeCredits}>{m.credits}k</span>
             </button>
           ))}
 
-          <div className={styles.sidebarLabel} style={{ marginTop: 16 }}>Nástroje AI</div>
+          <div className={styles.sidebarLabel} style={{ marginTop: 16 }}>{t.sidebar.aiTools}</div>
           {MODES.filter(m => m.group === 'tools').map(m => (
-            <button key={m.id} className={`${styles.modeBtn} ${mode === m.id ? styles.modeBtnActive : ''}`} onClick={() => { setMode(m.id); setResult(''); setAnswers([]); setInterviewStarted(false) }}>
+            <button key={m.id} className={`${styles.modeBtn} ${mode === m.id ? styles.modeBtnActive : ''}`}
+              onClick={() => { setMode(m.id); setResult(''); setAnswers([]); setInterviewStarted(false); setImagineUrl(''); setImagineError('') }}>
               <span className={styles.modeIcon}>{m.icon}</span>
-              <span className={styles.modeLabelText}>{m.label}</span>
+              <span className={styles.modeLabelText}>{(t.modes as any)[m.id]}</span>
               <span className={styles.modeCredits}>{m.credits}k</span>
             </button>
           ))}
 
           {history.length > 0 && (
             <>
-              <div className={styles.sidebarLabel} style={{ marginTop: 16 }}>Historie</div>
+              <div className={styles.sidebarLabel} style={{ marginTop: 16 }}>{t.sidebar.history}</div>
               {history.map(item => (
-                <button key={item.id} className={styles.historyItem} onClick={() => { setResult(item.result); setMode(item.mode); setFileName(item.fileName); setAnswers([]) }} title={item.fileName}>
+                <button key={item.id} className={styles.historyItem}
+                  onClick={() => { setResult(item.result); setMode(item.mode); setFileName(item.fileName); setAnswers([]) }}
+                  title={item.fileName}>
                   <span className={styles.historyName}>{item.fileName}</span>
                   <span className={styles.historyMeta}>{item.date}</span>
                 </button>
@@ -524,7 +561,8 @@ export default function Analyzer() {
         </aside>
 
         <div className={styles.content}>
-          {/* CHAT */}
+
+          {/* ── CHAT ── */}
           {mode === 'chat' && (
             <div className={styles.chatWrap}>
               {chatMessages.length === 0 ? (
@@ -532,11 +570,13 @@ export default function Analyzer() {
                   <div className={styles.chatWelcomeIcon}>
                     <div className={styles.chatWelcomeDot} />
                   </div>
-                  <h2 className={styles.chatWelcomeTitle}>Jak ti mohu pomoci?</h2>
-                  <p className={styles.chatWelcomeSub}>AI Chat je zdarma — bez kreditů, kdykoli.</p>
+                  <h2 className={styles.chatWelcomeTitle}>{t.chat.welcome}</h2>
+                  <p className={styles.chatWelcomeSub}>{t.chat.sub}</p>
                   <div className={styles.chatSuggestions}>
-                    {CHAT_SUGGESTIONS.map((s, i) => (
-                      <button key={i} className={styles.chatSuggestion} style={{ animationDelay: `${i * 0.07}s` }} onClick={() => sendChatMessage(s)}>
+                    {t.chat.suggestions.map((s, i) => (
+                      <button key={i} className={styles.chatSuggestion}
+                        style={{ animationDelay: `${i * 0.07}s` }}
+                        onClick={() => sendChatMessage(s)}>
                         {s}
                       </button>
                     ))}
@@ -567,25 +607,23 @@ export default function Analyzer() {
 
               <div className={styles.chatInputWrap}>
                 {chatMessages.length > 0 && (
-                  <button className={styles.chatClearBtn} onClick={() => { setChatMessages([]); setChatHistory([]) }}>
-                    + Nový rozhovor
+                  <button className={styles.chatClearBtn}
+                    onClick={() => { setChatMessages([]); setChatHistory([]) }}>
+                    {t.chat.newChat}
                   </button>
                 )}
                 <div className={styles.chatInputRow}>
                   <input
                     className={styles.chatInput}
-                    placeholder="Napiš zprávu… (Enter pro odeslání)"
+                    placeholder={t.chat.placeholder}
                     value={chatInput}
                     onChange={e => setChatInput(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !chatLoading) { e.preventDefault(); sendChatMessage() } }}
                     disabled={chatLoading}
                     autoFocus
                   />
-                  <button
-                    className={styles.chatSendBtn}
-                    onClick={() => sendChatMessage()}
-                    disabled={chatLoading || !chatInput.trim()}
-                  >
+                  <button className={styles.chatSendBtn} onClick={() => sendChatMessage()}
+                    disabled={chatLoading || !chatInput.trim()}>
                     {chatLoading ? (
                       <div className={styles.chatSendDots}><span /><span /><span /></div>
                     ) : (
@@ -596,12 +634,12 @@ export default function Analyzer() {
                     )}
                   </button>
                 </div>
-                <p className={styles.chatHint}>DocThink AI · zdarma · bez kreditů</p>
+                <p className={styles.chatHint}>{t.chat.hint}</p>
               </div>
             </div>
           )}
 
-          {/* UPLOAD */}
+          {/* ── UPLOAD ── */}
           {showUpload && (
             <>
               <div className={`${styles.upload} ${dragging ? styles.uploadDrag : ''}`}
@@ -616,9 +654,10 @@ export default function Analyzer() {
                     <line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
                   </svg>
                 </div>
-                <div className={styles.uploadTitle}>Přetáhni nebo klikni pro nahrání</div>
-                <div className={styles.uploadSub}>PDF · Word · TXT · max 10 MB</div>
-                <input ref={fileRef} type="file" accept=".pdf,.doc,.docx,.txt" style={{ display: 'none' }} onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
+                <div className={styles.uploadTitle}>{t.upload.title}</div>
+                <div className={styles.uploadSub}>{t.upload.sub}</div>
+                <input ref={fileRef} type="file" accept=".pdf,.doc,.docx,.txt" style={{ display: 'none' }}
+                  onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
               </div>
               {fileName && (
                 <div className={styles.fileBar}>
@@ -631,78 +670,67 @@ export default function Analyzer() {
             </>
           )}
 
-          {/* REWRITE OPTIONS */}
+          {/* ── REWRITE OPTIONS ── */}
           {mode === 'rewrite' && (
             <div className={styles.optionRow}>
-              <span className={styles.optionLabel}>Styl přepisu:</span>
-              <button className={`${styles.optionBtn} ${rewriteStyle === 'formal' ? styles.optionBtnActive : ''}`} onClick={() => setRewriteStyle('formal')}>Formálnější</button>
-              <button className={`${styles.optionBtn} ${rewriteStyle === 'simple' ? styles.optionBtnActive : ''}`} onClick={() => setRewriteStyle('simple')}>Jednodušší</button>
+              <span className={styles.optionLabel}>{t.rewrite.style}</span>
+              <button className={`${styles.optionBtn} ${rewriteStyle === 'formal' ? styles.optionBtnActive : ''}`} onClick={() => setRewriteStyle('formal')}>{t.rewrite.formal}</button>
+              <button className={`${styles.optionBtn} ${rewriteStyle === 'simple' ? styles.optionBtnActive : ''}`} onClick={() => setRewriteStyle('simple')}>{t.rewrite.simple}</button>
             </div>
           )}
 
-          {/* TRANSLATE OPTIONS */}
+          {/* ── TRANSLATE OPTIONS ── */}
           {mode === 'translate' && (
             <div className={styles.optionRow}>
-              <span className={styles.optionLabel}>Přeložit do:</span>
+              <span className={styles.optionLabel}>{t.translate.to}</span>
               <select className={styles.selectInput} value={targetLang} onChange={e => setTargetLang(e.target.value)}>
                 {TRANSLATE_LANGS.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}
               </select>
             </div>
           )}
 
-          {/* TEMPLATE */}
+          {/* ── TEMPLATE ── */}
           {mode === 'template' && (
             <div className={styles.toolCard}>
-              <div className={styles.toolCardTitle}>📝 Generátor šablon <span className={styles.creditBadge}>2 kredity</span></div>
-              <p className={styles.toolCardDesc}>Popiš jaký dokument potřebuješ a AI ho vygeneruje připravený k použití.</p>
-              <textarea
-                className={styles.textareaInput}
-                placeholder="Např: Smlouva o dílo mezi OSVČ a firmou, předmět díla je vývoj webu, cena 50 000 Kč, doba plnění 2 měsíce..."
-                value={templateDesc}
-                onChange={e => setTemplateDesc(e.target.value)}
-                rows={4}
-              />
+              <div className={styles.toolCardTitle}>📝 {t.modes.template} <span className={styles.creditBadge}>2 kredity</span></div>
+              <p className={styles.toolCardDesc}>{t.template.desc}</p>
+              <textarea className={styles.textareaInput} placeholder={t.template.placeholder}
+                value={templateDesc} onChange={e => setTemplateDesc(e.target.value)} rows={4} />
               <div className={styles.optionRow}>
-                <span className={styles.optionLabel}>Jazyk dokumentu:</span>
+                <span className={styles.optionLabel}>{t.template.langLabel}</span>
                 <button className={`${styles.optionBtn} ${templateLang === 'cs' ? styles.optionBtnActive : ''}`} onClick={() => setTemplateLang('cs')}>🇨🇿 Čeština</button>
-                <button className={`${styles.optionBtn} ${templateLang === 'en' ? styles.optionBtnActive : ''}`} onClick={() => setTemplateLang('en')}>🇬🇧 Angličtina</button>
+                <button className={`${styles.optionBtn} ${templateLang === 'en' ? styles.optionBtnActive : ''}`} onClick={() => setTemplateLang('en')}>🇬🇧 English</button>
               </div>
               <button className={styles.analyzeBtn} onClick={generateTemplate} disabled={loading || !templateDesc.trim()}>
-                {loading ? <span className={styles.loadingDots}><span /><span /><span /></span> : '✨ Vygenerovat dokument'}
+                {loading ? <span className={styles.loadingDots}><span /><span /><span /></span> : t.template.generate}
               </button>
             </div>
           )}
 
-          {/* INTERVIEW */}
+          {/* ── INTERVIEW START ── */}
           {mode === 'interview' && !interviewStarted && (
             <div className={styles.toolCard}>
-              <div className={styles.toolCardTitle}>🤖 AI Tazatel <span className={styles.creditBadge}>5 kreditů</span></div>
-              <p className={styles.toolCardDesc}>AI se tě bude ptát otázkami a na základě odpovědí vytvoří kompletní dokument.</p>
-              <input
-                className={styles.textInput}
-                placeholder="Jaký dokument chceš vytvořit? Např: NDA smlouva, Pracovní smlouva, Obchodní nabídka..."
-                value={interviewType}
-                onChange={e => setInterviewType(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && startInterview()}
-              />
+              <div className={styles.toolCardTitle}>🤖 {t.modes.interview} <span className={styles.creditBadge}>5 kreditů</span></div>
+              <p className={styles.toolCardDesc}>{t.interview.desc}</p>
+              <input className={styles.textInput} placeholder={t.interview.placeholder}
+                value={interviewType} onChange={e => setInterviewType(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && startInterview()} />
               <button className={styles.analyzeBtn} onClick={startInterview} disabled={interviewLoading || !interviewType.trim()}>
-                {interviewLoading ? <span className={styles.loadingDots}><span /><span /><span /></span> : '🚀 Zahájit rozhovor'}
+                {interviewLoading ? <span className={styles.loadingDots}><span /><span /><span /></span> : t.interview.start}
               </button>
             </div>
           )}
 
-          {/* INTERVIEW CHAT */}
+          {/* ── INTERVIEW CHAT ── */}
           {mode === 'interview' && interviewStarted && (
             <div className={styles.interviewBox}>
               <div className={styles.interviewHeader}>
-                <span className={styles.resultLabel}>🤖 AI Tazatel — {interviewType}</span>
-                <button className={styles.actionBtn} onClick={() => { setInterviewStarted(false); setInterviewDoc('') }}>Nový</button>
+                <span className={styles.resultLabel}>🤖 {t.modes.interview} — {interviewType}</span>
+                <button className={styles.actionBtn} onClick={() => { setInterviewStarted(false); setInterviewDoc('') }}>{t.interview.newBtn}</button>
               </div>
               <div className={styles.chatArea}>
                 {interviewChat.map((msg, i) => (
-                  <div key={i} className={msg.role === 'ai' ? styles.chatAi : styles.chatUser}>
-                    {msg.text}
-                  </div>
+                  <div key={i} className={msg.role === 'ai' ? styles.chatAi : styles.chatUser}>{msg.text}</div>
                 ))}
                 {interviewLoading && (
                   <div className={styles.chatAi}>
@@ -712,8 +740,10 @@ export default function Analyzer() {
               </div>
               {!interviewDoc && (
                 <div className={styles.questionBar}>
-                  <input className={styles.questionInput} placeholder="Tvoje odpověď..." value={interviewInput} onChange={e => setInterviewInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendInterviewAnswer()} disabled={interviewLoading} />
-                  <button className={styles.questionBtn} onClick={sendInterviewAnswer} disabled={interviewLoading}>Odeslat →</button>
+                  <input className={styles.questionInput} placeholder={t.interview.answerPlaceholder}
+                    value={interviewInput} onChange={e => setInterviewInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && sendInterviewAnswer()} disabled={interviewLoading} />
+                  <button className={styles.questionBtn} onClick={sendInterviewAnswer} disabled={interviewLoading}>{t.interview.send}</button>
                 </div>
               )}
               {interviewDoc && (
@@ -721,9 +751,9 @@ export default function Analyzer() {
                   <div className={styles.interviewResultHeader}>
                     <span style={{ color: '#5DCAA5', fontSize: 12 }}>✅ Dokument vygenerován</span>
                     <div style={{ display: 'flex', gap: 6 }}>
-                      <button className={styles.actionBtn} onClick={copyResult}>{copied ? '✓' : 'Kopírovat'}</button>
-                      <button className={styles.actionBtn} onClick={exportTxt}>TXT</button>
-                      <button className={styles.actionBtn} onClick={exportPdf}>PDF</button>
+                      <button className={styles.actionBtn} onClick={copyResult}>{copied ? t.result.copied : t.result.copy}</button>
+                      <button className={styles.actionBtn} onClick={exportTxt}>{t.result.txt}</button>
+                      <button className={styles.actionBtn} onClick={exportPdf}>{t.result.pdf}</button>
                     </div>
                   </div>
                   <pre className={styles.interviewDoc}>{interviewDoc}</pre>
@@ -732,35 +762,80 @@ export default function Analyzer() {
             </div>
           )}
 
-          {/* ANALYZE BUTTON for non-special modes */}
+          {/* ── IMAGINE ── */}
+          {mode === 'imagine' && (
+            <div className={styles.toolCard}>
+              <div className={styles.toolCardTitle}>🎨 {t.modes.imagine} <span className={styles.creditBadge}>1 kredit</span></div>
+              <p className={styles.toolCardDesc}>{t.imagine.desc}</p>
+              <textarea className={styles.textareaInput} placeholder={t.imagine.placeholder}
+                value={imaginePrompt} onChange={e => setImaginePrompt(e.target.value)} rows={3} />
+              <div className={styles.optionRow}>
+                <span className={styles.optionLabel}>{t.imagine.styleLabel}</span>
+                {IMAGINE_STYLES.map(s => (
+                  <button key={s.id}
+                    className={`${styles.optionBtn} ${imagineStyle === s.id ? styles.optionBtnActive : ''}`}
+                    onClick={() => setImagineStyle(s.id)}>
+                    {(t.imagine.styles as any)[s.id]}
+                  </button>
+                ))}
+              </div>
+              <button className={styles.analyzeBtn} onClick={generateImage}
+                disabled={imagineLoading || !imaginePrompt.trim()}>
+                {imagineLoading
+                  ? <span className={styles.loadingDots}><span /><span /><span /></span>
+                  : t.imagine.generate}
+              </button>
+              {imagineError && <p style={{ color: '#F09595', fontSize: 13, margin: 0 }}>{imagineError}</p>}
+              {imagineLoading && (
+                <div className={styles.imagineLoading}>
+                  <div className={styles.imagineBar}><div className={styles.imagineBarFill} /></div>
+                  <p className={styles.imagineLoadingText}>{t.imagine.loading}</p>
+                </div>
+              )}
+              {imagineUrl && !imagineLoading && (
+                <div className={styles.imagineResult}>
+                  <img src={imagineUrl} alt={imaginePrompt} className={styles.imagineImg} />
+                  <div className={styles.imagineActions}>
+                    <a href={imagineUrl} target="_blank" rel="noopener noreferrer" className={styles.actionBtn}>{t.imagine.open}</a>
+                    <a href={imagineUrl} download={`docthink-${Date.now()}.jpg`} className={styles.actionBtn}>{t.imagine.download}</a>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── ANALYZE BUTTON ── */}
           {showAnalyzeBtn && (
             <button className={styles.analyzeBtn} onClick={analyze} disabled={loading}>
-              {loading ? <span className={styles.loadingDots}><span /><span /><span /></span> : (
-                <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                {currentMode.label} — {currentMode.credits} {currentMode.credits === 1 ? 'kredit' : 'kredity'}</>
-              )}
+              {loading
+                ? <span className={styles.loadingDots}><span /><span /><span /></span>
+                : (<>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  {t.analyzeBtn((t.modes as any)[mode], currentMode.credits)}
+                </>)
+              }
             </button>
           )}
 
-          {/* RESULT BOX */}
-          {(result || loading) && mode !== 'interview' && (
+          {/* ── RESULT BOX ── */}
+          {(result || loading) && mode !== 'interview' && mode !== 'imagine' && (
             <div className={styles.resultBox}>
               <div className={styles.resultHeader}>
-                <span className={styles.resultLabel}>{currentMode.label}</span>
+                <span className={styles.resultLabel}>{(t.modes as any)[mode]}</span>
                 <div className={styles.resultActions}>
                   {result && !loading && (
                     <>
-                      <button className={styles.actionBtn} onClick={copyResult}>{copied ? '✓ Zkopírováno' : 'Kopírovat'}</button>
-                      <button className={styles.actionBtn} onClick={exportTxt}>TXT</button>
-                      <button className={styles.actionBtn} onClick={exportPdf}>PDF</button>
+                      <button className={styles.actionBtn} onClick={copyResult}>{copied ? t.result.copied : t.result.copy}</button>
+                      <button className={styles.actionBtn} onClick={exportTxt}>{t.result.txt}</button>
+                      <button className={styles.actionBtn} onClick={exportPdf}>{t.result.pdf}</button>
                     </>
                   )}
-                  <span className={styles.resultMeta}>{fileName || 'demo text'}</span>
+                  <span className={styles.resultMeta}>{fileName || t.result.demoText}</span>
                 </div>
               </div>
               <div className={styles.resultBody}>
                 {loading ? (
-                  <div className={styles.loadingRow}><div className={styles.dot} /><div className={styles.dot} /><div className={styles.dot} /><span>Zpracovávám...</span></div>
+                  <div className={styles.loadingRow}><div className={styles.dot} /><div className={styles.dot} /><div className={styles.dot} /><span>{t.result.processing}</span></div>
                 ) : mode === 'rewrite' || mode === 'translate' || mode === 'template' ? (
                   <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontSize: 13, lineHeight: 1.8, color: '#c8c4e8' }}>{result}</pre>
                 ) : (
@@ -769,14 +844,18 @@ export default function Analyzer() {
                 {answers.map((a, i) => (
                   <div key={i} className={styles.answerCard}>
                     <p className={styles.answerQ}>{a.q}</p>
-                    <p className={styles.answerA}>{a.a === '...' ? <span style={{ color: '#555' }}>načítám...</span> : a.a}</p>
+                    <p className={styles.answerA}>{a.a === '...' ? <span style={{ color: '#555' }}>{t.result.loading ?? 'načítám…'}</span> : a.a}</p>
                   </div>
                 ))}
               </div>
               {result && !loading && ['summary', 'actions', 'risks', 'qa'].includes(mode) && (
                 <div className={styles.questionBar}>
-                  <input className={styles.questionInput} placeholder="Zeptej se na cokoliv v dokumentu..." value={question} onChange={e => setQuestion(e.target.value)} onKeyDown={e => e.key === 'Enter' && !qLoading && askQuestion()} disabled={qLoading} />
-                  <button className={styles.questionBtn} onClick={askQuestion} disabled={qLoading}>{qLoading ? '...' : 'Zeptat se →'}</button>
+                  <input className={styles.questionInput} placeholder={t.result.ask}
+                    value={question} onChange={e => setQuestion(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && !qLoading && askQuestion()} disabled={qLoading} />
+                  <button className={styles.questionBtn} onClick={askQuestion} disabled={qLoading}>
+                    {qLoading ? '...' : t.result.askBtn}
+                  </button>
                 </div>
               )}
             </div>
