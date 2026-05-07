@@ -141,7 +141,7 @@ export const T = {
   de: {
     nav: { credits: 'Credits', buy: 'Credits kaufen' },
     sidebar: { aiAssistant: 'KI-Assistent', docAnalysis: 'Dokumentenanalyse', aiTools: 'KI-Tools', history: 'Verlauf', free: 'kostenlos' },
-    modes: { chat: 'KI-Chat', summary: 'Zusammenfassung', actions: 'Aktionspunkte', risks: 'Risiken', qa: 'Q & A', deadlines: 'Termine', rewrite: 'Umschreiben', translate: 'Übersetzer', template: 'Vorlagen-Gen.', interview: 'KI-Interviewer', codegen: 'Code-Generator', email: 'E-Mail-Generator', batch: 'Stapelanalyse' },
+    modes: { chat: 'KI-Chat', summary: 'Zusammenfassung', actions: 'Aktionspunkte', risks: 'Risiken', qa: 'Q & A', deadlines: 'Termine', rewrite: 'Umschreiben', translate: 'Übersetzer', template: 'Vorlagen-Gen.', interview: 'KI-Interviewer', codegen: 'Code-Generator', email: 'E-Mail-Generator', batch: 'Stapelanalyse', finance: 'Finanzanalyst' },
     chat: {
       welcome: 'Wie kann ich helfen?',
       sub: 'KI-Chat — 1 Credit pro 5 KI-Antworten',
@@ -264,7 +264,7 @@ export const T = {
   fr: {
     nav: { credits: 'crédits', buy: 'Acheter des crédits' },
     sidebar: { aiAssistant: 'Assistant IA', docAnalysis: 'Analyse de document', aiTools: 'Outils IA', history: 'Historique', free: 'gratuit' },
-    modes: { chat: 'Chat IA', summary: 'Résumé', actions: 'Actions', risks: 'Risques', qa: 'Q & R', deadlines: 'Délais', rewrite: 'Réécriture', translate: 'Traducteur', template: 'Générateur', interview: 'Entretien IA', codegen: 'Gén. code', email: 'Gén. e-mail', batch: 'Analyse en lot' },
+    modes: { chat: 'Chat IA', summary: 'Résumé', actions: 'Actions', risks: 'Risques', qa: 'Q & R', deadlines: 'Délais', rewrite: 'Réécriture', translate: 'Traducteur', template: 'Générateur', interview: 'Entretien IA', codegen: 'Gén. code', email: 'Gén. e-mail', batch: 'Analyse en lot', finance: 'Analyste financier' },
     chat: {
       welcome: 'Comment puis-je vous aider ?',
       sub: 'Chat IA — 1 crédit par 5 réponses IA',
@@ -325,7 +325,7 @@ export const T = {
   es: {
     nav: { credits: 'créditos', buy: 'Comprar créditos' },
     sidebar: { aiAssistant: 'Asistente IA', docAnalysis: 'Análisis de documento', aiTools: 'Herramientas IA', history: 'Historial', free: 'gratis' },
-    modes: { chat: 'Chat IA', summary: 'Resumen', actions: 'Acciones', risks: 'Riesgos', qa: 'P & R', deadlines: 'Plazos', rewrite: 'Reescritor', translate: 'Traductor', template: 'Generador', interview: 'Entrevista IA', codegen: 'Gen. código', email: 'Gen. email', batch: 'Análisis masivo' },
+    modes: { chat: 'Chat IA', summary: 'Resumen', actions: 'Acciones', risks: 'Riesgos', qa: 'P & R', deadlines: 'Plazos', rewrite: 'Reescritor', translate: 'Traductor', template: 'Generador', interview: 'Entrevista IA', codegen: 'Gen. código', email: 'Gen. email', batch: 'Análisis masivo', finance: 'Analista financiero' },
     chat: {
       welcome: '¿Cómo puedo ayudarte?',
       sub: 'Chat IA — 1 crédito por cada 5 respuestas IA',
@@ -386,7 +386,7 @@ export const T = {
   it: {
     nav: { credits: 'crediti', buy: 'Acquista crediti' },
     sidebar: { aiAssistant: 'Assistente IA', docAnalysis: 'Analisi documento', aiTools: 'Strumenti IA', history: 'Cronologia', free: 'gratis' },
-    modes: { chat: 'Chat IA', summary: 'Riepilogo', actions: 'Azioni', risks: 'Rischi', qa: 'D & R', deadlines: 'Scadenze', rewrite: 'Riscrittura', translate: 'Traduttore', template: 'Generatore', interview: 'Intervista IA', codegen: 'Gen. codice', email: 'Gen. email', batch: 'Analisi batch' },
+    modes: { chat: 'Chat IA', summary: 'Riepilogo', actions: 'Azioni', risks: 'Rischi', qa: 'D & R', deadlines: 'Scadenze', rewrite: 'Riscrittura', translate: 'Traduttore', template: 'Generatore', interview: 'Intervista IA', codegen: 'Gen. codice', email: 'Gen. email', batch: 'Analisi batch', finance: 'Analista finanziario' },
     chat: {
       welcome: 'Come posso aiutarti?',
       sub: 'Chat IA — 1 credito ogni 5 risposte IA',
@@ -447,7 +447,7 @@ export const T = {
   pl: {
     nav: { credits: 'kredyty', buy: 'Kup kredyty' },
     sidebar: { aiAssistant: 'Asystent AI', docAnalysis: 'Analiza dokumentu', aiTools: 'Narzędzia AI', history: 'Historia', free: 'za darmo' },
-    modes: { chat: 'Chat AI', summary: 'Podsumowanie', actions: 'Zadania', risks: 'Ryzyka', qa: 'P & O', deadlines: 'Terminy', rewrite: 'Przepisywanie', translate: 'Tłumacz', template: 'Generator szabl.', interview: 'Wywiad AI', codegen: 'Gen. kodu', email: 'Gen. emaila', batch: 'Analiza wsadowa' },
+    modes: { chat: 'Chat AI', summary: 'Podsumowanie', actions: 'Zadania', risks: 'Ryzyka', qa: 'P & O', deadlines: 'Terminy', rewrite: 'Przepisywanie', translate: 'Tłumacz', template: 'Generator szabl.', interview: 'Wywiad AI', codegen: 'Gen. kodu', email: 'Gen. emaila', batch: 'Analiza wsadowa', finance: 'Analityk finansowy' },
     chat: {
       welcome: 'Jak mogę pomóc?',
       sub: 'Chat AI — 1 kredyt za każde 5 odpowiedzi AI',
@@ -509,7 +509,7 @@ export const T = {
   nl: {
     nav: { credits: 'credits', buy: 'Credits kopen' },
     sidebar: { aiAssistant: 'AI-assistent', docAnalysis: 'Documentanalyse', aiTools: 'AI-tools', history: 'Geschiedenis', free: 'gratis' },
-    modes: { chat: 'AI-chat', summary: 'Samenvatting', actions: 'Actiepunten', risks: "Risico's", qa: 'V & A', deadlines: 'Deadlines', rewrite: 'Herschrijven', translate: 'Vertaler', template: 'Sjabloongenerator', interview: 'AI-interview', codegen: 'Codegenerator', email: 'E-mailgenerator', batch: 'Batch-analyse' },
+    modes: { chat: 'AI-chat', summary: 'Samenvatting', actions: 'Actiepunten', risks: "Risico's", qa: 'V & A', deadlines: 'Deadlines', rewrite: 'Herschrijven', translate: 'Vertaler', template: 'Sjabloongenerator', interview: 'AI-interview', codegen: 'Codegenerator', email: 'E-mailgenerator', batch: 'Batch-analyse', finance: 'Financieel analist' },
     chat: {
       welcome: 'Hoe kan ik u helpen?',
       sub: 'AI-chat — 1 credit per 5 AI-antwoorden',
@@ -570,7 +570,7 @@ export const T = {
   pt: {
     nav: { credits: 'créditos', buy: 'Comprar créditos' },
     sidebar: { aiAssistant: 'Assistente IA', docAnalysis: 'Análise de documento', aiTools: 'Ferramentas IA', history: 'Histórico', free: 'grátis' },
-    modes: { chat: 'Chat IA', summary: 'Resumo', actions: 'Ações', risks: 'Riscos', qa: 'P & R', deadlines: 'Prazos', rewrite: 'Reescrita', translate: 'Tradutor', template: 'Gerador', interview: 'Entrevista IA', codegen: 'Gen. código', email: 'Gen. email', batch: 'Análise em lote' },
+    modes: { chat: 'Chat IA', summary: 'Resumo', actions: 'Ações', risks: 'Riscos', qa: 'P & R', deadlines: 'Prazos', rewrite: 'Reescrita', translate: 'Tradutor', template: 'Gerador', interview: 'Entrevista IA', codegen: 'Gen. código', email: 'Gen. email', batch: 'Análise em lote', finance: 'Analista financeiro' },
     chat: {
       welcome: 'Como posso ajudar?',
       sub: 'Chat IA — 1 crédito por cada 5 respostas IA',
