@@ -4,7 +4,7 @@ export const T = {
   cs: {
     nav: { credits: 'kredity', buy: 'Koupit kredity' },
     sidebar: { aiAssistant: 'AI asistent', docAnalysis: 'Analýza dokumentu', aiTools: 'Nástroje AI', history: 'Historie', free: 'zdarma' },
-    modes: { chat: 'AI Chat', summary: 'Shrnutí', actions: 'Akční body', risks: 'Rizika', qa: 'Q & A', rewrite: 'Přepisovač', translate: 'Překladač', template: 'Generátor šablon', interview: 'AI Tazatel', imagine: 'AI Obrázky' },
+    modes: { chat: 'AI Chat', summary: 'Shrnutí', actions: 'Akční body', risks: 'Rizika', qa: 'Q & A', deadlines: 'Termíny', rewrite: 'Přepisovač', translate: 'Překladač', template: 'Generátor šablon', interview: 'AI Tazatel', imagine: 'AI Obrázky', email: 'Emailový generátor' },
     chat: {
       welcome: 'Jak ti mohu pomoci?',
       sub: 'AI Chat je zdarma — bez kreditů, kdykoli.',
@@ -29,6 +29,17 @@ export const T = {
       loading: 'Generuji obrázek… může trvat 15–30 sekund',
       error: 'Nepodařilo se vygenerovat obrázek. Zkus znovu.',
       styles: { realistic: 'Realistický', artistic: 'Umělecký', illustration: 'Ilustrace', cinematic: 'Filmový', minimal: 'Minimální' },
+    },
+    inputMode: { file: '📎 Soubor', text: '✏️ Vložit text', placeholder: 'Vlož nebo napiš text, který chceš analyzovat…', chars: 'znaků', clear: 'Vymazat' },
+    email: {
+      desc: 'Nahraj nebo vlož dokument a AI napíše profesionální email na jeho základě.',
+      typeLabel: 'Typ emailu:',
+      types: { followup: 'Follow-up po meetingu', response: 'Odpověď na stížnost', proposal: 'Obchodní nabídka', reminder: 'Připomínka deadline', request: 'Žádost o podklady' },
+      recipientPlaceholder: 'Jméno nebo firma příjemce (volitelné)',
+      toneLabel: 'Tón:',
+      formal: 'Formální', friendly: 'Přátelský',
+      langLabel: 'Jazyk emailu:',
+      generate: '📧 Vygenerovat email',
     },
     rewrite: { style: 'Styl přepisu:', formal: 'Formálnější', simple: 'Jednodušší' },
     translate: { to: 'Přeložit do:' },
@@ -55,7 +66,7 @@ export const T = {
   en: {
     nav: { credits: 'credits', buy: 'Buy credits' },
     sidebar: { aiAssistant: 'AI assistant', docAnalysis: 'Document analysis', aiTools: 'AI tools', history: 'History', free: 'free' },
-    modes: { chat: 'AI Chat', summary: 'Summary', actions: 'Action items', risks: 'Risks', qa: 'Q & A', rewrite: 'Rewriter', translate: 'Translator', template: 'Template gen.', interview: 'AI Interviewer', imagine: 'AI Images' },
+    modes: { chat: 'AI Chat', summary: 'Summary', actions: 'Action items', risks: 'Risks', qa: 'Q & A', deadlines: 'Deadlines', rewrite: 'Rewriter', translate: 'Translator', template: 'Template gen.', interview: 'AI Interviewer', imagine: 'AI Images', email: 'Email generator' },
     chat: {
       welcome: 'How can I help you?',
       sub: 'AI Chat is free — no credits needed, anytime.',
@@ -80,6 +91,17 @@ export const T = {
       loading: 'Generating image… may take 15–30 seconds',
       error: 'Failed to generate image. Please try again.',
       styles: { realistic: 'Realistic', artistic: 'Artistic', illustration: 'Illustration', cinematic: 'Cinematic', minimal: 'Minimal' },
+    },
+    inputMode: { file: '📎 File', text: '✏️ Paste text', placeholder: 'Paste or type the text you want to analyze…', chars: 'characters', clear: 'Clear' },
+    email: {
+      desc: 'Upload or paste a document and AI will write a professional email based on it.',
+      typeLabel: 'Email type:',
+      types: { followup: 'Meeting follow-up', response: 'Complaint response', proposal: 'Business proposal', reminder: 'Deadline reminder', request: 'Information request' },
+      recipientPlaceholder: 'Recipient name or company (optional)',
+      toneLabel: 'Tone:',
+      formal: 'Formal', friendly: 'Friendly',
+      langLabel: 'Email language:',
+      generate: '📧 Generate email',
     },
     rewrite: { style: 'Rewrite style:', formal: 'More formal', simple: 'Simpler' },
     translate: { to: 'Translate to:' },
@@ -106,7 +128,7 @@ export const T = {
   de: {
     nav: { credits: 'Credits', buy: 'Credits kaufen' },
     sidebar: { aiAssistant: 'KI-Assistent', docAnalysis: 'Dokumentenanalyse', aiTools: 'KI-Tools', history: 'Verlauf', free: 'kostenlos' },
-    modes: { chat: 'KI-Chat', summary: 'Zusammenfassung', actions: 'Aktionspunkte', risks: 'Risiken', qa: 'Q & A', rewrite: 'Umschreiben', translate: 'Übersetzer', template: 'Vorlagen-Gen.', interview: 'KI-Interviewer', imagine: 'KI-Bilder' },
+    modes: { chat: 'KI-Chat', summary: 'Zusammenfassung', actions: 'Aktionspunkte', risks: 'Risiken', qa: 'Q & A', deadlines: 'Termine', rewrite: 'Umschreiben', translate: 'Übersetzer', template: 'Vorlagen-Gen.', interview: 'KI-Interviewer', imagine: 'KI-Bilder', email: 'E-Mail-Generator' },
     chat: {
       welcome: 'Wie kann ich helfen?',
       sub: 'KI-Chat ist kostenlos — jederzeit, ohne Credits.',
@@ -132,6 +154,17 @@ export const T = {
       error: 'Bild konnte nicht generiert werden. Bitte erneut versuchen.',
       styles: { realistic: 'Realistisch', artistic: 'Künstlerisch', illustration: 'Illustration', cinematic: 'Kinematografisch', minimal: 'Minimal' },
     },
+    inputMode: { file: '📎 Datei', text: '✏️ Text einfügen', placeholder: 'Text zum Analysieren einfügen oder eingeben…', chars: 'Zeichen', clear: 'Löschen' },
+    email: {
+      desc: 'Lade ein Dokument hoch und KI schreibt eine professionelle E-Mail darauf basierend.',
+      typeLabel: 'E-Mail-Typ:',
+      types: { followup: 'Meeting-Nachbereitung', response: 'Antwort auf Beschwerde', proposal: 'Geschäftsangebot', reminder: 'Deadline-Erinnerung', request: 'Informationsanfrage' },
+      recipientPlaceholder: 'Empfänger Name oder Firma (optional)',
+      toneLabel: 'Ton:',
+      formal: 'Formell', friendly: 'Freundlich',
+      langLabel: 'E-Mail-Sprache:',
+      generate: '📧 E-Mail generieren',
+    },
     rewrite: { style: 'Umschreibstil:', formal: 'Formeller', simple: 'Einfacher' },
     translate: { to: 'Übersetzen nach:' },
     template: {
@@ -156,7 +189,7 @@ export const T = {
   sk: {
     nav: { credits: 'kredity', buy: 'Kúpiť kredity' },
     sidebar: { aiAssistant: 'AI asistent', docAnalysis: 'Analýza dokumentov', aiTools: 'AI nástroje', history: 'História', free: 'zadarmo' },
-    modes: { chat: 'AI Chat', summary: 'Zhrnutie', actions: 'Akčné body', risks: 'Riziká', qa: 'Q & A', rewrite: 'Prepisovač', translate: 'Prekladač', template: 'Generátor šablón', interview: 'AI Spytovateľ', imagine: 'AI Obrázky' },
+    modes: { chat: 'AI Chat', summary: 'Zhrnutie', actions: 'Akčné body', risks: 'Riziká', qa: 'Q & A', deadlines: 'Termíny', rewrite: 'Prepisovač', translate: 'Prekladač', template: 'Generátor šablón', interview: 'AI Spytovateľ', imagine: 'AI Obrázky', email: 'Emailový generátor' },
     chat: {
       welcome: 'Ako ti môžem pomôcť?',
       sub: 'AI Chat je zadarmo — bez kreditov, kedykoľvek.',
@@ -181,6 +214,17 @@ export const T = {
       loading: 'Generujem obrázok… môže trvať 15–30 sekúnd',
       error: 'Nepodarilo sa vygenerovať obrázok. Skús znovu.',
       styles: { realistic: 'Realistický', artistic: 'Umelecký', illustration: 'Ilustrácia', cinematic: 'Filmový', minimal: 'Minimálny' },
+    },
+    inputMode: { file: '📎 Súbor', text: '✏️ Vložiť text', placeholder: 'Vlož alebo napíš text, ktorý chceš analyzovať…', chars: 'znakov', clear: 'Vymazať' },
+    email: {
+      desc: 'Nahraj alebo vlož dokument a AI napíše profesionálny email na jeho základe.',
+      typeLabel: 'Typ emailu:',
+      types: { followup: 'Follow-up po meetingu', response: 'Odpoveď na sťažnosť', proposal: 'Obchodná ponuka', reminder: 'Pripomienka deadline', request: 'Žiadosť o podklady' },
+      recipientPlaceholder: 'Meno alebo firma príjemcu (voliteľné)',
+      toneLabel: 'Tón:',
+      formal: 'Formálny', friendly: 'Priateľský',
+      langLabel: 'Jazyk emailu:',
+      generate: '📧 Vygenerovať email',
     },
     rewrite: { style: 'Štýl prepisu:', formal: 'Formálnejší', simple: 'Jednoduchší' },
     translate: { to: 'Preložiť do:' },

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-type Mode = 'summary' | 'actions' | 'risks' | 'qa'
+type Mode = 'summary' | 'actions' | 'risks' | 'qa' | 'deadlines'
 
 const PROMPTS: Record<Mode, string> = {
   summary: `Analyzuj dokument a vrať strukturované shrnutí v češtině jako HTML.
@@ -25,6 +25,28 @@ Formát: <div style="margin-bottom:16px;padding:12px;background:#13111f;border-r
 <p style="font-size:12px;color:#7F77DD;margin:0 0 6px;font-weight:500">Otázka?</p>
 <p style="font-size:13px;color:#c8c4e8;margin:0;line-height:1.7">Odpověď...</p></div>
 Česky. Vrať POUZE HTML fragmenty, žádný markdown.`,
+
+  deadlines: `Extrahuj VŠECHNA data, termíny, deadliny a časové závazky z dokumentu. Vrať jako HTML tabulku.
+Hlavička tabulky:
+<table style="width:100%;border-collapse:collapse;font-size:13px">
+<thead><tr>
+<th style="text-align:left;padding:8px 12px;border-bottom:0.5px solid #2a2640;color:#AFA9EC;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.06em">Datum / Termín</th>
+<th style="text-align:left;padding:8px 12px;border-bottom:0.5px solid #2a2640;color:#AFA9EC;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.06em">Popis</th>
+<th style="text-align:left;padding:8px 12px;border-bottom:0.5px solid #2a2640;color:#AFA9EC;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.06em">Odpovědná osoba</th>
+<th style="text-align:left;padding:8px 12px;border-bottom:0.5px solid #2a2640;color:#AFA9EC;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.06em">Priorita</th>
+</tr></thead>
+<tbody>
+[řádky ve formátu:]
+<tr style="border-bottom:0.5px solid #1a1730">
+<td style="padding:9px 12px;color:#c8c4e8;white-space:nowrap">DD.MM.YYYY nebo popis</td>
+<td style="padding:9px 12px;color:#c8c4e8">popis termínu nebo úkolu</td>
+<td style="padding:9px 12px;color:#888">jméno nebo — pokud není</td>
+<td style="padding:9px 12px"><span style="padding:2px 8px;border-radius:10px;font-size:11px;background:#2e1a1a;color:#F09595">vysoká</span></td>
+</tr>
+</tbody></table>
+Priorita: vysoká (červená #F09595 / bg #2e1a1a), střední (žlutá #F5C842 / bg #2e2a1a), nízká (zelená #5DCAA5 / bg #1a2e1a).
+Pokud žádné termíny nenajdeš, vrať: <p style="color:#666;font-size:13px">V dokumentu nebyly nalezeny žádné konkrétní termíny nebo deadliny.</p>
+Česky. Vrať POUZE HTML, žádný markdown.`,
 }
 
 const TIMEOUT_MS = 30_000

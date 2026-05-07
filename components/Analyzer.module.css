@@ -498,6 +498,60 @@
   to { opacity: 1; transform: translateX(0); }
 }
 
+/* INPUT MODE TOGGLE */
+.inputModeToggle {
+  display: flex;
+  gap: 6px;
+  background: rgba(13, 11, 24, 0.8);
+  border: 0.5px solid rgba(127, 119, 221, 0.12);
+  border-radius: 10px;
+  padding: 4px;
+  width: fit-content;
+}
+.inputModeBtn {
+  font-size: 12px; font-family: inherit;
+  background: none; border: none;
+  border-radius: 7px; padding: 6px 14px; color: #444060;
+  cursor: pointer; transition: all 0.18s;
+}
+.inputModeBtn:hover { color: #c8c4e8; }
+.inputModeBtnActive {
+  background: rgba(127, 119, 221, 0.15) !important;
+  color: #AFA9EC !important;
+}
+
+/* PASTE WRAP */
+.pasteWrap {
+  display: flex; flex-direction: column; gap: 0;
+  border: 0.5px solid rgba(127, 119, 221, 0.18);
+  border-radius: 12px; overflow: hidden;
+  background: rgba(13, 11, 24, 0.7);
+  animation: slideInDown 0.25s ease;
+}
+.pasteTextarea {
+  background: transparent; border: none; outline: none;
+  padding: 16px; font-family: inherit; font-size: 13px;
+  color: #c8c4e8; line-height: 1.75; resize: none;
+  width: 100%; box-sizing: border-box;
+  transition: background 0.18s;
+}
+.pasteTextarea::placeholder { color: #2e2b42; }
+.pasteTextarea:focus { background: rgba(127, 119, 221, 0.03); }
+.pasteBar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 14px;
+  border-top: 0.5px solid rgba(127, 119, 221, 0.08);
+  background: rgba(9, 9, 14, 0.6);
+}
+.pasteChars { font-size: 11px; color: #2e2b42; }
+.pasteClear {
+  font-size: 11px; font-family: inherit;
+  background: none; border: 0.5px solid rgba(127, 119, 221, 0.12);
+  border-radius: 6px; padding: 3px 10px; color: #444060;
+  cursor: pointer; transition: all 0.15s;
+}
+.pasteClear:hover { border-color: rgba(127, 119, 221, 0.35); color: #9d97d8; }
+
 /* ═══════════════════════════════════════
    MOBILE — kompletní redesign
    ═══════════════════════════════════════ */

@@ -6,7 +6,7 @@ import { UserButton, useUser } from '@clerk/nextjs'
 import { useLanguage } from '@/contexts/LanguageContext'
 import styles from './Analyzer.module.css'
 
-type Mode = 'chat' | 'summary' | 'actions' | 'risks' | 'qa' | 'rewrite' | 'translate' | 'template' | 'interview' | 'imagine'
+type Mode = 'chat' | 'summary' | 'actions' | 'risks' | 'qa' | 'deadlines' | 'rewrite' | 'translate' | 'template' | 'interview' | 'imagine' | 'email'
 
 interface HistoryItem {
   id: string
@@ -25,9 +25,11 @@ const MODES: { id: Mode; icon: string; credits: number; group: 'chat' | 'analyze
   { id: 'actions',   icon: '✅', credits: 1, group: 'analyze' },
   { id: 'risks',     icon: '⚠️', credits: 1, group: 'analyze' },
   { id: 'qa',        icon: '💬', credits: 1, group: 'analyze' },
+  { id: 'deadlines', icon: '📅', credits: 1, group: 'analyze' },
   { id: 'rewrite',   icon: '✍️', credits: 2, group: 'tools'   },
   { id: 'translate', icon: '🌍', credits: 2, group: 'tools'   },
   { id: 'template',  icon: '📝', credits: 2, group: 'tools'   },
+  { id: 'email',     icon: '📧', credits: 2, group: 'tools'   },
   { id: 'interview', icon: '🤖', credits: 5, group: 'tools'   },
   { id: 'imagine',   icon: '🎨', credits: 1, group: 'tools'   },
 ]
@@ -97,6 +99,15 @@ export default function Analyzer() {
   const [chatHistory, setChatHistory] = useState<{ role: string; content: string }[]>([])
   const [chatInput, setChatInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
+
+  // Input mode (file / paste text)
+  const [inputMode, setInputMode] = useState<'file' | 'text'>('file')
+
+  // Email
+  const [emailType, setEmailType] = useState('followup')
+  const [emailRecipient, setEmailRecipient] = useState('')
+  const [emailTone, setEmailTone] = useState<'formal' | 'friendly'>('formal')
+  const [emailLang, setEmailLang] = useState('cs')
 
   // Imagine
   const [imaginePrompt, setImaginePrompt] = useState('')
@@ -195,8 +206,8 @@ export default function Analyzer() {
   }
 
   const currentMode = MODES.find(m => m.id === mode)!
-  const needsFile = ['summary', 'actions', 'risks', 'qa', 'rewrite', 'translate'].includes(mode)
-  const showAnalyzeBtn = ['summary', 'actions', 'risks', 'qa', 'rewrite', 'translate'].includes(mode)
+  const needsFile = ['summary', 'actions', 'risks', 'qa', 'deadlines', 'rewrite', 'translate', 'email'].includes(mode)
+  const showAnalyzeBtn = ['summary', 'actions', 'risks', 'qa', 'deadlines', 'rewrite', 'translate'].includes(mode)
 
   // ── ANALYZE ──
   async function analyze() {
@@ -408,6 +419,32 @@ export default function Analyzer() {
       })
     } finally {
       setChatLoading(false)
+    }
+  }
+
+  // ── EMAIL ──
+  async function generateEmail() {
+    const content = fileContent || DEMO_TEXT
+    const cost = currentMode.credits
+    if (!(await spendCredits(cost))) return
+    setLoading(true)
+    setResult('')
+    try {
+      const res = await fetch('/api/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content, emailType, recipient: emailRecipient, tone: emailTone, language: emailLang }),
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      setResult(data.result)
+      saveToHistory(data.result, fileName || t.result.demoText, mode)
+    } catch (err: any) {
+      const msg = err instanceof Error ? err.message : 'Chyba. Zkus znovu.'
+      setResult(`<p style="color:#F09595;font-size:13px">${msg}</p>`)
+      restoreCredits(cost)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -639,8 +676,18 @@ export default function Analyzer() {
             </div>
           )}
 
-          {/* ── UPLOAD ── */}
+          {/* ── INPUT MODE TOGGLE ── */}
           {showUpload && (
+            <div className={styles.inputModeToggle}>
+              <button className={`${styles.inputModeBtn} ${inputMode === 'file' ? styles.inputModeBtnActive : ''}`}
+                onClick={() => setInputMode('file')}>{t.inputMode.file}</button>
+              <button className={`${styles.inputModeBtn} ${inputMode === 'text' ? styles.inputModeBtnActive : ''}`}
+                onClick={() => setInputMode('text')}>{t.inputMode.text}</button>
+            </div>
+          )}
+
+          {/* ── UPLOAD ── */}
+          {showUpload && inputMode === 'file' && (
             <>
               <div className={`${styles.upload} ${dragging ? styles.uploadDrag : ''}`}
                 onClick={() => fileRef.current?.click()}
@@ -668,6 +715,68 @@ export default function Analyzer() {
                 </div>
               )}
             </>
+          )}
+
+          {/* ── PASTE TEXT ── */}
+          {showUpload && inputMode === 'text' && (
+            <div className={styles.pasteWrap}>
+              <textarea
+                className={styles.pasteTextarea}
+                placeholder={t.inputMode.placeholder}
+                value={fileContent}
+                onChange={e => { setFileContent(e.target.value); setFileName(e.target.value ? 'Vložený text' : '') }}
+                rows={9}
+              />
+              {fileContent && (
+                <div className={styles.pasteBar}>
+                  <span className={styles.pasteChars}>{fileContent.length} {t.inputMode.chars}</span>
+                  <button className={styles.pasteClear} onClick={() => { setFileContent(''); setFileName('') }}>{t.inputMode.clear}</button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── EMAIL OPTIONS ── */}
+          {mode === 'email' && (
+            <div className={styles.toolCard}>
+              <div className={styles.toolCardTitle}>📧 {t.modes.email} <span className={styles.creditBadge}>2 kredity</span></div>
+              <p className={styles.toolCardDesc}>{t.email.desc}</p>
+              <div className={styles.optionRow}>
+                <span className={styles.optionLabel}>{t.email.typeLabel}</span>
+                {Object.entries(t.email.types).map(([key, label]) => (
+                  <button key={key}
+                    className={`${styles.optionBtn} ${emailType === key ? styles.optionBtnActive : ''}`}
+                    onClick={() => setEmailType(key)}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <input className={styles.textInput}
+                placeholder={t.email.recipientPlaceholder}
+                value={emailRecipient}
+                onChange={e => setEmailRecipient(e.target.value)} />
+              <div className={styles.optionRow}>
+                <span className={styles.optionLabel}>{t.email.toneLabel}</span>
+                <button className={`${styles.optionBtn} ${emailTone === 'formal' ? styles.optionBtnActive : ''}`}
+                  onClick={() => setEmailTone('formal')}>{t.email.formal}</button>
+                <button className={`${styles.optionBtn} ${emailTone === 'friendly' ? styles.optionBtnActive : ''}`}
+                  onClick={() => setEmailTone('friendly')}>{t.email.friendly}</button>
+              </div>
+              <div className={styles.optionRow}>
+                <span className={styles.optionLabel}>{t.email.langLabel}</span>
+                <button className={`${styles.optionBtn} ${emailLang === 'cs' ? styles.optionBtnActive : ''}`}
+                  onClick={() => setEmailLang('cs')}>🇨🇿 Čeština</button>
+                <button className={`${styles.optionBtn} ${emailLang === 'en' ? styles.optionBtnActive : ''}`}
+                  onClick={() => setEmailLang('en')}>🇬🇧 English</button>
+                <button className={`${styles.optionBtn} ${emailLang === 'de' ? styles.optionBtnActive : ''}`}
+                  onClick={() => setEmailLang('de')}>🇩🇪 Deutsch</button>
+              </div>
+              <button className={styles.analyzeBtn} onClick={generateEmail} disabled={loading}>
+                {loading
+                  ? <span className={styles.loadingDots}><span /><span /><span /></span>
+                  : t.email.generate}
+              </button>
+            </div>
           )}
 
           {/* ── REWRITE OPTIONS ── */}
@@ -836,7 +945,7 @@ export default function Analyzer() {
               <div className={styles.resultBody}>
                 {loading ? (
                   <div className={styles.loadingRow}><div className={styles.dot} /><div className={styles.dot} /><div className={styles.dot} /><span>{t.result.processing}</span></div>
-                ) : mode === 'rewrite' || mode === 'translate' || mode === 'template' ? (
+                ) : mode === 'rewrite' || mode === 'translate' || mode === 'template' || mode === 'email' ? (
                   <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontSize: 13, lineHeight: 1.8, color: '#c8c4e8' }}>{result}</pre>
                 ) : (
                   <div dangerouslySetInnerHTML={{ __html: result }} />
