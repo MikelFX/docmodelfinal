@@ -134,26 +134,33 @@ export default function Analyzer() {
   }, [chatMessages])
 
   async function spendCredits(cost: number): Promise<boolean> {
+    if (cost === 0) return true
     if (credits < cost) { router.push('/koupit'); return false }
-    const res = await fetch('/api/credits', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'spend', amount: cost }),
-    })
-    const data = await res.json()
-    if (data.error) { router.push('/koupit'); return false }
-    setCredits(data.credits)
+    setCredits(prev => prev - cost)
+    try {
+      const res = await fetch('/api/credits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'spend', amount: cost }),
+      })
+      const data = await res.json()
+      if (data.credits !== undefined) setCredits(data.credits)
+    } catch { /* KV unreachable – local state already decremented */ }
     return true
   }
 
   async function restoreCredits(cost: number) {
-    const res = await fetch('/api/credits', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'add', amount: cost }),
-    })
-    const data = await res.json()
-    if (data.credits !== undefined) setCredits(data.credits)
+    if (cost === 0) return
+    setCredits(prev => prev + cost)
+    try {
+      const res = await fetch('/api/credits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'add', amount: cost }),
+      })
+      const data = await res.json()
+      if (data.credits !== undefined) setCredits(data.credits)
+    } catch { /* KV unreachable – local state already restored */ }
   }
 
   function saveToHistory(res: string, fname: string, m: Mode) {
@@ -212,10 +219,10 @@ export default function Analyzer() {
   // ── ANALYZE ──
   async function analyze() {
     const cost = currentMode.credits
-    if (!(await spendCredits(cost))) return
     setLoading(true)
     setResult('')
     setAnswers([])
+    if (!(await spendCredits(cost))) { setLoading(false); return }
 
     try {
       let res: Response
@@ -258,9 +265,9 @@ export default function Analyzer() {
   async function generateTemplate() {
     if (!templateDesc.trim()) return
     const cost = currentMode.credits
-    if (!(await spendCredits(cost))) return
     setLoading(true)
     setResult('')
+    if (!(await spendCredits(cost))) { setLoading(false); return }
     try {
       const res = await fetch('/api/template', {
         method: 'POST',
@@ -284,8 +291,8 @@ export default function Analyzer() {
   async function startInterview() {
     if (!interviewType.trim()) return
     const cost = currentMode.credits
-    if (!(await spendCredits(cost))) return
     setInterviewLoading(true)
+    if (!(await spendCredits(cost))) { setInterviewLoading(false); return }
     setInterviewStarted(true)
     setInterviewChat([])
     setInterviewHistory([])
@@ -426,9 +433,9 @@ export default function Analyzer() {
   async function generateEmail() {
     const content = fileContent || DEMO_TEXT
     const cost = currentMode.credits
-    if (!(await spendCredits(cost))) return
     setLoading(true)
     setResult('')
+    if (!(await spendCredits(cost))) { setLoading(false); return }
     try {
       const res = await fetch('/api/email', {
         method: 'POST',
@@ -452,16 +459,15 @@ export default function Analyzer() {
   async function generateImage() {
     const prompt = imaginePrompt.trim()
     if (!prompt) return
-    if (!(await spendCredits(1))) return
+    setImagineLoading(true)
+    setImagineUrl('')
+    setImagineError('')
+    if (!(await spendCredits(1))) { setImagineLoading(false); return }
 
     const style = IMAGINE_STYLES.find(s => s.id === imagineStyle)
     const fullPrompt = `${prompt}, ${style?.suffix ?? ''}`
     const seed = Math.floor(Math.random() * 99999)
     const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(fullPrompt)}?width=832&height=512&nologo=true&enhance=true&seed=${seed}`
-
-    setImagineLoading(true)
-    setImagineUrl('')
-    setImagineError('')
 
     const img = new window.Image()
     img.onload = () => { setImagineUrl(url); setImagineLoading(false) }
