@@ -659,6 +659,8 @@ export default function Analyzer() {
 
   return (
     <div className={styles.wrap}>
+      <div className={styles.orbApp1} />
+      <div className={styles.orbApp2} />
       <nav className={styles.nav}>
         <div className={styles.logo}><div className={styles.logoDot} />docthink</div>
         <div className={styles.navRight}>
@@ -673,8 +675,10 @@ export default function Analyzer() {
       <div className={styles.main}>
         <aside className={styles.sidebar}>
           <div className={styles.sidebarLabel}>{t.sidebar.aiAssistant}</div>
-          {MODES.filter(m => m.group === 'chat').map(m => (
-            <button key={m.id} className={`${styles.modeBtn} ${mode === m.id ? styles.modeBtnActive : ''}`}
+          {MODES.filter(m => m.group === 'chat').map((m, i) => (
+            <button key={m.id}
+              className={`${styles.modeBtn} ${styles.sidebarIn} ${mode === m.id ? styles.modeBtnActive : ''}`}
+              style={{ '--delay': `${(i + 1) * 0.04}s` } as React.CSSProperties}
               onClick={() => { setMode(m.id); setResult(''); setAnswers([]) }}>
               <span className={styles.modeIcon}>{m.icon}</span>
               <span className={styles.modeLabelText}>{(t.modes as any)[m.id]}</span>
@@ -682,9 +686,11 @@ export default function Analyzer() {
             </button>
           ))}
 
-          <div className={styles.sidebarLabel} style={{ marginTop: 16 }}>{t.sidebar.docAnalysis}</div>
-          {MODES.filter(m => m.group === 'analyze').map(m => (
-            <button key={m.id} className={`${styles.modeBtn} ${mode === m.id ? styles.modeBtnActive : ''}`}
+          <div className={`${styles.sidebarLabel} ${styles.sidebarIn}`} style={{ marginTop: 16, '--delay': '0.08s' } as React.CSSProperties}>{t.sidebar.docAnalysis}</div>
+          {MODES.filter(m => m.group === 'analyze').map((m, i) => (
+            <button key={m.id}
+              className={`${styles.modeBtn} ${styles.sidebarIn} ${mode === m.id ? styles.modeBtnActive : ''}`}
+              style={{ '--delay': `${(i + 2) * 0.05}s` } as React.CSSProperties}
               onClick={() => { setMode(m.id); setResult(''); setAnswers([]) }}>
               <span className={styles.modeIcon}>{m.icon}</span>
               <span className={styles.modeLabelText}>{(t.modes as any)[m.id]}</span>
@@ -692,9 +698,11 @@ export default function Analyzer() {
             </button>
           ))}
 
-          <div className={styles.sidebarLabel} style={{ marginTop: 16 }}>{t.sidebar.aiTools}</div>
-          {MODES.filter(m => m.group === 'tools').map(m => (
-            <button key={m.id} className={`${styles.modeBtn} ${mode === m.id ? styles.modeBtnActive : ''}`}
+          <div className={`${styles.sidebarLabel} ${styles.sidebarIn}`} style={{ marginTop: 16, '--delay': '0.32s' } as React.CSSProperties}>{t.sidebar.aiTools}</div>
+          {MODES.filter(m => m.group === 'tools').map((m, i) => (
+            <button key={m.id}
+              className={`${styles.modeBtn} ${styles.sidebarIn} ${mode === m.id ? styles.modeBtnActive : ''}`}
+              style={{ '--delay': `${(i + 7) * 0.05}s` } as React.CSSProperties}
               onClick={() => { setMode(m.id); setResult(''); setAnswers([]); setInterviewStarted(false); setCodegenResult('') }}>
               <span className={styles.modeIcon}>{m.icon}</span>
               <span className={styles.modeLabelText}>{(t.modes as any)[m.id]}</span>
@@ -717,7 +725,7 @@ export default function Analyzer() {
           )}
         </aside>
 
-        <div className={styles.content}>
+        <div className={`${styles.content} ${styles.contentIn}`}>
 
           {/* ── CHAT ── */}
           {mode === 'chat' && (
@@ -814,7 +822,7 @@ export default function Analyzer() {
                 onDragOver={e => { e.preventDefault(); setDragging(true) }}
                 onDrop={onDrop}
                 onDragLeave={() => setDragging(false)}>
-                <div className={styles.uploadIcon}>
+                <div className={`${styles.uploadIcon} ${styles.uploadIconFloat}`}>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7F77DD" strokeWidth="1.5" strokeLinecap="round">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                     <polyline points="14 2 14 8 20 8"/>
