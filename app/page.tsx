@@ -9,7 +9,7 @@ export default function LandingPage() {
   const router = useRouter()
 
   useEffect(() => {
-    const els = document.querySelectorAll('[data-animate]')
+    const els = document.querySelectorAll('[data-anim]')
     const obs = new IntersectionObserver(
       (entries) => entries.forEach(e => {
         if (e.isIntersecting) {
@@ -105,7 +105,7 @@ export default function LandingPage() {
       </div>
 
       {/* STATS STRIP */}
-      <div className={styles.stats} data-animate>
+      <div className={`${styles.stats} ${styles.animate}`} data-anim>
         {[
           { value: '13+', label: 'AI tools' },
           { value: '24', label: 'EU languages' },
@@ -121,7 +121,7 @@ export default function LandingPage() {
 
       {/* FEATURES */}
       <div className={styles.featuresWrap}>
-        <div className={styles.sectionLabel} data-animate>What DocThink can do</div>
+        <div className={`${styles.sectionLabel} ${styles.animate}`} data-anim>What DocThink can do</div>
         <div className={styles.features}>
           {[
             { icon: '📋', title: 'Summary', desc: 'A concise overview of any document in seconds.' },
@@ -136,8 +136,8 @@ export default function LandingPage() {
           ].map((f, i) => (
             <div
               key={f.title}
-              className={styles.featureCard}
-              data-animate
+              className={`${styles.featureCard} ${styles.animate}`}
+              data-anim
               style={{ '--delay': `${i * 0.06}s` } as React.CSSProperties}
             >
               <div className={styles.featureIcon}>{f.icon}</div>
@@ -149,7 +149,7 @@ export default function LandingPage() {
       </div>
 
       {/* SAVINGS STRIP */}
-      <div className={styles.savings} data-animate>
+      <div className={`${styles.savings} ${styles.animate}`} data-anim>
         <div className={styles.sectionLabel}>How much do you save?</div>
         <div className={styles.savingsGrid}>
           {[
@@ -174,7 +174,7 @@ export default function LandingPage() {
       </div>
 
       {/* PRICING */}
-      <div className={styles.pricing} data-animate>
+      <div className={`${styles.pricing} ${styles.animate}`} data-anim>
         <div className={styles.sectionLabel}>Pricing</div>
         <h2 className={styles.pricingTitle}>Pay only for what you use</h2>
         <p className={styles.pricingSub}>Credits never expire · No subscription · Cancel anytime</p>

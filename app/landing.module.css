@@ -459,8 +459,7 @@
   gap: 14px;
 }
 
-/* data-animate base state */
-[data-animate] {
+.animate {
   opacity: 0;
   transform: translateY(28px);
   transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
