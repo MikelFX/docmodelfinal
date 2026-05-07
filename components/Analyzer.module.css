@@ -656,67 +656,28 @@
 .pasteClear:hover { border-color: rgba(127, 119, 221, 0.35); color: #9d97d8; }
 
 /* ═══════════════════════════════════════
-   MOBILE — kompletní redesign
+   MOBILE BOTTOM BAR + SHEET (hidden on desktop)
+   ═══════════════════════════════════════ */
+.mobileBar { display: none; }
+.mobileOverlay { display: none; }
+
+/* ═══════════════════════════════════════
+   MOBILE
    ═══════════════════════════════════════ */
 @media (max-width: 768px) {
   .wrap { font-size: 14px; }
 
+  /* Nav */
   .nav { padding: 0 16px; height: 50px; }
   .buyBtn { display: none; }
   .credits { font-size: 11px; padding: 3px 10px; }
 
-  /* Sidebar → horizontal pill tab bar */
+  /* Layout: single column, sidebar hidden */
   .main { grid-template-columns: 1fr; display: flex; flex-direction: column; }
+  .sidebar { display: none; }
 
-  .sidebar {
-    position: static;
-    max-height: none;
-    overflow-y: visible;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding: 10px 12px;
-    gap: 6px;
-    border-right: none;
-    border-bottom: 0.5px solid rgba(127, 119, 221, 0.08);
-    background: rgba(7, 7, 13, 0.95);
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-  }
-  .sidebar::-webkit-scrollbar { display: none; }
-
-  .sidebarLabel { display: none; }
-
-  .modeBtn {
-    flex-shrink: 0;
-    padding: 7px 14px;
-    font-size: 12px;
-    border-radius: 20px;
-    border: 0.5px solid rgba(127, 119, 221, 0.12) !important;
-    background: rgba(13, 11, 24, 0.8) !important;
-    flex-direction: row;
-    gap: 6px;
-    transform: none !important;
-    scroll-snap-align: start;
-    white-space: nowrap;
-    min-width: auto;
-  }
-  .modeBtn:hover { transform: none !important; background: rgba(127, 119, 221, 0.1) !important; }
-  .modeBtnActive {
-    background: rgba(127, 119, 221, 0.18) !important;
-    border-color: rgba(127, 119, 221, 0.4) !important;
-  }
-
-  .modeIcon { width: 22px; height: 22px; font-size: 13px; background: none !important; border-radius: 0; }
-  .modeBtnActive .modeIcon { background: none !important; }
-  .modeCredits { display: none; }
-  .historyItem { display: none; }
-
-  /* Content */
-  .content { padding: 14px 16px; gap: 12px; max-width: 100%; }
+  /* Content gets padding for bottom bar */
+  .content { padding: 14px 16px 90px; gap: 12px; max-width: 100%; }
 
   /* Upload */
   .upload { padding: 28px 16px; }
@@ -736,17 +697,15 @@
   .questionBtn { width: 100%; text-align: center; }
 
   /* Chat */
-  .chatWelcome { padding: 40px 16px 24px; }
+  .chatWelcome { padding: 32px 16px 20px; }
   .chatWelcomeTitle { font-size: 22px; }
   .chatSuggestions { grid-template-columns: 1fr; max-width: 100%; }
   .chatSuggestion { font-size: 12px; padding: 10px 14px; }
-
-  .chatThread { max-height: calc(100vh - 320px); min-height: 200px; }
+  .chatThread { max-height: calc(100vh - 290px); min-height: 200px; }
   .chatBubbleAi, .chatBubbleUser { max-width: 92%; font-size: 13px; }
-
   .chatInputWrap {
     position: sticky;
-    bottom: 0;
+    bottom: 68px;
     background: rgba(7, 7, 13, 0.96);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
@@ -754,24 +713,183 @@
     margin-top: 8px;
     border-top: 0.5px solid rgba(127, 119, 221, 0.08);
   }
-  .chatInput { font-size: 16px; } /* prevent iOS zoom */
+  .chatInput { font-size: 16px; }
 
   /* Interview */
   .chatArea { max-height: 260px; }
   .interviewDoc { max-height: 200px; }
 
-  /* Imagine */
-  .chatSuggestions { grid-template-columns: 1fr; }
+  /* Options */
   .optionRow { gap: 6px; }
   .optionBtn { font-size: 11px; padding: 5px 10px; }
 
   /* Tool cards */
   .toolCard { padding: 16px; gap: 12px; }
+
+  /* ── Bottom bar ── */
+  .mobileBar {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 66px;
+    background: rgba(7, 7, 13, 0.96);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-top: 0.5px solid rgba(127, 119, 221, 0.15);
+    z-index: 100;
+    align-items: center;
+    padding: 0 16px;
+    gap: 10px;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5), 0 -1px 0 rgba(127, 119, 221, 0.06) inset;
+  }
+
+  .mobileBarMode {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    background: rgba(16, 14, 30, 0.9);
+    border: 0.5px solid rgba(127, 119, 221, 0.16);
+    border-radius: 14px;
+    padding: 0 14px;
+    height: 46px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.18s;
+    text-align: left;
+    color: inherit;
+  }
+  .mobileBarMode:active { background: rgba(127, 119, 221, 0.12); border-color: rgba(127, 119, 221, 0.35); }
+
+  .mobileBarIcon { font-size: 20px; line-height: 1; flex-shrink: 0; }
+  .mobileBarLabel { font-size: 13px; font-weight: 500; color: #c8c4e8; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mobileBarCredits {
+    font-size: 10px; font-weight: 600;
+    color: #534AB7; background: rgba(127, 119, 221, 0.1);
+    padding: 2px 8px; border-radius: 10px; flex-shrink: 0;
+  }
+
+  .mobileBarMenu {
+    width: 46px; height: 46px; flex-shrink: 0;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(127, 119, 221, 0.18), rgba(99, 102, 241, 0.12));
+    border: 0.5px solid rgba(127, 119, 221, 0.28);
+    color: #AFA9EC;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.18s;
+    box-shadow: 0 2px 12px rgba(127, 119, 221, 0.15);
+  }
+  .mobileBarMenu:active { transform: scale(0.92); background: rgba(127, 119, 221, 0.28); }
+
+  /* ── Overlay ── */
+  .mobileOverlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 300;
+    animation: overlayIn 0.22s ease;
+  }
+
+  @keyframes overlayIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* ── Sheet ── */
+  .mobileSheet {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(180deg, rgba(11, 10, 22, 0.99) 0%, rgba(8, 7, 16, 0.99) 100%);
+    border-radius: 24px 24px 0 0;
+    border: 0.5px solid rgba(127, 119, 221, 0.18);
+    border-bottom: none;
+    animation: sheetUp 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: 88vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+    box-shadow: 0 -16px 64px rgba(0, 0, 0, 0.6), 0 -1px 0 rgba(127, 119, 221, 0.1);
+  }
+  .mobileSheet::-webkit-scrollbar { display: none; }
+
+  @keyframes sheetUp {
+    from { transform: translateY(100%); opacity: 0.6; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .mobileSheetHandle {
+    width: 40px; height: 4px;
+    background: rgba(127, 119, 221, 0.18);
+    border-radius: 2px;
+    margin: 14px auto 0;
+  }
+
+  .mobileSheetContent {
+    padding: 8px 18px 40px;
+  }
+
+  .mobileSheetSection {
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: #2e2b42;
+    padding: 18px 2px 8px;
+  }
+
+  /* ── Grid ── */
+  .mobileGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .mobileGridItem {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 6px;
+    padding: 16px 6px 13px;
+    background: rgba(14, 12, 26, 0.9);
+    border: 0.5px solid rgba(127, 119, 221, 0.09);
+    border-radius: 16px;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mobileGridItem:active {
+    transform: scale(0.95);
+    background: rgba(127, 119, 221, 0.1);
+    border-color: rgba(127, 119, 221, 0.3);
+  }
+  .mobileGridItemActive {
+    background: rgba(127, 119, 221, 0.13) !important;
+    border-color: rgba(127, 119, 221, 0.42) !important;
+    box-shadow: 0 0 0 1px rgba(127, 119, 221, 0.15), 0 4px 20px rgba(127, 119, 221, 0.12);
+  }
+
+  .mobileGridIcon { font-size: 24px; line-height: 1; }
+
+  .mobileGridLabel {
+    font-size: 10px; font-weight: 500;
+    color: #5a5680; text-align: center; line-height: 1.35;
+  }
+  .mobileGridItemActive .mobileGridLabel { color: #AFA9EC; }
+
+  .mobileGridCost {
+    font-size: 9px; font-weight: 600;
+    color: #534AB7; background: rgba(127, 119, 221, 0.09);
+    padding: 2px 7px; border-radius: 8px;
+  }
 }
 
 @media (max-width: 380px) {
   .nav { padding: 0 12px; }
-  .content { padding: 12px; }
+  .content { padding: 12px 12px 90px; }
   .chatWelcomeTitle { font-size: 20px; }
-  .chatThread { max-height: calc(100vh - 340px); }
+  .chatThread { max-height: calc(100vh - 310px); }
+  .mobileGrid { gap: 6px; }
+  .mobileGridItem { padding: 13px 4px 11px; border-radius: 13px; }
+  .mobileGridIcon { font-size: 22px; }
 }

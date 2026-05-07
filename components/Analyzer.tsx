@@ -88,6 +88,7 @@ export default function Analyzer() {
   const [qLoading, setQLoading] = useState(false)
   const [answers, setAnswers] = useState<{ q: string; a: string }[]>([])
   const [history, setHistory] = useState<HistoryItem[]>([])
+  const [mobileSheetOpen, setMobileSheetOpen] = useState(false)
   const [copied, setCopied] = useState(false)
 
   const [rewriteStyle, setRewriteStyle] = useState<'formal' | 'simple'>('formal')
@@ -1219,6 +1220,71 @@ export default function Analyzer() {
           )}
         </div>
       </div>
+
+      {/* ── MOBILE BOTTOM BAR ── */}
+      <div className={styles.mobileBar}>
+        <button className={styles.mobileBarMode} onClick={() => setMobileSheetOpen(true)}>
+          <span className={styles.mobileBarIcon}>{currentMode.icon}</span>
+          <span className={styles.mobileBarLabel}>{(t.modes as any)[mode]}</span>
+          {mode === 'chat'
+            ? <span className={styles.mobileBarCredits} style={{ color: '#5DCAA5', background: 'rgba(93,202,165,0.08)' }}>1k/5</span>
+            : currentMode.credits > 0 && <span className={styles.mobileBarCredits}>{currentMode.credits}k</span>
+          }
+        </button>
+        <button className={styles.mobileBarMenu} onClick={() => setMobileSheetOpen(true)}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+          </svg>
+        </button>
+      </div>
+
+      {/* ── MOBILE SHEET ── */}
+      {mobileSheetOpen && (
+        <div className={styles.mobileOverlay} onClick={() => setMobileSheetOpen(false)}>
+          <div className={styles.mobileSheet} onClick={e => e.stopPropagation()}>
+            <div className={styles.mobileSheetHandle} />
+            <div className={styles.mobileSheetContent}>
+              <div className={styles.mobileSheetSection}>{t.sidebar.aiAssistant}</div>
+              <div className={styles.mobileGrid}>
+                {MODES.filter(m => m.group === 'chat').map(m => (
+                  <button key={m.id}
+                    className={`${styles.mobileGridItem} ${mode === m.id ? styles.mobileGridItemActive : ''}`}
+                    onClick={() => { setMode(m.id); setResult(''); setAnswers([]); setMobileSheetOpen(false) }}>
+                    <span className={styles.mobileGridIcon}>{m.icon}</span>
+                    <span className={styles.mobileGridLabel}>{(t.modes as any)[m.id]}</span>
+                    <span className={styles.mobileGridCost} style={{ color: '#5DCAA5', background: 'rgba(93,202,165,0.07)' }}>1k/5</span>
+                  </button>
+                ))}
+              </div>
+              <div className={styles.mobileSheetSection}>{t.sidebar.docAnalysis}</div>
+              <div className={styles.mobileGrid}>
+                {MODES.filter(m => m.group === 'analyze').map(m => (
+                  <button key={m.id}
+                    className={`${styles.mobileGridItem} ${mode === m.id ? styles.mobileGridItemActive : ''}`}
+                    onClick={() => { setMode(m.id); setResult(''); setAnswers([]); setMobileSheetOpen(false) }}>
+                    <span className={styles.mobileGridIcon}>{m.icon}</span>
+                    <span className={styles.mobileGridLabel}>{(t.modes as any)[m.id]}</span>
+                    <span className={styles.mobileGridCost}>{m.credits}k</span>
+                  </button>
+                ))}
+              </div>
+              <div className={styles.mobileSheetSection}>{t.sidebar.aiTools}</div>
+              <div className={styles.mobileGrid}>
+                {MODES.filter(m => m.group === 'tools').map(m => (
+                  <button key={m.id}
+                    className={`${styles.mobileGridItem} ${mode === m.id ? styles.mobileGridItemActive : ''}`}
+                    onClick={() => { setMode(m.id); setResult(''); setAnswers([]); setInterviewStarted(false); setCodegenResult(''); setMobileSheetOpen(false) }}>
+                    <span className={styles.mobileGridIcon}>{m.icon}</span>
+                    <span className={styles.mobileGridLabel}>{(t.modes as any)[m.id]}</span>
+                    <span className={styles.mobileGridCost}>{m.credits}k</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
