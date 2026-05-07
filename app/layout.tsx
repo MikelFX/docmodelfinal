@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Geist } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
 import { LanguageProvider } from '@/contexts/LanguageContext'
@@ -8,9 +8,13 @@ import './globals.css'
 const geist = Geist({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'DocThink — AI analyzátor dokumentů',
-  description: 'Nahraj dokument a získej shrnutí, akční body a rizika pomocí AI.',
-  viewport: 'width=device-width, initial-scale=1',
+  title: 'DocThink — AI document analyzer',
+  description: 'Upload a document and get summaries, action items and risks using AI.',
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
