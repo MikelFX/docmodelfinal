@@ -43,6 +43,10 @@ export async function POST(req: NextRequest) {
   const current = (await kvGet(`credits:${userId}`)) ?? DEFAULT_CREDITS
 
   if (action === 'spend') {
+    if (!KV_AVAILABLE) {
+      // KV not configured — client already has the correct local value, don't override it
+      return NextResponse.json({ ok: true })
+    }
     if (current < amount) {
       return NextResponse.json({ error: 'Insufficient credits' }, { status: 400 })
     }
