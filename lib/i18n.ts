@@ -17,7 +17,7 @@ export const T = {
   cs: {
     nav: { credits: 'kredity', buy: 'Koupit kredity' },
     sidebar: { aiAssistant: 'AI asistent', docAnalysis: 'Analýza dokumentu', aiTools: 'Nástroje AI', history: 'Historie', free: 'zdarma' },
-    modes: { chat: 'AI Chat', summary: 'Shrnutí', actions: 'Akční body', risks: 'Rizika', qa: 'Q & A', deadlines: 'Termíny', rewrite: 'Přepisovač', translate: 'Překladač', template: 'Generátor šablon', interview: 'AI Tazatel', codegen: 'Generátor kódu', email: 'Emailový generátor', batch: 'Hromadná analýza' },
+    modes: { chat: 'AI Chat', summary: 'Shrnutí', actions: 'Akční body', risks: 'Rizika', qa: 'Q & A', deadlines: 'Termíny', rewrite: 'Přepisovač', translate: 'Překladač', template: 'Generátor šablon', interview: 'AI Tazatel', codegen: 'Generátor kódu', email: 'Emailový generátor', batch: 'Hromadná analýza', finance: 'Finanční analytik' },
     chat: {
       welcome: 'Jak ti mohu pomoci?',
       sub: 'AI Chat — 1 kredit za každých 5 odpovědí AI',
@@ -79,7 +79,7 @@ export const T = {
   en: {
     nav: { credits: 'credits', buy: 'Buy credits' },
     sidebar: { aiAssistant: 'AI assistant', docAnalysis: 'Document analysis', aiTools: 'AI tools', history: 'History', free: 'free' },
-    modes: { chat: 'AI Chat', summary: 'Summary', actions: 'Action items', risks: 'Risks', qa: 'Q & A', deadlines: 'Deadlines', rewrite: 'Rewriter', translate: 'Translator', template: 'Template gen.', interview: 'AI Interviewer', codegen: 'Code generator', email: 'Email generator', batch: 'Batch analysis' },
+    modes: { chat: 'AI Chat', summary: 'Summary', actions: 'Action items', risks: 'Risks', qa: 'Q & A', deadlines: 'Deadlines', rewrite: 'Rewriter', translate: 'Translator', template: 'Template gen.', interview: 'AI Interviewer', codegen: 'Code generator', email: 'Email generator', batch: 'Batch analysis', finance: 'Finance analyst' },
     chat: {
       welcome: 'How can I help you?',
       sub: 'AI Chat — 1 credit per every 5 AI responses',
@@ -202,7 +202,7 @@ export const T = {
   sk: {
     nav: { credits: 'kredity', buy: 'Kúpiť kredity' },
     sidebar: { aiAssistant: 'AI asistent', docAnalysis: 'Analýza dokumentov', aiTools: 'AI nástroje', history: 'História', free: 'zadarmo' },
-    modes: { chat: 'AI Chat', summary: 'Zhrnutie', actions: 'Akčné body', risks: 'Riziká', qa: 'Q & A', deadlines: 'Termíny', rewrite: 'Prepisovač', translate: 'Prekladač', template: 'Generátor šablón', interview: 'AI Spytovateľ', codegen: 'Generátor kódu', email: 'Emailový generátor', batch: 'Hromadná analýza' },
+    modes: { chat: 'AI Chat', summary: 'Zhrnutie', actions: 'Akčné body', risks: 'Riziká', qa: 'Q & A', deadlines: 'Termíny', rewrite: 'Prepisovač', translate: 'Prekladač', template: 'Generátor šablón', interview: 'AI Spytovateľ', codegen: 'Generátor kódu', email: 'Emailový generátor', batch: 'Hromadná analýza', finance: 'Finančný analytik' },
     chat: {
       welcome: 'Ako ti môžem pomôcť?',
       sub: 'AI Chat — 1 kredit za každých 5 odpovedí AI',

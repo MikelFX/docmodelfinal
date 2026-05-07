@@ -6,7 +6,7 @@ import { UserButton, useUser } from '@clerk/nextjs'
 import { useLanguage } from '@/contexts/LanguageContext'
 import styles from './Analyzer.module.css'
 
-type Mode = 'chat' | 'summary' | 'actions' | 'risks' | 'qa' | 'deadlines' | 'rewrite' | 'translate' | 'template' | 'interview' | 'codegen' | 'email' | 'batch'
+type Mode = 'chat' | 'summary' | 'actions' | 'risks' | 'qa' | 'deadlines' | 'rewrite' | 'translate' | 'template' | 'interview' | 'codegen' | 'email' | 'batch' | 'finance'
 
 interface HistoryItem {
   id: string
@@ -32,6 +32,7 @@ const MODES: { id: Mode; icon: string; credits: number; group: 'chat' | 'analyze
   { id: 'email',     icon: '📧', credits: 2, group: 'tools'   },
   { id: 'interview', icon: '🤖', credits: 5, group: 'tools'   },
   { id: 'codegen',   icon: '💻', credits: 3, group: 'tools'   },
+  { id: 'finance',   icon: '💰', credits: 3, group: 'tools'   },
   { id: 'batch',     icon: '📦', credits: 1, group: 'tools'   },
 ]
 
@@ -263,8 +264,8 @@ export default function Analyzer() {
   }
 
   const currentMode = MODES.find(m => m.id === mode)!
-  const needsFile = ['summary', 'actions', 'risks', 'qa', 'deadlines', 'rewrite', 'translate', 'email'].includes(mode)
-  const showAnalyzeBtn = ['summary', 'actions', 'risks', 'qa', 'deadlines', 'rewrite', 'translate'].includes(mode)
+  const needsFile = ['summary', 'actions', 'risks', 'qa', 'deadlines', 'rewrite', 'translate', 'email', 'finance'].includes(mode)
+  const showAnalyzeBtn = ['summary', 'actions', 'risks', 'qa', 'deadlines', 'rewrite', 'translate', 'finance'].includes(mode)
 
   // ── ANALYZE ──
   async function analyze() {

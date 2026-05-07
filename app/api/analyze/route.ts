@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { anthropic, MODEL } from '@/lib/anthropic'
 
-type Mode = 'summary' | 'actions' | 'risks' | 'qa' | 'deadlines'
+type Mode = 'summary' | 'actions' | 'risks' | 'qa' | 'deadlines' | 'finance'
 
 const PROMPTS: Record<Mode, string> = {
   summary: `Analyze the document and return a structured summary as HTML.
@@ -48,6 +48,33 @@ Table header:
 Priority: high (red #F09595 / bg #2e1a1a), medium (yellow #F5C842 / bg #2e2a1a), low (green #5DCAA5 / bg #1a2e1a).
 If no deadlines found, return: <p style="color:#666;font-size:13px">No specific dates or deadlines were found in the document.</p>
 Return ONLY HTML, no markdown.`,
+
+  finance: `You are a senior financial analyst. Perform a deep financial analysis of this document. Cover ALL of the following sections that are relevant:
+
+1. Financial obligations & payment terms
+2. Amounts, prices, fees, penalties and escalation clauses
+3. Revenue / cost projections or estimates
+4. Financial risks and liabilities
+5. Cash flow implications
+6. Hidden costs or unfavorable financial conditions
+
+Format each section as:
+<h4 style="color:#F5C842;margin:16px 0 8px;font-size:13px;font-weight:500">Section title</h4>
+
+For each finding use:
+<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+<span style="display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;background:#2e2a1a;color:#F5C842;flex-shrink:0">finance</span>
+<span style="font-size:13px;color:#c8c4e8;line-height:1.7">finding description with specific amounts where available</span></div>
+
+If a finding is a financial risk, use background:#2e1a1a and color:#F09595 with label "risk".
+If a finding is positive/favorable, use background:#1a2e1a and color:#5DCAA5 with label "positive".
+
+End with a summary box:
+<div style="margin-top:20px;padding:14px;background:#13111f;border-radius:10px;border:0.5px solid #2e2a1a">
+<p style="font-size:12px;color:#F5C842;margin:0 0 6px;font-weight:600">Financial summary</p>
+<p style="font-size:13px;color:#c8c4e8;margin:0;line-height:1.8">2-3 sentence overall financial assessment.</p></div>
+
+Return ONLY HTML fragments, no markdown, no backticks.`,
 }
 
 export async function POST(req: NextRequest) {
@@ -72,13 +99,13 @@ export async function POST(req: NextRequest) {
     : 'You are an analytical assistant. Respond ONLY as HTML fragments. No markdown, no backticks, no DOCTYPE.'
 
   const userMessage = question
-    ? `Based on the document, answer: "${question}"\n\nDOCUMENT:\n${content.slice(0, 2000)}\n\nAnswer concisely.`
-    : PROMPTS[(mode as Mode) ?? 'summary'] + '\n\nDOCUMENT:\n' + content.slice(0, 3000)
+    ? `Based on the document, answer: "${question}"\n\nDOCUMENT:\n${content.slice(0, 4000)}\n\nAnswer concisely.`
+    : PROMPTS[(mode as Mode) ?? 'summary'] + '\n\nDOCUMENT:\n' + content.slice(0, 8000)
 
   try {
     const message = await anthropic.messages.create({
       model: MODEL,
-      max_tokens: 1024,
+      max_tokens: 2048,
       system: systemPrompt,
       messages: [{ role: 'user', content: userMessage }],
     })
