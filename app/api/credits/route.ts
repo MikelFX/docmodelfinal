@@ -1,19 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
-import { kv } from '@vercel/kv'
+import { Redis } from '@upstash/redis'
 
 const DEFAULT_CREDITS = 10
 
-const KV_AVAILABLE = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)
+// Support both Vercel KV env var names and Upstash direct env var names
+const REST_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL
+const REST_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN
+
+const redis = REST_URL && REST_TOKEN
+  ? new Redis({ url: REST_URL, token: REST_TOKEN })
+  : null
 
 async function kvGet(key: string): Promise<number | null> {
-  if (!KV_AVAILABLE) return null
-  try { return await kv.get<number>(key) } catch { return null }
+  if (!redis) return null
+  try { return await redis.get<number>(key) } catch { return null }
 }
 
 async function kvSet(key: string, value: number): Promise<void> {
-  if (!KV_AVAILABLE) return
-  try { await kv.set(key, value) } catch { /* silent */ }
+  if (!redis) return
+  try { await redis.set(key, value) } catch { /* silent */ }
 }
 
 export async function GET() {
@@ -40,13 +46,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const current = (await kvGet(`credits:${userId}`)) ?? DEFAULT_CREDITS
-
   if (action === 'spend') {
-    if (!KV_AVAILABLE) {
-      // KV not configured — client already has the correct local value, don't override it
+    if (!redis) {
       return NextResponse.json({ ok: true })
     }
+    const current = (await kvGet(`credits:${userId}`)) ?? DEFAULT_CREDITS
     if (current < amount) {
       return NextResponse.json({ error: 'Insufficient credits' }, { status: 400 })
     }
