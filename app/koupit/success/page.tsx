@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useEffect, useState, useRef } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import styles from './page.module.css'
 
@@ -8,57 +8,79 @@ function SuccessContent() {
   const params = useSearchParams()
   const router = useRouter()
   const credits = parseInt(params.get('credits') || '0')
+  const sessionId = params.get('session_id') || ''
   const [total, setTotal] = useState<number | null>(null)
   const [ready, setReady] = useState(false)
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const startCreditsRef = useRef<number | null>(null)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    if (credits <= 0) { setReady(true); return }
+    if (!sessionId || credits <= 0) { setReady(true); return }
 
-    // Zjisti aktuální stav kreditů před pollováním
-    fetch('/api/credits')
-      .then(r => r.json())
-      .then(d => {
-        if (d.credits !== undefined) {
-          startCreditsRef.current = d.credits
-          localStorage.setItem('docthink_credits', d.credits.toString())
-        }
-      })
-
-    // Polluj dokud Stripe webhook nepřipíše kredity (max 30s)
     let attempts = 0
-    pollRef.current = setInterval(async () => {
+    const MAX = 12 // 24s total
+
+    async function tryVerify() {
       attempts++
       try {
-        const res = await fetch('/api/credits')
+        // First try: call verify endpoint (works even if webhook didn't fire)
+        const res = await fetch('/api/stripe/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId }),
+        })
         const d = await res.json()
-        if (d.credits !== undefined) {
-          const start = startCreditsRef.current ?? 0
-          if (d.credits > start || attempts >= 15) {
-            clearInterval(pollRef.current!)
-            setTotal(d.credits)
-            localStorage.setItem('docthink_credits', d.credits.toString())
-            setReady(true)
-          }
-        }
-      } catch { /* ignoruj */ }
-    }, 2000)
 
-    return () => { if (pollRef.current) clearInterval(pollRef.current) }
-  }, [credits])
+        if (res.ok && d.credits !== undefined) {
+          localStorage.setItem('docthink_credits', d.credits.toString())
+          setTotal(d.credits)
+          setReady(true)
+          return
+        }
+
+        // 402 = Stripe says not paid yet (rare), retry
+        if (res.status === 402 && attempts < MAX) {
+          setTimeout(tryVerify, 2000)
+          return
+        }
+
+        // Any other error or max attempts — still let user proceed
+        console.error('[success] verify failed:', d.error)
+        setError(d.error || 'Verification failed')
+        setReady(true)
+      } catch (err) {
+        if (attempts < MAX) {
+          setTimeout(tryVerify, 2000)
+        } else {
+          setError('Network error — please contact support.')
+          setReady(true)
+        }
+      }
+    }
+
+    tryVerify()
+  }, [sessionId, credits])
 
   return (
     <div className={styles.wrap}>
       <div className={styles.card}>
-        <div className={styles.icon}>✅</div>
-        <h1 className={styles.title}>Platba proběhla úspěšně!</h1>
+        <div className={styles.icon}>{error ? '⚠️' : '✅'}</div>
+        <h1 className={styles.title}>
+          {error ? 'Platba proběhla, ale…' : 'Platba proběhla úspěšně!'}
+        </h1>
         <p className={styles.sub}>
           {ready ? (
-            <>
-              Bylo ti připsáno <strong>{credits} kreditů</strong>.
-              {total !== null && <> Celkem máš nyní <strong>{total} kreditů</strong>.</>}
-            </>
+            error ? (
+              <>
+                Platba byla přijata, ale kredity se nepodařilo automaticky přidat.
+                Napiš nám na support s číslem objednávky a kredity přidáme ručně.
+                <br /><small style={{ color: '#666', fontSize: 11 }}>{error}</small>
+              </>
+            ) : (
+              <>
+                Bylo ti připsáno <strong>{credits} kreditů</strong>.
+                {total !== null && <> Celkem máš nyní <strong>{total} kreditů</strong>.</>}
+              </>
+            )
           ) : (
             'Zpracovávám platbu…'
           )}
