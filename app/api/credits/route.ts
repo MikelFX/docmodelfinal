@@ -2,17 +2,28 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { kv } from '@vercel/kv'
 
-const DEFAULT_CREDITS = 5
+const DEFAULT_CREDITS = 10
+
+const KV_AVAILABLE = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)
+
+async function kvGet(key: string): Promise<number | null> {
+  if (!KV_AVAILABLE) return null
+  try { return await kv.get<number>(key) } catch { return null }
+}
+
+async function kvSet(key: string, value: number): Promise<void> {
+  if (!KV_AVAILABLE) return
+  try { await kv.set(key, value) } catch { /* silent */ }
+}
 
 export async function GET() {
   const { userId } = await auth()
-  if (!userId) return NextResponse.json({ error: 'Nepřihlášen' }, { status: 401 })
+  if (!userId) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
 
-  const credits = await kv.get<number>(`credits:${userId}`)
+  const credits = await kvGet(`credits:${userId}`)
 
-  // První přihlášení — nastav výchozí kredity
   if (credits === null) {
-    await kv.set(`credits:${userId}`, DEFAULT_CREDITS)
+    await kvSet(`credits:${userId}`, DEFAULT_CREDITS)
     return NextResponse.json({ credits: DEFAULT_CREDITS })
   }
 
@@ -21,26 +32,31 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth()
-  if (!userId) return NextResponse.json({ error: 'Nepřihlášen' }, { status: 401 })
+  if (!userId) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
 
   const { action, amount } = await req.json()
 
-  const current = await kv.get<number>(`credits:${userId}`) ?? DEFAULT_CREDITS
-
   if (action === 'add') {
-    const newVal = current + amount
-    await kv.set(`credits:${userId}`, newVal)
-    return NextResponse.json({ credits: newVal })
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
+
+  const current = (await kvGet(`credits:${userId}`)) ?? DEFAULT_CREDITS
 
   if (action === 'spend') {
     if (current < amount) {
-      return NextResponse.json({ error: 'Nedostatek kreditů' }, { status: 400 })
+      return NextResponse.json({ error: 'Insufficient credits' }, { status: 400 })
     }
     const newVal = current - amount
-    await kv.set(`credits:${userId}`, newVal)
+    await kvSet(`credits:${userId}`, newVal)
     return NextResponse.json({ credits: newVal })
   }
 
-  return NextResponse.json({ error: 'Neznámá akce' }, { status: 400 })
+  return NextResponse.json({ error: 'Unknown action' }, { status: 400 })
+}
+
+export async function addCredits(userId: string, amount: number): Promise<number> {
+  const current = (await kvGet(`credits:${userId}`)) ?? DEFAULT_CREDITS
+  const newVal = current + amount
+  await kvSet(`credits:${userId}`, newVal)
+  return newVal
 }

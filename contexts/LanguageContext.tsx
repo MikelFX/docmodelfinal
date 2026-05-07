@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { T, LangKey, Translations } from '@/lib/i18n'
+import { getT, isValidLang, LangKey, Translations } from '@/lib/i18n'
 
 interface LanguageContextType {
   lang: LangKey
@@ -10,17 +10,17 @@ interface LanguageContextType {
 }
 
 const LanguageContext = createContext<LanguageContextType>({
-  lang: 'cs',
+  lang: 'en',
   setLang: () => {},
-  t: T.cs,
+  t: getT('en'),
 })
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<LangKey>('cs')
+  const [lang, setLangState] = useState<LangKey>('en')
 
   useEffect(() => {
-    const saved = localStorage.getItem('docthink_lang') as LangKey
-    if (saved && T[saved]) setLangState(saved)
+    const saved = localStorage.getItem('docthink_lang')
+    if (saved && isValidLang(saved)) setLangState(saved)
   }, [])
 
   function setLang(l: LangKey) {
@@ -29,7 +29,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <LanguageContext.Provider value={{ lang, setLang, t: T[lang] }}>
+    <LanguageContext.Provider value={{ lang, setLang, t: getT(lang) }}>
       {children}
     </LanguageContext.Provider>
   )

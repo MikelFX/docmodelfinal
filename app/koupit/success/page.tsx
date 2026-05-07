@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect, useState, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import styles from './page.module.css'
 
@@ -9,20 +9,44 @@ function SuccessContent() {
   const router = useRouter()
   const credits = parseInt(params.get('credits') || '0')
   const [total, setTotal] = useState<number | null>(null)
-  const [done, setDone] = useState(false)
+  const [ready, setReady] = useState(false)
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const startCreditsRef = useRef<number | null>(null)
 
   useEffect(() => {
-    if (credits > 0 && !done) {
-      setDone(true)
-      fetch('/api/credits', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'add', amount: credits }),
+    if (credits <= 0) { setReady(true); return }
+
+    // Zjisti aktuální stav kreditů před pollováním
+    fetch('/api/credits')
+      .then(r => r.json())
+      .then(d => {
+        if (d.credits !== undefined) {
+          startCreditsRef.current = d.credits
+          localStorage.setItem('docthink_credits', d.credits.toString())
+        }
       })
-        .then(r => r.json())
-        .then(d => setTotal(d.credits))
-    }
-  }, [credits, done])
+
+    // Polluj dokud Stripe webhook nepřipíše kredity (max 30s)
+    let attempts = 0
+    pollRef.current = setInterval(async () => {
+      attempts++
+      try {
+        const res = await fetch('/api/credits')
+        const d = await res.json()
+        if (d.credits !== undefined) {
+          const start = startCreditsRef.current ?? 0
+          if (d.credits > start || attempts >= 15) {
+            clearInterval(pollRef.current!)
+            setTotal(d.credits)
+            localStorage.setItem('docthink_credits', d.credits.toString())
+            setReady(true)
+          }
+        }
+      } catch { /* ignoruj */ }
+    }, 2000)
+
+    return () => { if (pollRef.current) clearInterval(pollRef.current) }
+  }, [credits])
 
   return (
     <div className={styles.wrap}>
@@ -30,10 +54,16 @@ function SuccessContent() {
         <div className={styles.icon}>✅</div>
         <h1 className={styles.title}>Platba proběhla úspěšně!</h1>
         <p className={styles.sub}>
-          Bylo ti připsáno <strong>{credits} kreditů</strong>.
-          {total !== null && <> Celkem máš nyní <strong>{total} kreditů</strong>.</>}
+          {ready ? (
+            <>
+              Bylo ti připsáno <strong>{credits} kreditů</strong>.
+              {total !== null && <> Celkem máš nyní <strong>{total} kreditů</strong>.</>}
+            </>
+          ) : (
+            'Zpracovávám platbu…'
+          )}
         </p>
-        <button className={styles.btn} onClick={() => router.push('/app')}>
+        <button className={styles.btn} onClick={() => router.push('/app')} disabled={!ready}>
           Zpět do DocThink →
         </button>
       </div>

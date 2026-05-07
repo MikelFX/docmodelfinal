@@ -1,158 +1,100 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { anthropic, MODEL } from '@/lib/anthropic'
 
 type Mode = 'summary' | 'actions' | 'risks' | 'qa' | 'deadlines'
 
 const PROMPTS: Record<Mode, string> = {
-  summary: `Analyzuj dokument a vrať strukturované shrnutí v češtině jako HTML.
-Použij <h4 style="color:#AFA9EC;margin:0 0 8px;font-size:13px;font-weight:500"> pro nadpisy
-a <p style="margin:0 0 12px;color:#c8c4e8;font-size:13px;line-height:1.8"> pro odstavce.
-Žádný markdown, žádné backticky. Vrať POUZE HTML.`,
+  summary: `Analyze the document and return a structured summary as HTML.
+Use <h4 style="color:#AFA9EC;margin:0 0 8px;font-size:13px;font-weight:500"> for headings
+and <p style="margin:0 0 12px;color:#c8c4e8;font-size:13px;line-height:1.8"> for paragraphs.
+No markdown, no backticks. Return ONLY HTML.`,
 
-  actions: `Najdi akční body a úkoly v dokumentu. Vrať jako HTML seznam.
-Každá položka: <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
-<span style="display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;background:#1a2e1a;color:#5DCAA5;flex-shrink:0">akce</span>
-<span style="font-size:13px;color:#c8c4e8;line-height:1.7">popis úkolu</span></div>
-Česky. Vrať POUZE HTML fragmenty, žádný markdown.`,
+  actions: `Find action items and tasks in the document. Return as an HTML list.
+Each item: <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+<span style="display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;background:#1a2e1a;color:#5DCAA5;flex-shrink:0">action</span>
+<span style="font-size:13px;color:#c8c4e8;line-height:1.7">task description</span></div>
+Return ONLY HTML fragments, no markdown.`,
 
-  risks: `Identifikuj rizika a problémy v dokumentu.
-Každé riziko: <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
-<span style="display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;background:#2e1a1a;color:#F09595;flex-shrink:0">riziko</span>
-<span style="font-size:13px;color:#c8c4e8;line-height:1.7">popis rizika</span></div>
-Česky. Vrať POUZE HTML fragmenty, žádný markdown.`,
+  risks: `Identify risks and issues in the document.
+Each risk: <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+<span style="display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;background:#2e1a1a;color:#F09595;flex-shrink:0">risk</span>
+<span style="font-size:13px;color:#c8c4e8;line-height:1.7">risk description</span></div>
+Return ONLY HTML fragments, no markdown.`,
 
-  qa: `Vygeneruj 5 klíčových otázek a odpovědí z dokumentu.
-Formát: <div style="margin-bottom:16px;padding:12px;background:#13111f;border-radius:8px;border:0.5px solid #2a2640">
-<p style="font-size:12px;color:#7F77DD;margin:0 0 6px;font-weight:500">Otázka?</p>
-<p style="font-size:13px;color:#c8c4e8;margin:0;line-height:1.7">Odpověď...</p></div>
-Česky. Vrať POUZE HTML fragmenty, žádný markdown.`,
+  qa: `Generate 5 key questions and answers from the document.
+Format: <div style="margin-bottom:16px;padding:12px;background:#13111f;border-radius:8px;border:0.5px solid #2a2640">
+<p style="font-size:12px;color:#7F77DD;margin:0 0 6px;font-weight:500">Question?</p>
+<p style="font-size:13px;color:#c8c4e8;margin:0;line-height:1.7">Answer...</p></div>
+Return ONLY HTML fragments, no markdown.`,
 
-  deadlines: `Extrahuj VŠECHNA data, termíny, deadliny a časové závazky z dokumentu. Vrať jako HTML tabulku.
-Hlavička tabulky:
+  deadlines: `Extract ALL dates, deadlines, and time-based commitments from the document. Return as an HTML table.
+Table header:
 <table style="width:100%;border-collapse:collapse;font-size:13px">
 <thead><tr>
-<th style="text-align:left;padding:8px 12px;border-bottom:0.5px solid #2a2640;color:#AFA9EC;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.06em">Datum / Termín</th>
-<th style="text-align:left;padding:8px 12px;border-bottom:0.5px solid #2a2640;color:#AFA9EC;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.06em">Popis</th>
-<th style="text-align:left;padding:8px 12px;border-bottom:0.5px solid #2a2640;color:#AFA9EC;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.06em">Odpovědná osoba</th>
-<th style="text-align:left;padding:8px 12px;border-bottom:0.5px solid #2a2640;color:#AFA9EC;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.06em">Priorita</th>
+<th style="text-align:left;padding:8px 12px;border-bottom:0.5px solid #2a2640;color:#AFA9EC;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.06em">Date / Deadline</th>
+<th style="text-align:left;padding:8px 12px;border-bottom:0.5px solid #2a2640;color:#AFA9EC;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.06em">Description</th>
+<th style="text-align:left;padding:8px 12px;border-bottom:0.5px solid #2a2640;color:#AFA9EC;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.06em">Responsible</th>
+<th style="text-align:left;padding:8px 12px;border-bottom:0.5px solid #2a2640;color:#AFA9EC;font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.06em">Priority</th>
 </tr></thead>
 <tbody>
-[řádky ve formátu:]
+[rows in format:]
 <tr style="border-bottom:0.5px solid #1a1730">
-<td style="padding:9px 12px;color:#c8c4e8;white-space:nowrap">DD.MM.YYYY nebo popis</td>
-<td style="padding:9px 12px;color:#c8c4e8">popis termínu nebo úkolu</td>
-<td style="padding:9px 12px;color:#888">jméno nebo — pokud není</td>
-<td style="padding:9px 12px"><span style="padding:2px 8px;border-radius:10px;font-size:11px;background:#2e1a1a;color:#F09595">vysoká</span></td>
+<td style="padding:9px 12px;color:#c8c4e8;white-space:nowrap">DD.MM.YYYY or description</td>
+<td style="padding:9px 12px;color:#c8c4e8">deadline or task description</td>
+<td style="padding:9px 12px;color:#888">name or — if unknown</td>
+<td style="padding:9px 12px"><span style="padding:2px 8px;border-radius:10px;font-size:11px;background:#2e1a1a;color:#F09595">high</span></td>
 </tr>
 </tbody></table>
-Priorita: vysoká (červená #F09595 / bg #2e1a1a), střední (žlutá #F5C842 / bg #2e2a1a), nízká (zelená #5DCAA5 / bg #1a2e1a).
-Pokud žádné termíny nenajdeš, vrať: <p style="color:#666;font-size:13px">V dokumentu nebyly nalezeny žádné konkrétní termíny nebo deadliny.</p>
-Česky. Vrať POUZE HTML, žádný markdown.`,
-}
-
-const TIMEOUT_MS = 30_000
-const MAX_RETRIES = 3
-
-async function callOpenRouter(body: object, apiKey: string, attempt = 1): Promise<string> {
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS)
-
-  let response: Response
-  try {
-    response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer': 'http://localhost:3000',
-        'X-Title': 'DocMind',
-      },
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    })
-  } catch (err: any) {
-    clearTimeout(timer)
-    if (err.name === 'AbortError') {
-      throw new Error('Časový limit vypršel (30s). Zkus to znovu.')
-    }
-    if (attempt < MAX_RETRIES) {
-      await new Promise(r => setTimeout(r, 1000 * attempt))
-      return callOpenRouter(body, apiKey, attempt + 1)
-    }
-    throw new Error('Nepodařilo se spojit s AI serverem.')
-  }
-  clearTimeout(timer)
-
-  const data = await response.json()
-
-  if (response.status === 429) {
-    if (attempt < MAX_RETRIES) {
-      await new Promise(r => setTimeout(r, 2000 * attempt))
-      return callOpenRouter(body, apiKey, attempt + 1)
-    }
-    throw new Error('Překročen limit požadavků. Počkej chvíli a zkus znovu.')
-  }
-
-  if (response.status === 401) {
-    throw new Error('Neplatný API klíč. Zkontroluj OPENROUTER_API_KEY.')
-  }
-
-  if (!response.ok) {
-    const msg = data.error?.message || `Chyba serveru (${response.status})`
-    if (attempt < MAX_RETRIES) {
-      await new Promise(r => setTimeout(r, 1000 * attempt))
-      return callOpenRouter(body, apiKey, attempt + 1)
-    }
-    throw new Error(msg)
-  }
-
-  let result: string = data.choices?.[0]?.message?.content ?? ''
-  result = result.replace(/```html/gi, '').replace(/```/g, '').trim()
-
-  if (!result) throw new Error('AI vrátilo prázdnou odpověď. Zkus znovu.')
-
-  return result
+Priority: high (red #F09595 / bg #2e1a1a), medium (yellow #F5C842 / bg #2e2a1a), low (green #5DCAA5 / bg #1a2e1a).
+If no deadlines found, return: <p style="color:#666;font-size:13px">No specific dates or deadlines were found in the document.</p>
+Return ONLY HTML, no markdown.`,
 }
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.OPENROUTER_API_KEY
-  if (!apiKey) {
-    return NextResponse.json({ error: 'Chybí OPENROUTER_API_KEY v .env.local' }, { status: 500 })
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return NextResponse.json({ error: 'Missing ANTHROPIC_API_KEY in .env.local' }, { status: 500 })
   }
 
   let body: { content?: string; mode?: string; question?: string }
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: 'Neplatný požadavek.' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid request.' }, { status: 400 })
   }
 
   const { content, mode, question } = body
   if (!content) {
-    return NextResponse.json({ error: 'Chybí obsah dokumentu.' }, { status: 400 })
+    return NextResponse.json({ error: 'Missing document content.' }, { status: 400 })
   }
 
   const systemPrompt = question
-    ? 'Jsi analytický asistent. Odpovídáš stručně a věcně česky.'
-    : 'Jsi analytický asistent. Odpovídáš POUZE jako HTML fragmenty. Žádný markdown, žádné backticky, žádný DOCTYPE.'
+    ? 'You are an analytical assistant. Answer concisely and factually. Mirror the language the user writes in.'
+    : 'You are an analytical assistant. Respond ONLY as HTML fragments. No markdown, no backticks, no DOCTYPE.'
 
   const userMessage = question
-    ? `Na základě dokumentu odpověz na: "${question}"\n\nDOKUMENT:\n${content.slice(0, 2000)}\n\nOdpověz stručně česky.`
-    : PROMPTS[(mode as Mode) ?? 'summary'] + '\n\nDOKUMENT:\n' + content.slice(0, 3000)
-
-  const requestBody = {
-    model: 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
-    max_tokens: 1024,
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userMessage },
-    ],
-  }
+    ? `Based on the document, answer: "${question}"\n\nDOCUMENT:\n${content.slice(0, 2000)}\n\nAnswer concisely.`
+    : PROMPTS[(mode as Mode) ?? 'summary'] + '\n\nDOCUMENT:\n' + content.slice(0, 3000)
 
   try {
-    const result = await callOpenRouter(requestBody, apiKey)
+    const message = await anthropic.messages.create({
+      model: MODEL,
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }],
+    })
+
+    let result = message.content[0].type === 'text' ? message.content[0].text : ''
+    result = result.replace(/```html/gi, '').replace(/```/g, '').trim()
+
+    if (!result) return NextResponse.json({ error: 'AI returned an empty response. Try again.' }, { status: 502 })
+
     return NextResponse.json({ result })
   } catch (err: any) {
-    console.error('[DocMind] API error:', err.message)
-    return NextResponse.json({ error: err.message }, { status: 502 })
+    console.error('[DocMind] analyze error:', err.message)
+    const status = err.status === 429 ? 429 : 502
+    const msg = err.status === 429
+      ? 'Request limit exceeded. Wait a moment and try again.'
+      : err.message ?? 'AI server error.'
+    return NextResponse.json({ error: msg }, { status })
   }
 }

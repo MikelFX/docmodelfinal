@@ -242,6 +242,46 @@
 .featureTitle { font-size: 14px; font-weight: 500; margin-bottom: 7px; color: #d4d0f0; }
 .featureDesc { font-size: 13px; color: #45415f; line-height: 1.65; }
 
+/* SAVINGS STRIP */
+.savings {
+  max-width: 960px;
+  margin: 0 auto 80px;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.savingsTitle {
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #3d3a55;
+  margin-bottom: 24px;
+}
+
+.savingsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.savingsItem {
+  background: rgba(13, 11, 24, 0.8);
+  border: 0.5px solid rgba(127, 119, 221, 0.08);
+  border-radius: 12px;
+  padding: 18px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.savingsLabel { font-size: 12px; font-weight: 500; color: #7a76a8; margin-bottom: 4px; }
+.savingsAlt { font-size: 12px; color: #3d3a55; text-decoration: line-through; }
+.savingsArrow { font-size: 12px; color: #2d2b40; }
+.savingsYou { font-size: 18px; font-weight: 600; color: #5DCAA5; letter-spacing: -0.5px; }
+.savingsPct { font-size: 11px; font-weight: 600; color: #2a9d6e; background: rgba(93, 202, 165, 0.08); padding: 2px 8px; border-radius: 20px; }
+
 /* PRICING */
 .pricing {
   text-align: center;
@@ -254,8 +294,14 @@
   font-size: 30px;
   font-weight: 600;
   letter-spacing: -0.9px;
-  margin-bottom: 38px;
+  margin-bottom: 10px;
   color: #f0eeff;
+}
+
+.pricingSub {
+  font-size: 13px;
+  color: #3d3a55;
+  margin-bottom: 32px;
 }
 
 .plans {
@@ -301,9 +347,9 @@
   box-shadow: 0 2px 14px rgba(127, 119, 221, 0.45);
 }
 
-.planName { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
-.planPrice { font-size: 28px; font-weight: 600; letter-spacing: -1px; margin-bottom: 5px; color: #f0eeff; }
-.planCredits { font-size: 13px; color: #AFA9EC; margin-bottom: 4px; }
+.planName { font-size: 10px; color: #3a3655; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; margin-bottom: 10px; }
+.planPrice { font-size: 26px; font-weight: 600; letter-spacing: -1px; margin-bottom: 4px; color: #f0eeff; }
+.planCredits { font-size: 13px; color: #AFA9EC; margin-bottom: 3px; font-weight: 500; }
 .planPer { font-size: 11px; color: #3d3a55; }
 
 /* FOOTER */
@@ -328,6 +374,8 @@
   .nav { padding: 0 16px; }
   .hero { padding: 56px 16px 48px; }
   .features { grid-template-columns: 1fr 1fr; padding: 0 16px; gap: 10px; }
+  .savingsGrid { grid-template-columns: 1fr 1fr; }
+  .savings { margin-bottom: 56px; }
   .plans { grid-template-columns: 1fr; }
   .pricing { padding: 0 16px 60px; }
   .footer { padding: 20px 16px; flex-direction: column; gap: 8px; text-align: center; }

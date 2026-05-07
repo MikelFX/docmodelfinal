@@ -363,6 +363,12 @@
 }
 .optionBtn:hover { border-color: rgba(127, 119, 221, 0.4); color: #c8c4e8; }
 .optionBtnActive { border-color: rgba(127, 119, 221, 0.5) !important; color: #AFA9EC !important; background: rgba(127, 119, 221, 0.1) !important; }
+.langSelect {
+  background: rgba(19, 17, 31, 0.8); border: 0.5px solid rgba(127, 119, 221, 0.12);
+  border-radius: 7px; padding: 5px 10px; font-family: inherit; font-size: 12px; color: #c8c4e8;
+  cursor: pointer; outline: none; transition: border-color 0.18s; max-width: 180px;
+}
+.langSelect:hover, .langSelect:focus { border-color: rgba(127, 119, 221, 0.4); }
 .selectInput {
   background: rgba(19, 17, 31, 0.8); border: 0.5px solid rgba(127, 119, 221, 0.12);
   border-radius: 7px; padding: 6px 12px; font-family: inherit; font-size: 13px; color: #c8c4e8; cursor: pointer; outline: none; transition: border-color 0.18s;

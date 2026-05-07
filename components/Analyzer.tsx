@@ -6,7 +6,7 @@ import { UserButton, useUser } from '@clerk/nextjs'
 import { useLanguage } from '@/contexts/LanguageContext'
 import styles from './Analyzer.module.css'
 
-type Mode = 'chat' | 'summary' | 'actions' | 'risks' | 'qa' | 'deadlines' | 'rewrite' | 'translate' | 'template' | 'interview' | 'imagine' | 'email' | 'batch'
+type Mode = 'chat' | 'summary' | 'actions' | 'risks' | 'qa' | 'deadlines' | 'rewrite' | 'translate' | 'template' | 'interview' | 'codegen' | 'email' | 'batch'
 
 interface HistoryItem {
   id: string
@@ -31,16 +31,8 @@ const MODES: { id: Mode; icon: string; credits: number; group: 'chat' | 'analyze
   { id: 'template',  icon: '📝', credits: 2, group: 'tools'   },
   { id: 'email',     icon: '📧', credits: 2, group: 'tools'   },
   { id: 'interview', icon: '🤖', credits: 5, group: 'tools'   },
-  { id: 'imagine',   icon: '🎨', credits: 1, group: 'tools'   },
+  { id: 'codegen',   icon: '💻', credits: 3, group: 'tools'   },
   { id: 'batch',     icon: '📦', credits: 1, group: 'tools'   },
-]
-
-const IMAGINE_STYLES = [
-  { id: 'realistic',    suffix: 'photorealistic, 8k, sharp, detailed' },
-  { id: 'artistic',     suffix: 'digital art, vibrant colors, artistic' },
-  { id: 'illustration', suffix: 'illustration, vector art, clean lines' },
-  { id: 'cinematic',    suffix: 'cinematic, dramatic lighting, movie still, 35mm' },
-  { id: 'minimal',      suffix: 'minimalist, clean, simple, white background' },
 ]
 
 const DEMO_TEXT = `DocThink Demo: Toto je ukázkový analytický dokument.
@@ -52,13 +44,28 @@ Rozpočet: 450 000 Kč, aktuálně proinvestováno 280 000 Kč.
 Závěr: projekt je v plánu, nutné sledovat rizika dodavatele.`
 
 const TRANSLATE_LANGS = [
-  { code: 'en', label: '🇬🇧 Angličtina' },
-  { code: 'de', label: '🇩🇪 Němčina' },
-  { code: 'sk', label: '🇸🇰 Slovenština' },
-  { code: 'pl', label: '🇵🇱 Polština' },
-  { code: 'fr', label: '🇫🇷 Francouzština' },
-  { code: 'es', label: '🇪🇸 Španělština' },
-  { code: 'cs', label: '🇨🇿 Čeština' },
+  { code: 'en', label: '🇬🇧 English' },
+  { code: 'cs', label: '🇨🇿 Czech' },
+  { code: 'de', label: '🇩🇪 German' },
+  { code: 'sk', label: '🇸🇰 Slovak' },
+  { code: 'fr', label: '🇫🇷 French' },
+  { code: 'es', label: '🇪🇸 Spanish' },
+  { code: 'it', label: '🇮🇹 Italian' },
+  { code: 'pl', label: '🇵🇱 Polish' },
+  { code: 'nl', label: '🇳🇱 Dutch' },
+  { code: 'pt', label: '🇵🇹 Portuguese' },
+  { code: 'ro', label: '🇷🇴 Romanian' },
+  { code: 'hu', label: '🇭🇺 Hungarian' },
+  { code: 'sv', label: '🇸🇪 Swedish' },
+  { code: 'da', label: '🇩🇰 Danish' },
+  { code: 'fi', label: '🇫🇮 Finnish' },
+  { code: 'el', label: '🇬🇷 Greek' },
+  { code: 'hr', label: '🇭🇷 Croatian' },
+  { code: 'bg', label: '🇧🇬 Bulgarian' },
+  { code: 'sl', label: '🇸🇮 Slovenian' },
+  { code: 'et', label: '🇪🇪 Estonian' },
+  { code: 'lv', label: '🇱🇻 Latvian' },
+  { code: 'lt', label: '🇱🇹 Lithuanian' },
 ]
 
 function stripHtml(html: string) {
@@ -75,11 +82,8 @@ export default function Analyzer() {
   const [dragging, setDragging] = useState(false)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState('')
-  const [credits, setCredits] = useState<number>(() => {
-    if (typeof window === 'undefined') return 10
-    const saved = localStorage.getItem('docthink_credits')
-    return saved !== null ? parseInt(saved, 10) : 10
-  })
+  const [credits, setCredits] = useState<number>(10)
+  const creditsReady = useRef(false)
   const [question, setQuestion] = useState('')
   const [qLoading, setQLoading] = useState(false)
   const [answers, setAnswers] = useState<{ q: string; a: string }[]>([])
@@ -89,7 +93,7 @@ export default function Analyzer() {
   const [rewriteStyle, setRewriteStyle] = useState<'formal' | 'simple'>('formal')
   const [targetLang, setTargetLang] = useState('en')
   const [templateDesc, setTemplateDesc] = useState('')
-  const [templateLang, setTemplateLang] = useState('cs')
+  const [templateLang, setTemplateLang] = useState('en')
 
   const [interviewType, setInterviewType] = useState('')
   const [interviewStarted, setInterviewStarted] = useState(false)
@@ -112,14 +116,17 @@ export default function Analyzer() {
   const [emailType, setEmailType] = useState('followup')
   const [emailRecipient, setEmailRecipient] = useState('')
   const [emailTone, setEmailTone] = useState<'formal' | 'friendly'>('formal')
-  const [emailLang, setEmailLang] = useState('cs')
+  const [emailLang, setEmailLang] = useState('en')
 
-  // Imagine
-  const [imaginePrompt, setImaginePrompt] = useState('')
-  const [imagineStyle, setImagineStyle] = useState('realistic')
-  const [imagineUrl, setImagineUrl] = useState('')
-  const [imagineLoading, setImagineLoading] = useState(false)
-  const [imagineError, setImagineError] = useState('')
+  // Codegen
+  const [codegenDesc, setCodegenDesc] = useState('')
+  const [codegenType, setCodegenType] = useState('website')
+  const [codegenLang, setCodegenLang] = useState('en')
+  const [codegenResult, setCodegenResult] = useState('')
+  const [codegenLoading, setCodegenLoading] = useState(false)
+
+  // Chat credit tracking (1 credit per 5 AI responses)
+  const [chatResponseCount, setChatResponseCount] = useState(0)
 
   // Batch
   const [batchFiles, setBatchFiles] = useState<File[]>([])
@@ -135,7 +142,14 @@ export default function Analyzer() {
   const { user } = useUser()
 
   useEffect(() => {
-    if (credits !== 10) localStorage.setItem('docthink_credits', credits.toString())
+    const saved = localStorage.getItem('docthink_credits')
+    if (saved !== null) setCredits(parseInt(saved, 10))
+    creditsReady.current = true
+  }, [])
+
+  useEffect(() => {
+    if (!creditsReady.current) return
+    localStorage.setItem('docthink_credits', credits.toString())
   }, [credits])
 
   useEffect(() => {
@@ -179,9 +193,11 @@ export default function Analyzer() {
 
   async function restoreCredits(cost: number) {
     if (cost === 0) return
-    const next = credits + cost
-    setCredits(next)
-    localStorage.setItem('docthink_credits', next.toString())
+    setCredits(prev => {
+      const next = prev + cost
+      localStorage.setItem('docthink_credits', next.toString())
+      return next
+    })
     try {
       const res = await fetch('/api/credits', {
         method: 'POST',
@@ -385,6 +401,12 @@ export default function Analyzer() {
   async function sendChatMessage(text?: string) {
     const msg = (text ?? chatInput).trim()
     if (!msg || chatLoading) return
+
+    // Charge 1 credit for every 5 AI responses already received
+    if (chatResponseCount > 0 && chatResponseCount % 5 === 0) {
+      if (!(await spendCredits(1))) return
+    }
+
     setChatInput('')
 
     const newHistory = [...chatHistory, { role: 'user', content: msg }]
@@ -451,6 +473,7 @@ export default function Analyzer() {
         return u
       })
       setChatHistory([...newHistory, { role: 'assistant', content: finalDisplay }])
+      setChatResponseCount(prev => prev + 1)
     } catch {
       setChatMessages(prev => {
         const u = [...prev]
@@ -488,28 +511,29 @@ export default function Analyzer() {
     }
   }
 
-  // ── IMAGINE ──
-  async function generateImage() {
-    const prompt = imaginePrompt.trim()
-    if (!prompt) return
-    setImagineLoading(true)
-    setImagineUrl('')
-    setImagineError('')
-    if (!(await spendCredits(1))) { setImagineLoading(false); return }
-
-    const style = IMAGINE_STYLES.find(s => s.id === imagineStyle)
-    const fullPrompt = `${prompt}, ${style?.suffix ?? ''}`
-    const seed = Math.floor(Math.random() * 99999)
-    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(fullPrompt)}?width=832&height=512&nologo=true&enhance=true&seed=${seed}`
-
-    const img = new window.Image()
-    img.onload = () => { setImagineUrl(url); setImagineLoading(false) }
-    img.onerror = () => {
-      setImagineError(t.imagine.error)
-      setImagineLoading(false)
-      restoreCredits(1)
+  // ── CODEGEN ──
+  async function generateCodegen() {
+    if (!codegenDesc.trim()) return
+    const cost = 3
+    setCodegenLoading(true)
+    setCodegenResult('')
+    if (!(await spendCredits(cost))) { setCodegenLoading(false); return }
+    try {
+      const res = await fetch('/api/codegen', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: codegenDesc, type: codegenType, language: codegenLang }),
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      setCodegenResult(data.result)
+      saveToHistory(data.result, 'Kód: ' + codegenDesc.slice(0, 30), mode)
+    } catch (err: any) {
+      setCodegenResult('Chyba: ' + (err instanceof Error ? err.message : 'Zkus znovu.'))
+      restoreCredits(cost)
+    } finally {
+      setCodegenLoading(false)
     }
-    img.src = url
   }
 
   // ── BATCH ──
@@ -652,7 +676,7 @@ export default function Analyzer() {
               onClick={() => { setMode(m.id); setResult(''); setAnswers([]) }}>
               <span className={styles.modeIcon}>{m.icon}</span>
               <span className={styles.modeLabelText}>{(t.modes as any)[m.id]}</span>
-              <span className={styles.modeCredits} style={{ color: '#5DCAA5', background: 'rgba(93,202,165,0.08)' }}>{t.sidebar.free}</span>
+              <span className={styles.modeCredits} style={{ color: '#5DCAA5', background: 'rgba(93,202,165,0.08)' }}>1k/5</span>
             </button>
           ))}
 
@@ -669,7 +693,7 @@ export default function Analyzer() {
           <div className={styles.sidebarLabel} style={{ marginTop: 16 }}>{t.sidebar.aiTools}</div>
           {MODES.filter(m => m.group === 'tools').map(m => (
             <button key={m.id} className={`${styles.modeBtn} ${mode === m.id ? styles.modeBtnActive : ''}`}
-              onClick={() => { setMode(m.id); setResult(''); setAnswers([]); setInterviewStarted(false); setImagineUrl(''); setImagineError('') }}>
+              onClick={() => { setMode(m.id); setResult(''); setAnswers([]); setInterviewStarted(false); setCodegenResult('') }}>
               <span className={styles.modeIcon}>{m.icon}</span>
               <span className={styles.modeLabelText}>{(t.modes as any)[m.id]}</span>
               <span className={styles.modeCredits}>{m.credits}k</span>
@@ -858,12 +882,9 @@ export default function Analyzer() {
               </div>
               <div className={styles.optionRow}>
                 <span className={styles.optionLabel}>{t.email.langLabel}</span>
-                <button className={`${styles.optionBtn} ${emailLang === 'cs' ? styles.optionBtnActive : ''}`}
-                  onClick={() => setEmailLang('cs')}>🇨🇿 Čeština</button>
-                <button className={`${styles.optionBtn} ${emailLang === 'en' ? styles.optionBtnActive : ''}`}
-                  onClick={() => setEmailLang('en')}>🇬🇧 English</button>
-                <button className={`${styles.optionBtn} ${emailLang === 'de' ? styles.optionBtnActive : ''}`}
-                  onClick={() => setEmailLang('de')}>🇩🇪 Deutsch</button>
+                <select className={styles.langSelect} value={emailLang} onChange={e => setEmailLang(e.target.value)}>
+                  {TRANSLATE_LANGS.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}
+                </select>
               </div>
               <button className={styles.analyzeBtn} onClick={generateEmail} disabled={loading}>
                 {loading
@@ -901,8 +922,9 @@ export default function Analyzer() {
                 value={templateDesc} onChange={e => setTemplateDesc(e.target.value)} rows={4} />
               <div className={styles.optionRow}>
                 <span className={styles.optionLabel}>{t.template.langLabel}</span>
-                <button className={`${styles.optionBtn} ${templateLang === 'cs' ? styles.optionBtnActive : ''}`} onClick={() => setTemplateLang('cs')}>🇨🇿 Čeština</button>
-                <button className={`${styles.optionBtn} ${templateLang === 'en' ? styles.optionBtnActive : ''}`} onClick={() => setTemplateLang('en')}>🇬🇧 English</button>
+                <select className={styles.langSelect} value={templateLang} onChange={e => setTemplateLang(e.target.value)}>
+                  {TRANSLATE_LANGS.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}
+                </select>
               </div>
               <button className={styles.analyzeBtn} onClick={generateTemplate} disabled={loading || !templateDesc.trim()}>
                 {loading ? <span className={styles.loadingDots}><span /><span /><span /></span> : t.template.generate}
@@ -965,43 +987,52 @@ export default function Analyzer() {
             </div>
           )}
 
-          {/* ── IMAGINE ── */}
-          {mode === 'imagine' && (
+          {/* ── CODEGEN ── */}
+          {mode === 'codegen' && (
             <div className={styles.toolCard}>
-              <div className={styles.toolCardTitle}>🎨 {t.modes.imagine} <span className={styles.creditBadge}>1 kredit</span></div>
-              <p className={styles.toolCardDesc}>{t.imagine.desc}</p>
-              <textarea className={styles.textareaInput} placeholder={t.imagine.placeholder}
-                value={imaginePrompt} onChange={e => setImaginePrompt(e.target.value)} rows={3} />
+              <div className={styles.toolCardTitle}>💻 {t.modes.codegen} <span className={styles.creditBadge}>3 kredity</span></div>
+              <p className={styles.toolCardDesc}>{t.codegen.desc}</p>
+              <textarea className={styles.textareaInput} placeholder={t.codegen.placeholder}
+                value={codegenDesc} onChange={e => setCodegenDesc(e.target.value)} rows={4} />
               <div className={styles.optionRow}>
-                <span className={styles.optionLabel}>{t.imagine.styleLabel}</span>
-                {IMAGINE_STYLES.map(s => (
-                  <button key={s.id}
-                    className={`${styles.optionBtn} ${imagineStyle === s.id ? styles.optionBtnActive : ''}`}
-                    onClick={() => setImagineStyle(s.id)}>
-                    {(t.imagine.styles as any)[s.id]}
+                <span className={styles.optionLabel}>{t.codegen.typeLabel}</span>
+                {(['website', 'landing', 'component', 'script'] as const).map(type => (
+                  <button key={type}
+                    className={`${styles.optionBtn} ${codegenType === type ? styles.optionBtnActive : ''}`}
+                    onClick={() => setCodegenType(type)}>
+                    {(t.codegen.types as any)[type]}
                   </button>
                 ))}
               </div>
-              <button className={styles.analyzeBtn} onClick={generateImage}
-                disabled={imagineLoading || !imaginePrompt.trim()}>
-                {imagineLoading
+              <div className={styles.optionRow}>
+                <span className={styles.optionLabel}>{t.codegen.langLabel}</span>
+                <select className={styles.langSelect} value={codegenLang} onChange={e => setCodegenLang(e.target.value)}>
+                  {TRANSLATE_LANGS.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}
+                </select>
+              </div>
+              <button className={styles.analyzeBtn} onClick={generateCodegen}
+                disabled={codegenLoading || !codegenDesc.trim()}>
+                {codegenLoading
                   ? <span className={styles.loadingDots}><span /><span /><span /></span>
-                  : t.imagine.generate}
+                  : t.codegen.generate}
               </button>
-              {imagineError && <p style={{ color: '#F09595', fontSize: 13, margin: 0 }}>{imagineError}</p>}
-              {imagineLoading && (
-                <div className={styles.imagineLoading}>
-                  <div className={styles.imagineBar}><div className={styles.imagineBarFill} /></div>
-                  <p className={styles.imagineLoadingText}>{t.imagine.loading}</p>
-                </div>
+              {codegenLoading && (
+                <p style={{ color: '#9590c8', fontSize: 13, margin: '8px 0 0' }}>{t.codegen.loading}</p>
               )}
-              {imagineUrl && !imagineLoading && (
-                <div className={styles.imagineResult}>
-                  <img src={imagineUrl} alt={imaginePrompt} className={styles.imagineImg} />
-                  <div className={styles.imagineActions}>
-                    <a href={imagineUrl} target="_blank" rel="noopener noreferrer" className={styles.actionBtn}>{t.imagine.open}</a>
-                    <a href={imagineUrl} download={`docthink-${Date.now()}.jpg`} className={styles.actionBtn}>{t.imagine.download}</a>
+              {codegenResult && !codegenLoading && (
+                <div style={{ marginTop: 16 }}>
+                  <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                    <button className={styles.actionBtn} onClick={() => navigator.clipboard.writeText(codegenResult)}>{t.codegen.copy}</button>
+                    <button className={styles.actionBtn} onClick={() => {
+                      const ext = codegenType === 'component' ? '.tsx' : codegenType === 'script' ? '.js' : '.html'
+                      const blob = new Blob([codegenResult], { type: 'text/plain;charset=utf-8' })
+                      const a = document.createElement('a')
+                      a.href = URL.createObjectURL(blob)
+                      a.download = `docthink-code${ext}`
+                      a.click()
+                    }}>{t.codegen.download}</button>
                   </div>
+                  <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 12, lineHeight: 1.6, color: '#c8c4e8', background: 'rgba(255,255,255,0.04)', padding: 16, borderRadius: 8, maxHeight: 520, overflowY: 'auto', margin: 0 }}>{codegenResult}</pre>
                 </div>
               )}
             </div>
@@ -1144,7 +1175,7 @@ export default function Analyzer() {
           )}
 
           {/* ── RESULT BOX ── */}
-          {(result || loading) && mode !== 'interview' && mode !== 'imagine' && (
+          {(result || loading) && mode !== 'interview' && (
             <div className={styles.resultBox}>
               <div className={styles.resultHeader}>
                 <span className={styles.resultLabel}>{(t.modes as any)[mode]}</span>

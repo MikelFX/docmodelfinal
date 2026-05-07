@@ -1,49 +1,48 @@
 import { NextRequest } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
+import { anthropic, MODEL } from '@/lib/anthropic'
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth()
-  if (!userId) return new Response('Nepřihlášen', { status: 401 })
+  if (!userId) return new Response('Not authenticated', { status: 401 })
 
-  const apiKey = process.env.OPENROUTER_API_KEY
-  if (!apiKey) return new Response('Chybí OPENROUTER_API_KEY', { status: 500 })
+  if (!process.env.ANTHROPIC_API_KEY) return new Response('Missing ANTHROPIC_API_KEY', { status: 500 })
 
   let messages: { role: string; content: string }[]
   try {
     const body = await req.json()
     messages = body.messages ?? []
   } catch {
-    return new Response('Neplatný požadavek', { status: 400 })
+    return new Response('Invalid request', { status: 400 })
   }
 
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-      'HTTP-Referer': 'https://docthink.vercel.app',
-      'X-Title': 'DocThink',
-    },
-    body: JSON.stringify({
-      model: 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
-      stream: true,
-      max_tokens: 1024,
-      messages: [
-        {
-          role: 'system',
-          content: 'Jsi DocThink AI asistent. Odpovídáš vždy česky, stručně, přátelsky a věcně. Buď konkrétní a praktický. Nikdy nepíš <think> bloky ani vnitřní úvahy — jen čistou odpověď.',
-        },
-        ...messages,
-      ],
-    }),
+  const stream = anthropic.messages.stream({
+    model: MODEL,
+    max_tokens: 1024,
+    system: 'You are DocThink AI assistant. Be concise, friendly, and practical. Always mirror the language the user writes in.',
+    messages: messages as { role: 'user' | 'assistant'; content: string }[],
   })
 
-  if (!response.ok || !response.body) {
-    const text = await response.text().catch(() => 'Chyba AI serveru')
-    return new Response(text, { status: 502 })
-  }
+  const encoder = new TextEncoder()
+  const readable = new ReadableStream({
+    async start(controller) {
+      try {
+        for await (const chunk of stream) {
+          if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+            const data = JSON.stringify({ choices: [{ delta: { content: chunk.delta.text } }] })
+            controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+          }
+        }
+        controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+      } catch {
+        controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+      } finally {
+        controller.close()
+      }
+    },
+  })
 
-  return new Response(response.body, {
+  return new Response(readable, {
     headers: {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache, no-transform',

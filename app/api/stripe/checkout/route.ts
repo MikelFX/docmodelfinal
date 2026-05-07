@@ -6,8 +6,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 const PLANS: Record<string, { priceId: string; credits: number }> = {
   starter: { priceId: process.env.STRIPE_PRICE_STARTER!, credits: 10 },
-  pro:     { priceId: process.env.STRIPE_PRICE_PRO!,     credits: 50 },
-  team:    { priceId: process.env.STRIPE_PRICE_TEAM!,    credits: 200 },
+  pro:     { priceId: process.env.STRIPE_PRICE_PRO!,     credits: 40  },
+  team:    { priceId: process.env.STRIPE_PRICE_TEAM!,    credits: 120 },
 }
 
 export async function POST(req: NextRequest) {

@@ -1,68 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server'
-
-const TIMEOUT_MS = 30_000
-const MAX_RETRIES = 3
-
-async function callOpenRouter(messages: object[], apiKey: string, attempt = 1): Promise<string> {
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS)
-  let response: Response
-  try {
-    response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}`, 'HTTP-Referer': 'http://localhost:3000', 'X-Title': 'DocMind' },
-      body: JSON.stringify({ model: 'openrouter/auto', max_tokens: 1024, messages }),
-      signal: controller.signal,
-    })
-  } catch (err: any) {
-    clearTimeout(timer)
-    if (err.name === 'AbortError') throw new Error('Časový limit vypršel.')
-    if (attempt < MAX_RETRIES) { await new Promise(r => setTimeout(r, 1000 * attempt)); return callOpenRouter(messages, apiKey, attempt + 1) }
-    throw new Error('Nepodařilo se spojit s AI serverem.')
-  }
-  clearTimeout(timer)
-  if (response.status === 429) {
-    if (attempt < MAX_RETRIES) { await new Promise(r => setTimeout(r, 2000 * attempt)); return callOpenRouter(messages, apiKey, attempt + 1) }
-    throw new Error('Překročen limit požadavků.')
-  }
-  if (!response.ok) { const data = await response.json(); throw new Error(data.error?.message || `Chyba (${response.status})`) }
-  const data = await response.json()
-  let result: string = data.choices?.[0]?.message?.content ?? ''
-  result = result.replace(/```/g, '').trim()
-  if (!result) throw new Error('AI vrátilo prázdnou odpověď.')
-  return result
-}
+import { anthropic, MODEL } from '@/lib/anthropic'
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.OPENROUTER_API_KEY
-  if (!apiKey) return NextResponse.json({ error: 'Chybí OPENROUTER_API_KEY' }, { status: 500 })
+  if (!process.env.ANTHROPIC_API_KEY) return NextResponse.json({ error: 'Missing ANTHROPIC_API_KEY' }, { status: 500 })
 
   const { docType, history, userAnswer } = await req.json()
-  if (!docType) return NextResponse.json({ error: 'Chybí typ dokumentu.' }, { status: 400 })
+  if (!docType) return NextResponse.json({ error: 'Missing document type.' }, { status: 400 })
 
-  const systemPrompt = `Jsi asistent který pomáhá uživateli vyplnit dokument formou rozhovoru.
-Typ dokumentu: ${docType}
-Ptáš se vždy NA JEDNU otázku. Jakmile máš dostatek informací, vrať kompletní vyplněný dokument.
-Pokud uživatel odpoví na všechny potřebné otázky, napiš "DOKUMENT_HOTOV:" a za tím celý dokument.
-Jinak napiš pouze další otázku.`
+  const systemPrompt = `You are an assistant helping the user fill out a document through a conversation.
+Document type: ${docType}
+Ask exactly ONE question at a time. Once you have enough information, return the complete filled document.
+When the user has answered all necessary questions, write "DOCUMENT_COMPLETE:" followed by the full document.
+Otherwise write only the next question.`
 
-  // Drz jen poslednich 8 zprav aby se neprekrocil kontext modelu
   const trimmedHistory = (history || []).slice(-8)
 
   const messages = [
-    { role: 'system', content: systemPrompt },
     ...trimmedHistory,
-    ...(userAnswer ? [{ role: 'user', content: userAnswer }] : []),
-    ...(!history?.length ? [{ role: 'user', content: `Začni rozhovor pro vytvoření: ${docType}` }] : []),
+    ...(userAnswer ? [{ role: 'user' as const, content: userAnswer }] : []),
+    ...(!history?.length ? [{ role: 'user' as const, content: `Start the conversation for creating: ${docType}` }] : []),
   ]
 
   try {
-    const result = await callOpenRouter(messages, apiKey)
-    const isFinished = result.includes('DOKUMENT_HOTOV:')
-    const document = isFinished ? result.split('DOKUMENT_HOTOV:')[1].trim() : null
+    const message = await anthropic.messages.create({
+      model: MODEL,
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages,
+    })
+
+    let result = message.content[0].type === 'text' ? message.content[0].text : ''
+    result = result.replace(/```/g, '').trim()
+    if (!result) throw new Error('AI returned an empty response.')
+
+    const isFinished = result.includes('DOCUMENT_COMPLETE:')
+    const document = isFinished ? result.split('DOCUMENT_COMPLETE:')[1].trim() : null
     const question = isFinished ? null : result
+
     return NextResponse.json({ question, document, isFinished })
   } catch (err: any) {
+    console.error('[DocMind] interview error:', err.message)
     return NextResponse.json({ error: err.message }, { status: 502 })
   }
 }
