@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { anthropic, MODEL } from '@/lib/anthropic'
+import { LANG_NAMES } from '@/lib/langNames'
 
 const TYPE_LABELS: Record<string, string> = {
   website: 'complete website (HTML + CSS + JavaScript, single .html file)',
@@ -15,7 +16,8 @@ export async function POST(req: NextRequest) {
   if (!description) return NextResponse.json({ error: 'Chybí popis projektu.' }, { status: 400 })
 
   const typeLabel = TYPE_LABELS[type] || TYPE_LABELS.website
-  const lang = language === 'en' ? 'with English text and comments' : 'with Czech text and comments'
+  const langName = LANG_NAMES[language] ?? 'English'
+  const lang = `with ${langName} text and comments`
 
   try {
     const message = await anthropic.messages.create({

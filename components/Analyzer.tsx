@@ -74,7 +74,7 @@ function stripHtml(html: string) {
 }
 
 export default function Analyzer() {
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
 
   const [mode, setMode] = useState<Mode>('chat')
   const [fileContent, setFileContent] = useState('')
@@ -283,7 +283,7 @@ export default function Analyzer() {
         res = await fetch('/api/rewrite', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content, style: rewriteStyle }),
+          body: JSON.stringify({ content, style: rewriteStyle, lang }),
         })
       } else if (mode === 'translate') {
         res = await fetch('/api/translate', {
@@ -295,7 +295,7 @@ export default function Analyzer() {
         res = await fetch('/api/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content, mode }),
+          body: JSON.stringify({ content, mode, lang }),
         })
       }
 
@@ -352,7 +352,7 @@ export default function Analyzer() {
       const res = await fetch('/api/interview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ docType: interviewType, history: [], userAnswer: null }),
+        body: JSON.stringify({ docType: interviewType, history: [], userAnswer: null, lang }),
       })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
@@ -380,7 +380,7 @@ export default function Analyzer() {
       const res = await fetch('/api/interview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ docType: interviewType, history: newHistory }),
+        body: JSON.stringify({ docType: interviewType, history: newHistory, lang }),
       })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
@@ -424,7 +424,7 @@ export default function Analyzer() {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newHistory }),
+        body: JSON.stringify({ messages: newHistory, lang }),
       })
 
       if (!res.body) throw new Error('Žádný stream')
@@ -578,7 +578,7 @@ export default function Analyzer() {
         const res = await fetch('/api/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content: content.slice(0, 3000), mode: batchAnalysisMode }),
+          body: JSON.stringify({ content: content.slice(0, 3000), mode: batchAnalysisMode, lang }),
         })
         const data = await res.json()
         if (data.error) throw new Error(data.error)
@@ -604,7 +604,7 @@ export default function Analyzer() {
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: fileContent || DEMO_TEXT, question: q }),
+        body: JSON.stringify({ content: fileContent || DEMO_TEXT, question: q, lang }),
       })
       const data = await res.json()
       setAnswers(prev => prev.map((item, i) => i === prev.length - 1 ? { ...item, a: data.result || 'Žádná odpověď.' } : item))

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { anthropic, MODEL } from '@/lib/anthropic'
+import { langInstruction } from '@/lib/langNames'
 
 type Mode = 'summary' | 'actions' | 'risks' | 'qa' | 'deadlines' | 'finance'
 
@@ -82,21 +83,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing ANTHROPIC_API_KEY in .env.local' }, { status: 500 })
   }
 
-  let body: { content?: string; mode?: string; question?: string }
+  let body: { content?: string; mode?: string; question?: string; lang?: string }
   try {
     body = await req.json()
   } catch {
     return NextResponse.json({ error: 'Invalid request.' }, { status: 400 })
   }
 
-  const { content, mode, question } = body
+  const { content, mode, question, lang } = body
   if (!content) {
     return NextResponse.json({ error: 'Missing document content.' }, { status: 400 })
   }
 
+  const langHint = langInstruction(lang ?? 'en')
+
   const systemPrompt = question
-    ? 'You are an analytical assistant. Answer concisely and factually. Mirror the language the user writes in.'
-    : 'You are an analytical assistant. Respond ONLY as HTML fragments. No markdown, no backticks, no DOCTYPE.'
+    ? `You are an analytical assistant. Answer concisely and factually. ${langHint}`
+    : `You are an analytical assistant. Respond ONLY as HTML fragments. No markdown, no backticks, no DOCTYPE. ${langHint}`
 
   const userMessage = question
     ? `Based on the document, answer: "${question}"\n\nDOCUMENT:\n${content.slice(0, 4000)}\n\nAnswer concisely.`

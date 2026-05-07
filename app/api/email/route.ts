@@ -1,14 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { anthropic, MODEL } from '@/lib/anthropic'
-
-const LANG_NAMES: Record<string, string> = {
-  cs: 'Czech', en: 'English', de: 'German', sk: 'Slovak', pl: 'Polish',
-  fr: 'French', es: 'Spanish', it: 'Italian', nl: 'Dutch', pt: 'Portuguese',
-  ro: 'Romanian', hu: 'Hungarian', sv: 'Swedish', da: 'Danish', fi: 'Finnish',
-  el: 'Greek', hr: 'Croatian', bg: 'Bulgarian', sl: 'Slovenian',
-  et: 'Estonian', lv: 'Latvian', lt: 'Lithuanian',
-}
+import { LANG_NAMES } from '@/lib/langNames'
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth()

@@ -1,17 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { anthropic, MODEL } from '@/lib/anthropic'
+import { langInstruction } from '@/lib/langNames'
 
 export async function POST(req: NextRequest) {
   if (!process.env.ANTHROPIC_API_KEY) return NextResponse.json({ error: 'Missing ANTHROPIC_API_KEY' }, { status: 500 })
 
-  const { docType, history, userAnswer } = await req.json()
+  const { docType, history, userAnswer, lang } = await req.json()
   if (!docType) return NextResponse.json({ error: 'Missing document type.' }, { status: 400 })
 
   const systemPrompt = `You are an assistant helping the user fill out a document through a conversation.
 Document type: ${docType}
 Ask exactly ONE question at a time. Once you have enough information, return the complete filled document.
 When the user has answered all necessary questions, write "DOCUMENT_COMPLETE:" followed by the full document.
-Otherwise write only the next question.`
+Otherwise write only the next question.
+${langInstruction(lang ?? 'en')}`
 
   const trimmedHistory = (history || []).slice(-8)
 

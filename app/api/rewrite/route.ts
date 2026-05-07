@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { anthropic, MODEL } from '@/lib/anthropic'
+import { langInstruction } from '@/lib/langNames'
 
 export async function POST(req: NextRequest) {
   if (!process.env.ANTHROPIC_API_KEY) return NextResponse.json({ error: 'Missing ANTHROPIC_API_KEY' }, { status: 500 })
 
-  const { content, style } = await req.json()
+  const { content, style, lang } = await req.json()
   if (!content) return NextResponse.json({ error: 'Missing document content.' }, { status: 400 })
 
   const stylePrompts: Record<string, string> = {
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
     const message = await anthropic.messages.create({
       model: MODEL,
       max_tokens: 2048,
-      system: 'You are a professional text editor. Rewrite texts according to the requested style. Return only the rewritten text, no commentary.',
+      system: `You are a professional text editor. Rewrite texts according to the requested style. Return only the rewritten text, no commentary. ${langInstruction(lang ?? 'en')}`,
       messages: [{ role: 'user', content: `${prompt}\n\nTEXT:\n${content.slice(0, 4000)}` }],
     })
 

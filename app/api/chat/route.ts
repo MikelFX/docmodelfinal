@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { anthropic, MODEL } from '@/lib/anthropic'
+import { langInstruction } from '@/lib/langNames'
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth()
@@ -16,10 +17,12 @@ export async function POST(req: NextRequest) {
     return new Response('Invalid request', { status: 400 })
   }
 
+  const lang: string = (body as any).lang ?? 'en'
+
   const stream = anthropic.messages.stream({
     model: MODEL,
     max_tokens: 1024,
-    system: 'You are DocThink AI assistant. Be concise, friendly, and practical. Always mirror the language the user writes in.',
+    system: `You are DocThink AI assistant. Be concise, friendly, and practical. ${langInstruction(lang)}`,
     messages: messages as { role: 'user' | 'assistant'; content: string }[],
   })
 
