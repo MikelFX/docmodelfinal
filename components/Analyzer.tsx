@@ -74,7 +74,11 @@ export default function Analyzer() {
   const [dragging, setDragging] = useState(false)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState('')
-  const [credits, setCredits] = useState(10)
+  const [credits, setCredits] = useState<number>(() => {
+    if (typeof window === 'undefined') return 10
+    const saved = localStorage.getItem('docthink_credits')
+    return saved !== null ? parseInt(saved, 10) : 10
+  })
   const [question, setQuestion] = useState('')
   const [qLoading, setQLoading] = useState(false)
   const [answers, setAnswers] = useState<{ q: string; a: string }[]>([])
@@ -122,11 +126,21 @@ export default function Analyzer() {
   const { user } = useUser()
 
   useEffect(() => {
+    if (credits !== 10) localStorage.setItem('docthink_credits', credits.toString())
+  }, [credits])
+
+  useEffect(() => {
     const saved = localStorage.getItem('docmind_history')
     if (saved) setHistory(JSON.parse(saved))
-    fetch('/api/credits').then(r => r.json()).then(d => {
-      if (d.credits !== undefined) setCredits(d.credits)
-    })
+    fetch('/api/credits')
+      .then(r => r.json())
+      .then(d => {
+        if (d.credits !== undefined) {
+          setCredits(d.credits)
+          localStorage.setItem('docthink_credits', d.credits.toString())
+        }
+      })
+      .catch(() => { /* KV unavailable — localStorage value used */ })
   }, [user])
 
   useEffect(() => {
@@ -136,7 +150,9 @@ export default function Analyzer() {
   async function spendCredits(cost: number): Promise<boolean> {
     if (cost === 0) return true
     if (credits < cost) { router.push('/koupit'); return false }
-    setCredits(prev => prev - cost)
+    const next = credits - cost
+    setCredits(next)
+    localStorage.setItem('docthink_credits', next.toString())
     try {
       const res = await fetch('/api/credits', {
         method: 'POST',
@@ -144,14 +160,19 @@ export default function Analyzer() {
         body: JSON.stringify({ action: 'spend', amount: cost }),
       })
       const data = await res.json()
-      if (data.credits !== undefined) setCredits(data.credits)
-    } catch { /* KV unreachable – local state already decremented */ }
+      if (data.credits !== undefined) {
+        setCredits(data.credits)
+        localStorage.setItem('docthink_credits', data.credits.toString())
+      }
+    } catch { /* KV unreachable — localStorage already updated */ }
     return true
   }
 
   async function restoreCredits(cost: number) {
     if (cost === 0) return
-    setCredits(prev => prev + cost)
+    const next = credits + cost
+    setCredits(next)
+    localStorage.setItem('docthink_credits', next.toString())
     try {
       const res = await fetch('/api/credits', {
         method: 'POST',
@@ -159,8 +180,11 @@ export default function Analyzer() {
         body: JSON.stringify({ action: 'add', amount: cost }),
       })
       const data = await res.json()
-      if (data.credits !== undefined) setCredits(data.credits)
-    } catch { /* KV unreachable – local state already restored */ }
+      if (data.credits !== undefined) {
+        setCredits(data.credits)
+        localStorage.setItem('docthink_credits', data.credits.toString())
+      }
+    } catch { /* KV unreachable — localStorage already updated */ }
   }
 
   function saveToHistory(res: string, fname: string, m: Mode) {
