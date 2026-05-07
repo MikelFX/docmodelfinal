@@ -46,6 +46,7 @@ export const T = {
       copy: 'Kopírovat', copied: '✓ Zkopírováno', txt: 'TXT', pdf: 'PDF',
       demoText: 'demo text', processing: 'Zpracovávám…',
       ask: 'Zeptej se na cokoliv v dokumentu…', askBtn: 'Zeptat se →',
+      loading: 'načítám…',
     },
     analyzeBtn: (label: string, credits: number) =>
       `${label} — ${credits} ${credits === 1 ? 'kredit' : 'kredity'}`,
@@ -96,6 +97,7 @@ export const T = {
       copy: 'Copy', copied: '✓ Copied', txt: 'TXT', pdf: 'PDF',
       demoText: 'demo text', processing: 'Processing…',
       ask: 'Ask anything about the document…', askBtn: 'Ask →',
+      loading: 'loading…',
     },
     analyzeBtn: (label: string, credits: number) =>
       `${label} — ${credits} ${credits === 1 ? 'credit' : 'credits'}`,
@@ -146,6 +148,7 @@ export const T = {
       copy: 'Kopieren', copied: '✓ Kopiert', txt: 'TXT', pdf: 'PDF',
       demoText: 'Demo-Text', processing: 'Verarbeitung…',
       ask: 'Frag alles zum Dokument…', askBtn: 'Fragen →',
+      loading: 'lädt…',
     },
     analyzeBtn: (label: string, credits: number) => `${label} — ${credits} Credit${credits !== 1 ? 's' : ''}`,
     credit: (n: number) => `Credit${n !== 1 ? 's' : ''}`,
@@ -195,6 +198,7 @@ export const T = {
       copy: 'Kopírovať', copied: '✓ Skopírované', txt: 'TXT', pdf: 'PDF',
       demoText: 'demo text', processing: 'Spracovávam…',
       ask: 'Spýtaj sa na čokoľvek v dokumente…', askBtn: 'Spýtať sa →',
+      loading: 'načítavam…',
     },
     analyzeBtn: (label: string, credits: number) =>
       `${label} — ${credits} ${credits === 1 ? 'kredit' : 'kredity'}`,
