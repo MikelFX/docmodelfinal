@@ -498,6 +498,103 @@
   to { opacity: 1; transform: translateX(0); }
 }
 
+/* TEAM BADGE */
+.teamBadge {
+  font-size: 10px; font-weight: 600;
+  background: linear-gradient(135deg, rgba(93,202,165,0.18), rgba(93,202,165,0.08));
+  color: #5DCAA5; border: 0.5px solid rgba(93,202,165,0.3);
+  border-radius: 10px; padding: 2px 9px; margin-left: 6px;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+
+/* ── BATCH ANALYSIS ── */
+.batchUploadZone {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 18px;
+  border: 1px dashed rgba(127, 119, 221, 0.25);
+  border-radius: 10px; cursor: pointer;
+  background: rgba(13, 11, 24, 0.5);
+  font-size: 13px; color: #555070;
+  transition: all 0.2s ease;
+}
+.batchUploadZone:hover {
+  border-color: rgba(127, 119, 221, 0.5);
+  background: rgba(127, 119, 221, 0.05);
+  color: #c8c4e8;
+}
+
+.batchFileList {
+  display: flex; flex-direction: column; gap: 0;
+  border: 0.5px solid rgba(127, 119, 221, 0.12);
+  border-radius: 10px; overflow: hidden;
+  max-height: 260px; overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(127,119,221,0.2) transparent;
+}
+.batchFileListHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 14px;
+  background: rgba(9, 9, 14, 0.7);
+  border-bottom: 0.5px solid rgba(127, 119, 221, 0.08);
+}
+.batchFileCount { font-size: 11px; color: #AFA9EC; font-weight: 500; }
+.batchFileItem {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 14px;
+  border-bottom: 0.5px solid rgba(127, 119, 221, 0.06);
+  transition: background 0.12s;
+}
+.batchFileItem:last-child { border-bottom: none; }
+.batchFileItem:hover { background: rgba(127, 119, 221, 0.04); }
+.batchFileItemName { flex: 1; font-size: 12px; color: #9d97d8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.batchProgressWrap { display: flex; flex-direction: column; gap: 7px; }
+.batchProgressBar { height: 4px; background: rgba(127, 119, 221, 0.1); border-radius: 4px; overflow: hidden; }
+.batchProgressFill { height: 100%; background: linear-gradient(90deg, #7F77DD, #a78bfa); border-radius: 4px; transition: width 0.4s ease; }
+.batchProgressText { font-size: 12px; color: #AFA9EC; }
+
+.batchResults { display: flex; flex-direction: column; gap: 0; border: 0.5px solid rgba(127, 119, 221, 0.12); border-radius: 10px; overflow: hidden; animation: slideInUp 0.3s ease; }
+.batchResultsHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px;
+  background: rgba(9, 9, 14, 0.7);
+  border-bottom: 0.5px solid rgba(127, 119, 221, 0.08);
+}
+.batchResultsTitle { font-size: 12px; color: #AFA9EC; font-weight: 500; }
+
+.batchResultItem { border-bottom: 0.5px solid rgba(127, 119, 221, 0.07); }
+.batchResultItem:last-child { border-bottom: none; }
+.batchResultHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px; cursor: pointer;
+  transition: background 0.15s;
+}
+.batchResultHeader:hover { background: rgba(127, 119, 221, 0.04); }
+.batchResultName { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #c8c4e8; flex: 1; min-width: 0; }
+.batchResultName span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.batchChevron { font-size: 10px; color: #3a3655; flex-shrink: 0; margin-left: 8px; }
+
+.batchStatusDone { color: #5DCAA5; font-size: 13px; flex-shrink: 0; }
+.batchStatusError { color: #F09595; font-size: 13px; flex-shrink: 0; }
+.batchStatusProcessing { flex-shrink: 0; }
+.batchStatusPending { color: #3a3655; font-size: 13px; flex-shrink: 0; }
+.batchSpinner {
+  display: inline-block; width: 10px; height: 10px;
+  border: 1.5px solid rgba(127,119,221,0.2);
+  border-top-color: #7F77DD;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.batchResultBody {
+  padding: 14px 16px;
+  border-top: 0.5px solid rgba(127, 119, 221, 0.07);
+  background: rgba(9, 9, 14, 0.3);
+  font-size: 13px; line-height: 1.75; color: #c8c4e8;
+  animation: slideInDown 0.2s ease;
+}
+
 /* INPUT MODE TOGGLE */
 .inputModeToggle {
   display: flex;

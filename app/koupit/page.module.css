@@ -162,6 +162,34 @@
   margin-top: 2px;
 }
 
+.planFeatures {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border-top: 0.5px solid #1e1b2e;
+  padding-top: 10px;
+  width: 100%;
+}
+
+.planFeatureItem {
+  font-size: 11px;
+  color: #555;
+  line-height: 1.5;
+  padding-left: 14px;
+  position: relative;
+}
+.planFeatureItem::before {
+  content: '·';
+  position: absolute;
+  left: 4px;
+  color: #534AB7;
+}
+.planActive .planFeatureItem { color: #888; }
+.planActive .planFeatureItem::before { color: #AFA9EC; }
+
 /* SUMMARY */
 .summary {
   background: #0d0b18;

@@ -6,7 +6,7 @@ import { UserButton, useUser } from '@clerk/nextjs'
 import { useLanguage } from '@/contexts/LanguageContext'
 import styles from './Analyzer.module.css'
 
-type Mode = 'chat' | 'summary' | 'actions' | 'risks' | 'qa' | 'deadlines' | 'rewrite' | 'translate' | 'template' | 'interview' | 'imagine' | 'email'
+type Mode = 'chat' | 'summary' | 'actions' | 'risks' | 'qa' | 'deadlines' | 'rewrite' | 'translate' | 'template' | 'interview' | 'imagine' | 'email' | 'batch'
 
 interface HistoryItem {
   id: string
@@ -32,6 +32,7 @@ const MODES: { id: Mode; icon: string; credits: number; group: 'chat' | 'analyze
   { id: 'email',     icon: '📧', credits: 2, group: 'tools'   },
   { id: 'interview', icon: '🤖', credits: 5, group: 'tools'   },
   { id: 'imagine',   icon: '🎨', credits: 1, group: 'tools'   },
+  { id: 'batch',     icon: '📦', credits: 1, group: 'tools'   },
 ]
 
 const IMAGINE_STYLES = [
@@ -120,7 +121,15 @@ export default function Analyzer() {
   const [imagineLoading, setImagineLoading] = useState(false)
   const [imagineError, setImagineError] = useState('')
 
+  // Batch
+  const [batchFiles, setBatchFiles] = useState<File[]>([])
+  const [batchAnalysisMode, setBatchAnalysisMode] = useState<'summary' | 'actions' | 'risks' | 'deadlines'>('summary')
+  const [batchResults, setBatchResults] = useState<{ name: string; result: string; status: 'pending' | 'processing' | 'done' | 'error'; expanded: boolean }[]>([])
+  const [batchRunning, setBatchRunning] = useState(false)
+  const [batchProgress, setBatchProgress] = useState(0)
+
   const fileRef = useRef<HTMLInputElement>(null)
+  const batchFileRef = useRef<HTMLInputElement>(null)
   const chatBottomRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const { user } = useUser()
@@ -501,6 +510,61 @@ export default function Analyzer() {
       restoreCredits(1)
     }
     img.src = url
+  }
+
+  // ── BATCH ──
+  async function readFileContent(file: File): Promise<string> {
+    if (file.name.toLowerCase().endsWith('.pdf')) {
+      try {
+        const pdfjsLib = await import('pdfjs-dist')
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`
+        const arrayBuffer = await file.arrayBuffer()
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
+        let text = ''
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i)
+          const tc = await page.getTextContent()
+          text += tc.items.map((item: any) => ('str' in item ? item.str : '')).join(' ') + '\n'
+        }
+        return text.trim() || 'PDF neobsahuje čitelný text.'
+      } catch { return 'Nepodařilo se načíst PDF.' }
+    }
+    return new Promise(resolve => {
+      const reader = new FileReader()
+      reader.onload = e => resolve(e.target?.result as string || '')
+      reader.readAsText(file)
+    })
+  }
+
+  async function runBatchAnalysis() {
+    if (batchFiles.length === 0 || batchRunning) return
+    const total = batchFiles.length
+    setBatchRunning(true)
+    setBatchProgress(0)
+    setBatchResults(batchFiles.map(f => ({ name: f.name, result: '', status: 'pending', expanded: false })))
+    if (!(await spendCredits(total))) { setBatchRunning(false); return }
+
+    let refunded = 0
+    for (let i = 0; i < batchFiles.length; i++) {
+      setBatchResults(prev => prev.map((r, idx) => idx === i ? { ...r, status: 'processing' } : r))
+      try {
+        const content = await readFileContent(batchFiles[i])
+        const res = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: content.slice(0, 3000), mode: batchAnalysisMode }),
+        })
+        const data = await res.json()
+        if (data.error) throw new Error(data.error)
+        setBatchResults(prev => prev.map((r, idx) => idx === i ? { ...r, result: data.result, status: 'done', expanded: true } : r))
+      } catch (err: any) {
+        setBatchResults(prev => prev.map((r, idx) => idx === i ? { ...r, result: err.message || 'Chyba', status: 'error' } : r))
+        refunded++
+      }
+      setBatchProgress(i + 1)
+    }
+    if (refunded > 0) restoreCredits(refunded)
+    setBatchRunning(false)
   }
 
   // ── Q&A follow-up ──
@@ -938,6 +1002,129 @@ export default function Analyzer() {
                     <a href={imagineUrl} target="_blank" rel="noopener noreferrer" className={styles.actionBtn}>{t.imagine.open}</a>
                     <a href={imagineUrl} download={`docthink-${Date.now()}.jpg`} className={styles.actionBtn}>{t.imagine.download}</a>
                   </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── BATCH ── */}
+          {mode === 'batch' && (
+            <div className={styles.toolCard}>
+              <div className={styles.toolCardTitle}>
+                📦 {t.modes.batch}
+                <span className={styles.creditBadge}>1 kredit / dokument</span>
+                <span className={styles.teamBadge}>Team</span>
+              </div>
+              <p className={styles.toolCardDesc}>
+                Nahraj 10–25 dokumentů a AI je analyzuje všechny najednou. Výsledky jsou zobrazeny jednotlivě a lze je exportovat.
+              </p>
+
+              <div className={styles.batchUploadZone} onClick={() => batchFileRef.current?.click()}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7F77DD" strokeWidth="1.5" strokeLinecap="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
+                </svg>
+                <span>Přidat dokumenty (max 25) — PDF · Word · TXT</span>
+                <input ref={batchFileRef} type="file" multiple accept=".pdf,.txt,.doc,.docx"
+                  style={{ display: 'none' }}
+                  onChange={e => {
+                    const added = Array.from(e.target.files || [])
+                    setBatchFiles(prev => [...prev, ...added].slice(0, 25))
+                    e.target.value = ''
+                  }} />
+              </div>
+
+              {batchFiles.length > 0 && (
+                <div className={styles.batchFileList}>
+                  <div className={styles.batchFileListHeader}>
+                    <span className={styles.batchFileCount}>{batchFiles.length} / 25 dokumentů</span>
+                    <button className={styles.pasteClear} onClick={() => setBatchFiles([])}>Vymazat vše</button>
+                  </div>
+                  {batchFiles.map((f, i) => (
+                    <div key={i} className={styles.batchFileItem}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7F77DD" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                      <span className={styles.batchFileItemName}>{f.name}</span>
+                      <button className={styles.fileRemove} onClick={() => setBatchFiles(prev => prev.filter((_, idx) => idx !== i))}>×</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className={styles.optionRow}>
+                <span className={styles.optionLabel}>Typ analýzy:</span>
+                {(['summary', 'actions', 'risks', 'deadlines'] as const).map(m => (
+                  <button key={m}
+                    className={`${styles.optionBtn} ${batchAnalysisMode === m ? styles.optionBtnActive : ''}`}
+                    onClick={() => setBatchAnalysisMode(m)}>
+                    {(t.modes as any)[m]}
+                  </button>
+                ))}
+              </div>
+
+              {batchRunning && (
+                <div className={styles.batchProgressWrap}>
+                  <div className={styles.batchProgressBar}>
+                    <div className={styles.batchProgressFill}
+                      style={{ width: `${batchFiles.length > 0 ? (batchProgress / batchFiles.length) * 100 : 0}%` }} />
+                  </div>
+                  <span className={styles.batchProgressText}>
+                    Zpracovávám {batchProgress} / {batchFiles.length} dokumentů…
+                  </span>
+                </div>
+              )}
+
+              <button className={styles.analyzeBtn} onClick={runBatchAnalysis}
+                disabled={batchRunning || batchFiles.length === 0}>
+                {batchRunning
+                  ? <span className={styles.loadingDots}><span /><span /><span /></span>
+                  : `📦 Analyzovat ${batchFiles.length > 0 ? `${batchFiles.length} dokumentů` : 'dokumenty'} — ${batchFiles.length} kreditů`}
+              </button>
+
+              {batchResults.length > 0 && (
+                <div className={styles.batchResults}>
+                  <div className={styles.batchResultsHeader}>
+                    <span className={styles.batchResultsTitle}>
+                      Výsledky — {batchResults.filter(r => r.status === 'done').length}/{batchResults.length} hotovo
+                    </span>
+                    {batchResults.some(r => r.status === 'done') && (
+                      <button className={styles.actionBtn} onClick={() => {
+                        const all = batchResults
+                          .filter(r => r.status === 'done')
+                          .map(r => `=== ${r.name} ===\n${stripHtml(r.result)}`)
+                          .join('\n\n')
+                        const blob = new Blob([all], { type: 'text/plain;charset=utf-8' })
+                        const a = document.createElement('a')
+                        a.href = URL.createObjectURL(blob)
+                        a.download = `docthink-batch-${Date.now()}.txt`
+                        a.click()
+                      }}>⬇ Stáhnout vše (.txt)</button>
+                    )}
+                  </div>
+                  {batchResults.map((r, i) => (
+                    <div key={i} className={styles.batchResultItem}>
+                      <div className={styles.batchResultHeader}
+                        onClick={() => setBatchResults(prev => prev.map((item, idx) => idx === i ? { ...item, expanded: !item.expanded } : item))}>
+                        <div className={styles.batchResultName}>
+                          <span className={
+                            r.status === 'done' ? styles.batchStatusDone :
+                            r.status === 'error' ? styles.batchStatusError :
+                            r.status === 'processing' ? styles.batchStatusProcessing :
+                            styles.batchStatusPending}>
+                            {r.status === 'done' ? '✓' : r.status === 'error' ? '✗' : r.status === 'processing' ? (
+                              <span className={styles.batchSpinner} />
+                            ) : '○'}
+                          </span>
+                          <span>{r.name}</span>
+                        </div>
+                        {r.status === 'done' && <span className={styles.batchChevron}>{r.expanded ? '▲' : '▼'}</span>}
+                      </div>
+                      {r.expanded && r.result && (
+                        <div className={styles.batchResultBody}
+                          dangerouslySetInnerHTML={{ __html: r.result }} />
+                      )}
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

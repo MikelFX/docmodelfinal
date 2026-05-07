@@ -4,7 +4,7 @@ export const T = {
   cs: {
     nav: { credits: 'kredity', buy: 'Koupit kredity' },
     sidebar: { aiAssistant: 'AI asistent', docAnalysis: 'Analýza dokumentu', aiTools: 'Nástroje AI', history: 'Historie', free: 'zdarma' },
-    modes: { chat: 'AI Chat', summary: 'Shrnutí', actions: 'Akční body', risks: 'Rizika', qa: 'Q & A', deadlines: 'Termíny', rewrite: 'Přepisovač', translate: 'Překladač', template: 'Generátor šablon', interview: 'AI Tazatel', imagine: 'AI Obrázky', email: 'Emailový generátor' },
+    modes: { chat: 'AI Chat', summary: 'Shrnutí', actions: 'Akční body', risks: 'Rizika', qa: 'Q & A', deadlines: 'Termíny', rewrite: 'Přepisovač', translate: 'Překladač', template: 'Generátor šablon', interview: 'AI Tazatel', imagine: 'AI Obrázky', email: 'Emailový generátor', batch: 'Hromadná analýza' },
     chat: {
       welcome: 'Jak ti mohu pomoci?',
       sub: 'AI Chat je zdarma — bez kreditů, kdykoli.',
@@ -66,7 +66,7 @@ export const T = {
   en: {
     nav: { credits: 'credits', buy: 'Buy credits' },
     sidebar: { aiAssistant: 'AI assistant', docAnalysis: 'Document analysis', aiTools: 'AI tools', history: 'History', free: 'free' },
-    modes: { chat: 'AI Chat', summary: 'Summary', actions: 'Action items', risks: 'Risks', qa: 'Q & A', deadlines: 'Deadlines', rewrite: 'Rewriter', translate: 'Translator', template: 'Template gen.', interview: 'AI Interviewer', imagine: 'AI Images', email: 'Email generator' },
+    modes: { chat: 'AI Chat', summary: 'Summary', actions: 'Action items', risks: 'Risks', qa: 'Q & A', deadlines: 'Deadlines', rewrite: 'Rewriter', translate: 'Translator', template: 'Template gen.', interview: 'AI Interviewer', imagine: 'AI Images', email: 'Email generator', batch: 'Batch analysis' },
     chat: {
       welcome: 'How can I help you?',
       sub: 'AI Chat is free — no credits needed, anytime.',
@@ -128,7 +128,7 @@ export const T = {
   de: {
     nav: { credits: 'Credits', buy: 'Credits kaufen' },
     sidebar: { aiAssistant: 'KI-Assistent', docAnalysis: 'Dokumentenanalyse', aiTools: 'KI-Tools', history: 'Verlauf', free: 'kostenlos' },
-    modes: { chat: 'KI-Chat', summary: 'Zusammenfassung', actions: 'Aktionspunkte', risks: 'Risiken', qa: 'Q & A', deadlines: 'Termine', rewrite: 'Umschreiben', translate: 'Übersetzer', template: 'Vorlagen-Gen.', interview: 'KI-Interviewer', imagine: 'KI-Bilder', email: 'E-Mail-Generator' },
+    modes: { chat: 'KI-Chat', summary: 'Zusammenfassung', actions: 'Aktionspunkte', risks: 'Risiken', qa: 'Q & A', deadlines: 'Termine', rewrite: 'Umschreiben', translate: 'Übersetzer', template: 'Vorlagen-Gen.', interview: 'KI-Interviewer', imagine: 'KI-Bilder', email: 'E-Mail-Generator', batch: 'Stapelanalyse' },
     chat: {
       welcome: 'Wie kann ich helfen?',
       sub: 'KI-Chat ist kostenlos — jederzeit, ohne Credits.',
@@ -189,7 +189,7 @@ export const T = {
   sk: {
     nav: { credits: 'kredity', buy: 'Kúpiť kredity' },
     sidebar: { aiAssistant: 'AI asistent', docAnalysis: 'Analýza dokumentov', aiTools: 'AI nástroje', history: 'História', free: 'zadarmo' },
-    modes: { chat: 'AI Chat', summary: 'Zhrnutie', actions: 'Akčné body', risks: 'Riziká', qa: 'Q & A', deadlines: 'Termíny', rewrite: 'Prepisovač', translate: 'Prekladač', template: 'Generátor šablón', interview: 'AI Spytovateľ', imagine: 'AI Obrázky', email: 'Emailový generátor' },
+    modes: { chat: 'AI Chat', summary: 'Zhrnutie', actions: 'Akčné body', risks: 'Riziká', qa: 'Q & A', deadlines: 'Termíny', rewrite: 'Prepisovač', translate: 'Prekladač', template: 'Generátor šablón', interview: 'AI Spytovateľ', imagine: 'AI Obrázky', email: 'Emailový generátor', batch: 'Hromadná analýza' },
     chat: {
       welcome: 'Ako ti môžem pomôcť?',
       sub: 'AI Chat je zadarmo — bez kreditov, kedykoľvek.',

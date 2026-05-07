@@ -13,6 +13,12 @@ const PLANS = [
     pricePerDoc: '0.50',
     description: 'Ideální pro vyzkoušení',
     highlight: false,
+    features: [
+      'Shrnutí, akční body, rizika',
+      'AI Chat zdarma',
+      'PDF, Word, TXT dokumenty',
+      'Export do TXT a PDF',
+    ],
   },
   {
     id: 'pro',
@@ -22,6 +28,13 @@ const PLANS = [
     pricePerDoc: '0.30',
     description: 'Nejoblíbenější volba',
     highlight: true,
+    features: [
+      'Vše ze Starter plánu',
+      'Překladač a přepisovač',
+      'Generátor emailů a šablon',
+      'AI Obrázky a tazatel',
+      'Extrakce termínů a deadlinů',
+    ],
   },
   {
     id: 'team',
@@ -31,6 +44,13 @@ const PLANS = [
     pricePerDoc: '0.25',
     description: 'Pro firmy a týmy',
     highlight: false,
+    features: [
+      'Vše z Pro plánu',
+      '🚀 Hromadná analýza 10–25 dokumentů',
+      'Prioritní zpracování',
+      'Export všech výsledků najednou',
+      'Nejnižší cena za dokument',
+    ],
   },
 ]
 
@@ -95,6 +115,11 @@ export default function KoupitPage() {
               <div className={styles.planCredits}>{p.credits} kreditů</div>
               <div className={styles.planPer}>${p.pricePerDoc} / dokument</div>
               <div className={styles.planDesc}>{p.description}</div>
+              <ul className={styles.planFeatures}>
+                {p.features.map((f, i) => (
+                  <li key={i} className={styles.planFeatureItem}>{f}</li>
+                ))}
+              </ul>
             </button>
           ))}
         </div>
