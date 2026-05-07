@@ -10,14 +10,14 @@ export async function POST(req: NextRequest) {
   if (!process.env.ANTHROPIC_API_KEY) return new Response('Missing ANTHROPIC_API_KEY', { status: 500 })
 
   let messages: { role: string; content: string }[]
+  let lang = 'en'
   try {
     const body = await req.json()
     messages = body.messages ?? []
+    lang = body.lang ?? 'en'
   } catch {
     return new Response('Invalid request', { status: 400 })
   }
-
-  const lang: string = (body as any).lang ?? 'en'
 
   const stream = anthropic.messages.stream({
     model: MODEL,
