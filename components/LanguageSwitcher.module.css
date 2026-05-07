@@ -112,7 +112,7 @@
 .optionCheck { font-size: 11px; color: #7F77DD; }
 
 @media (max-width: 768px) {
-  .wrap { bottom: 16px; right: 16px; }
-  .trigger { padding: 8px 11px; }
+  .wrap { bottom: 82px; right: 14px; }
+  .trigger { padding: 7px 11px; font-size: 11px; }
   .menu { max-height: 340px; }
 }
