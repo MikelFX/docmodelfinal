@@ -143,6 +143,25 @@ export default function LandingPage() {
         ))}
       </div>
 
+      {/* TESTIMONIALS */}
+      <div className={`${styles.testimonials} ${styles.animate}`} data-anim>
+        <div className={styles.sectionLabel}>{l.testimonialsLabel}</div>
+        <div className={styles.testimonialsGrid}>
+          {l.testimonials.map((item, i) => (
+            <div key={i} className={styles.testimonialCard} style={{ '--delay': `${i * 0.08}s` } as React.CSSProperties}>
+              <div className={styles.testimonialText}>"{item.text}"</div>
+              <div className={styles.testimonialAuthor}>
+                <div className={styles.testimonialAvatar}>{item.name.charAt(0)}</div>
+                <div>
+                  <div className={styles.testimonialName}>{item.name}</div>
+                  <div className={styles.testimonialRole}>{item.role}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* FEATURES */}
       <div className={styles.featuresWrap}>
         <div className={`${styles.sectionLabel} ${styles.animate}`} data-anim>{l.featuresLabel}</div>

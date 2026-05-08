@@ -8,9 +8,9 @@ import { useLanguage } from '@/contexts/LanguageContext'
 const PLAN_IDS = ['starter', 'pro', 'team'] as const
 
 const PLANS = [
-  { id: 'starter', credits: 10, price: 99, perCredit: '9,90' },
-  { id: 'pro',     credits: 40, price: 349, perCredit: '8,73' },
-  { id: 'team',    credits: 120, price: 999, perCredit: '8,33' },
+  { id: 'starter', credits: 10, price: 99, perCredit: '9,90', eur: '€4' },
+  { id: 'pro',     credits: 40, price: 349, perCredit: '8,73', eur: '€14' },
+  { id: 'team',    credits: 120, price: 999, perCredit: '8,33', eur: '€40' },
 ]
 
 const CREDIT_COSTS = [
@@ -135,6 +135,7 @@ export default function KoupitPage() {
                 <div className={styles.planPriceRow}>
                   <span className={styles.planAmount}>{p.price}</span>
                   <span className={styles.planCurrency}>{currency}</span>
+                  {currency !== 'Kč' && <span className={styles.planEur}>≈ {p.eur}</span>}
                 </div>
                 <div className={styles.planCreditsRow}>
                   <span className={styles.planCredits}>{p.credits} {t.credit(p.credits)}</span>

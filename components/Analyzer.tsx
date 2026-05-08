@@ -126,6 +126,13 @@ export default function Analyzer() {
   // Chat credit tracking (1 credit per 5 AI responses)
   const [chatResponseCount, setChatResponseCount] = useState(0)
 
+  // Onboarding
+  const [showOnboarding, setShowOnboarding] = useState(false)
+  const [onboardingStep, setOnboardingStep] = useState(0)
+
+  // Credit history
+  const [creditHistory, setCreditHistory] = useState<{ label: string; credits: number; date: string }[]>([])
+
   // Batch
   const [batchFiles, setBatchFiles] = useState<File[]>([])
   const [batchAnalysisMode, setBatchAnalysisMode] = useState<'summary' | 'actions' | 'risks' | 'deadlines'>('summary')
@@ -151,6 +158,12 @@ export default function Analyzer() {
   }, [credits])
 
   useEffect(() => {
+    if (!localStorage.getItem('docthink_onboarded')) setShowOnboarding(true)
+    const savedCreditHistory = localStorage.getItem('docthink_credit_history')
+    if (savedCreditHistory) setCreditHistory(JSON.parse(savedCreditHistory))
+  }, [])
+
+  useEffect(() => {
     const saved = localStorage.getItem('docmind_history')
     if (saved) setHistory(JSON.parse(saved))
     fetch('/api/credits')
@@ -168,12 +181,23 @@ export default function Analyzer() {
     chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chatMessages])
 
+  function logCreditUsage(label: string, cost: number) {
+    if (cost === 0) return
+    const entry = { label, credits: cost, date: new Date().toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' }) }
+    setCreditHistory(prev => {
+      const next = [entry, ...prev].slice(0, 15)
+      localStorage.setItem('docthink_credit_history', JSON.stringify(next))
+      return next
+    })
+  }
+
   async function spendCredits(cost: number): Promise<boolean> {
     if (cost === 0) return true
     if (credits < cost) { router.push('/koupit'); return false }
     const next = credits - cost
     setCredits(next)
     localStorage.setItem('docthink_credits', next.toString())
+    logCreditUsage((t.modes as any)[mode] ?? mode, cost)
     try {
       const res = await fetch('/api/credits', {
         method: 'POST',
@@ -641,13 +665,20 @@ export default function Analyzer() {
       <nav className={styles.nav}>
         <div className={styles.logo}><div className={styles.logoDot} />docthink</div>
         <div className={styles.navRight}>
-          <div className={styles.credits}>
+          <div className={`${styles.credits} ${credits <= 3 && credits > 0 ? styles.creditsLow : ''}`}>
             <span className={styles.creditsN}>{credits}</span> {t.nav.credits}
           </div>
           <button className={styles.buyBtn} onClick={() => router.push('/koupit')}>{t.nav.buy}</button>
           <UserButton afterSignOutUrl='/' />
         </div>
       </nav>
+
+      {credits <= 3 && credits > 0 && (
+        <div className={styles.lowCreditBanner}>
+          <span>⚠️ {t.nav.lowCredits} — {credits} {t.nav.credits}</span>
+          <button className={styles.lowCreditCta} onClick={() => router.push('/koupit')}>{t.nav.buy} →</button>
+        </div>
+      )}
 
       <div className={styles.main}>
         <aside className={styles.sidebar}>
@@ -700,6 +731,18 @@ export default function Analyzer() {
               ))}
             </>
           )}
+
+          <div className={styles.sidebarLabel} style={{ marginTop: 16 }}>{t.sidebar.creditHistory}</div>
+          {creditHistory.length === 0
+            ? <div className={styles.creditHistoryEmpty}>{t.sidebar.noHistory}</div>
+            : creditHistory.map((h, i) => (
+              <div key={i} className={styles.creditHistoryItem}>
+                <span className={styles.creditHistoryLabel}>{h.label}</span>
+                <span className={styles.creditHistoryCost}>−{h.credits}k</span>
+                <span className={styles.creditHistoryDate}>{h.date}</span>
+              </div>
+            ))
+          }
         </aside>
 
         <div className={`${styles.content} ${styles.contentIn}`}>
@@ -1201,6 +1244,39 @@ export default function Analyzer() {
           </svg>
         </button>
       </div>
+
+      {/* ── ONBOARDING MODAL ── */}
+      {showOnboarding && (
+        <div className={styles.onboardingOverlay} onClick={() => { setShowOnboarding(false); localStorage.setItem('docthink_onboarded', '1') }}>
+          <div className={styles.onboardingModal} onClick={e => e.stopPropagation()}>
+            <div className={styles.onboardingTitle}>{t.onboarding.title}</div>
+            <div className={styles.onboardingSteps}>
+              {t.onboarding.steps.map((step, i) => (
+                <div key={i} className={`${styles.onboardingStep} ${i === onboardingStep ? styles.onboardingStepActive : ''}`}>
+                  <div className={styles.onboardingStepIcon}>{step.icon}</div>
+                  <div className={styles.onboardingStepText}>
+                    <div className={styles.onboardingStepTitle}>{step.title}</div>
+                    <div className={styles.onboardingStepDesc}>{step.desc}</div>
+                  </div>
+                  <div className={styles.onboardingStepNum}>{i + 1}</div>
+                </div>
+              ))}
+            </div>
+            <div className={styles.onboardingDots}>
+              {t.onboarding.steps.map((_, i) => (
+                <button key={i} className={`${styles.onboardingDot} ${i === onboardingStep ? styles.onboardingDotActive : ''}`} onClick={() => setOnboardingStep(i)} />
+              ))}
+            </div>
+            <div className={styles.onboardingActions}>
+              <button className={styles.onboardingSkip} onClick={() => { setShowOnboarding(false); localStorage.setItem('docthink_onboarded', '1') }}>{t.onboarding.skip}</button>
+              {onboardingStep < t.onboarding.steps.length - 1
+                ? <button className={styles.onboardingCta} onClick={() => setOnboardingStep(s => s + 1)}>{t.onboarding.cta}</button>
+                : <button className={styles.onboardingCta} onClick={() => { setShowOnboarding(false); localStorage.setItem('docthink_onboarded', '1') }}>{t.onboarding.cta}</button>
+              }
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── MOBILE SHEET ── */}
       {mobileSheetOpen && (

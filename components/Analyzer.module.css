@@ -1026,3 +1026,167 @@
   .mobileGridItem { padding: 13px 4px 11px; border-radius: 13px; }
   .mobileGridIcon { font-size: 22px; }
 }
+
+/* ── LOW CREDIT BANNER ── */
+.creditsLow {
+  border-color: rgba(240, 149, 100, 0.4) !important;
+  background: rgba(240, 120, 60, 0.08) !important;
+}
+.creditsLow .creditsN { color: #f0956a !important; }
+
+.lowCreditBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 20px;
+  background: rgba(240, 120, 60, 0.07);
+  border-bottom: 0.5px solid rgba(240, 149, 100, 0.2);
+  font-size: 12px;
+  color: #c8845a;
+  z-index: 10;
+  position: relative;
+}
+
+.lowCreditCta {
+  background: rgba(240, 120, 60, 0.15);
+  border: 0.5px solid rgba(240, 149, 100, 0.3);
+  color: #f0956a;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.lowCreditCta:hover { background: rgba(240, 120, 60, 0.25); }
+
+/* ── CREDIT HISTORY ── */
+.creditHistoryEmpty {
+  font-size: 11px;
+  color: #2e2b42;
+  padding: 6px 8px;
+}
+
+.creditHistoryItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: 7px;
+  font-size: 11px;
+}
+
+.creditHistoryLabel {
+  flex: 1;
+  color: #4a4666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.creditHistoryCost { color: #f0956a; font-weight: 600; font-size: 10px; flex-shrink: 0; }
+.creditHistoryDate { color: #2e2b42; font-size: 10px; flex-shrink: 0; }
+
+/* ── ONBOARDING MODAL ── */
+.onboardingOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 3, 10, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.onboardingModal {
+  background: rgba(13, 11, 24, 0.98);
+  border: 0.5px solid rgba(127, 119, 221, 0.25);
+  border-radius: 20px;
+  padding: 36px 32px 28px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(127, 119, 221, 0.1);
+}
+
+.onboardingTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #f0eeff;
+  letter-spacing: -0.5px;
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.onboardingSteps { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+
+.onboardingStep {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 0.5px solid rgba(127, 119, 221, 0.08);
+  background: rgba(127, 119, 221, 0.03);
+  transition: all 0.2s ease;
+}
+
+.onboardingStepActive {
+  border-color: rgba(127, 119, 221, 0.35) !important;
+  background: rgba(127, 119, 221, 0.08) !important;
+}
+
+.onboardingStepIcon { font-size: 22px; flex-shrink: 0; width: 36px; text-align: center; }
+.onboardingStepText { flex: 1; }
+.onboardingStepTitle { font-size: 13px; font-weight: 600; color: #c8c4e8; margin-bottom: 2px; }
+.onboardingStepDesc { font-size: 11px; color: #4a4666; line-height: 1.5; }
+
+.onboardingStepNum {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: rgba(127, 119, 221, 0.15);
+  color: #7F77DD;
+  font-size: 11px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.onboardingDots { display: flex; justify-content: center; gap: 6px; margin-bottom: 20px; }
+
+.onboardingDot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(127, 119, 221, 0.2);
+  border: none; cursor: pointer; padding: 0;
+  transition: all 0.2s;
+}
+.onboardingDotActive { background: #7F77DD; width: 18px; border-radius: 3px; }
+
+.onboardingActions { display: flex; gap: 10px; justify-content: flex-end; align-items: center; }
+
+.onboardingSkip {
+  background: none; border: none;
+  color: #3d3a55; font-size: 13px; font-family: inherit;
+  cursor: pointer; padding: 8px 4px; transition: color 0.15s;
+}
+.onboardingSkip:hover { color: #7a76a8; }
+
+.onboardingCta {
+  background: linear-gradient(135deg, #7F77DD, #6366f1);
+  color: #fff; border: none; border-radius: 10px;
+  padding: 11px 24px; font-family: inherit;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(127, 119, 221, 0.4);
+}
+.onboardingCta:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(127, 119, 221, 0.55); }
+
+@media (max-width: 480px) {
+  .onboardingModal { padding: 28px 20px 22px; }
+  .onboardingTitle { font-size: 17px; }
+  .lowCreditBanner { flex-direction: column; align-items: flex-start; gap: 6px; }
+}

@@ -258,6 +258,14 @@
   align-items: baseline;
   gap: 4px;
   margin-bottom: 2px;
+  flex-wrap: wrap;
+}
+
+.planEur {
+  font-size: 11px;
+  color: #3d3a55;
+  margin-left: 2px;
+  font-weight: 400;
 }
 
 .planAmount {

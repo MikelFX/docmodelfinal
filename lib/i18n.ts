@@ -15,8 +15,8 @@ export function isValidLang(lang: string): lang is LangKey {
 
 export const T = {
   cs: {
-    nav: { credits: 'kredity', buy: 'Koupit kredity' },
-    sidebar: { aiAssistant: 'AI asistent', docAnalysis: 'Analýza dokumentu', aiTools: 'Nástroje AI', history: 'Historie', free: 'zdarma' },
+    nav: { credits: 'kredity', buy: 'Koupit kredity', lowCredits: 'Málo kreditů' },
+    sidebar: { aiAssistant: 'AI asistent', docAnalysis: 'Analýza dokumentu', aiTools: 'Nástroje AI', history: 'Historie', free: 'zdarma', creditHistory: 'Použití kreditů', noHistory: 'Zatím žádná aktivita' },
     modes: { chat: 'AI Chat', summary: 'Shrnutí', actions: 'Akční body', risks: 'Rizika', clauses: 'Klauzule', deadlines: 'Termíny', finance: 'Finanční analytik', rewrite: 'Přepisovač', translate: 'Překladač', email: 'Email generátor', template: 'Generátor šablon', compare: 'Porovnat dokumenty', interview: 'AI Tazatel', batch: 'Hromadná analýza' },
     chat: {
       welcome: 'Jak ti mohu pomoci?',
@@ -118,6 +118,22 @@ export const T = {
       mostPopular: 'Nejoblíbenější',
       footer: '© 2025 DocThink · Pro freelancery v EU',
       heroCard: { riskLabel: 'riziko', actionLabel: 'akce', financeLabel: 'finance', riskText: 'Klauzule o ukončení postrádá 30denní výpovědní lhůtu', actionText: 'Zkontrolovat splátkový kalendář do 15. října', financeText: 'Smluvní pokuta: 2 % měsíčně za pozdní platby', aiComplete: 'AI analýza dokončena' },
+      testimonialsLabel: 'Co říkají uživatelé',
+      testimonials: [
+        { text: 'DocThink mi zkrátil kontrolu smluv o 80 %. Povinná výbava pro každého freelancera.', name: 'Jana K.', role: 'OSVČ · právník' },
+        { text: 'Hromadná analýza 20 smluv najednou — neuvěřitelná úspora času a nervů.', name: 'Martin V.', role: 'Obchodní ředitel' },
+        { text: 'Konečně překlad právních dokumentů, který dává smysl. Vřele doporučuji.', name: 'Tereza N.', role: 'Překladatelka' },
+      ],
+    },
+    onboarding: {
+      title: 'Vítej v DocThink!',
+      steps: [
+        { icon: '📄', title: 'Nahraj dokument', desc: 'PDF, Word nebo vlož text přímo — max 10 MB' },
+        { icon: '🎯', title: 'Vyber analýzu', desc: 'Shrnutí, rizika, překlad a desítky dalších nástrojů' },
+        { icon: '⚡', title: 'Získej výsledky', desc: 'AI analyzuje za vteřiny — výsledky ihned k použití' },
+      ],
+      cta: 'Pojďme na to →',
+      skip: 'Přeskočit',
     },
     koupit: {
       back: 'Zpět', badge: 'Kredity',
@@ -151,8 +167,8 @@ export const T = {
     },
   },
   en: {
-    nav: { credits: 'credits', buy: 'Buy credits' },
-    sidebar: { aiAssistant: 'AI assistant', docAnalysis: 'Document analysis', aiTools: 'AI tools', history: 'History', free: 'free' },
+    nav: { credits: 'credits', buy: 'Buy credits', lowCredits: 'Low credits' },
+    sidebar: { aiAssistant: 'AI assistant', docAnalysis: 'Document analysis', aiTools: 'AI tools', history: 'History', free: 'free', creditHistory: 'Credit usage', noHistory: 'No activity yet' },
     modes: { chat: 'AI Chat', summary: 'Summary', actions: 'Action items', risks: 'Risks', clauses: 'Legal clauses', deadlines: 'Deadlines', finance: 'Finance analyst', rewrite: 'Rewriter', translate: 'Translator', email: 'Email generator', template: 'Template gen.', compare: 'Compare docs', interview: 'AI Interviewer', batch: 'Batch analysis' },
     chat: {
       welcome: 'How can I help you?',
@@ -254,6 +270,22 @@ export const T = {
       mostPopular: 'Most popular',
       footer: '© 2025 DocThink · For freelancers in EU',
       heroCard: { riskLabel: 'risk', actionLabel: 'action', financeLabel: 'finance', riskText: 'Termination clause lacks 30-day notice period', actionText: 'Review payment schedule by Oct 15', financeText: 'Penalty clause: 2% monthly on late payments', aiComplete: 'AI analysis complete' },
+      testimonialsLabel: 'What users say',
+      testimonials: [
+        { text: 'DocThink cut my contract review time by 80%. Essential tool for any freelancer.', name: 'Sarah M.', role: 'Freelance consultant' },
+        { text: 'Batch analysis of 20 contracts at once — incredible time saver.', name: 'James T.', role: 'Operations manager' },
+        { text: 'Finally a legal document translation that actually makes sense.', name: 'Emma L.', role: 'Translator' },
+      ],
+    },
+    onboarding: {
+      title: 'Welcome to DocThink!',
+      steps: [
+        { icon: '📄', title: 'Upload document', desc: 'PDF, Word or paste text directly — max 10 MB' },
+        { icon: '🎯', title: 'Choose analysis', desc: 'Summary, risks, translation and dozens more tools' },
+        { icon: '⚡', title: 'Get results', desc: 'AI analyzes in seconds — results ready instantly' },
+      ],
+      cta: 'Let\'s go →',
+      skip: 'Skip',
     },
     koupit: {
       back: 'Back', badge: 'Credits',
@@ -287,8 +319,8 @@ export const T = {
     },
   },
   de: {
-    nav: { credits: 'Credits', buy: 'Credits kaufen' },
-    sidebar: { aiAssistant: 'KI-Assistent', docAnalysis: 'Dokumentenanalyse', aiTools: 'KI-Tools', history: 'Verlauf', free: 'kostenlos' },
+    nav: { credits: 'Credits', buy: 'Credits kaufen', lowCredits: 'Wenig Credits' },
+    sidebar: { aiAssistant: 'KI-Assistent', docAnalysis: 'Dokumentenanalyse', aiTools: 'KI-Tools', history: 'Verlauf', free: 'kostenlos', creditHistory: 'Kreditverlauf', noHistory: 'Noch keine Aktivität' },
     modes: { chat: 'KI-Chat', summary: 'Zusammenfassung', actions: 'Aktionspunkte', risks: 'Risiken', clauses: 'Klauseln', deadlines: 'Termine', finance: 'Finanzanalyst', rewrite: 'Umschreiben', translate: 'Übersetzer', email: 'E-Mail-Gen.', template: 'Vorlagen-Gen.', compare: 'Vergleichen', interview: 'KI-Interviewer', batch: 'Stapelanalyse' },
     chat: {
       welcome: 'Wie kann ich helfen?',
@@ -389,6 +421,22 @@ export const T = {
       mostPopular: 'Beliebteste',
       footer: '© 2025 DocThink · Für Freelancer in der EU',
       heroCard: { riskLabel: 'Risiko', actionLabel: 'Aufgabe', financeLabel: 'Finanzen', riskText: 'Kündigungsklausel fehlt 30-tägige Kündigungsfrist', actionText: 'Zahlungsplan bis 15. Oktober überprüfen', financeText: 'Vertragsstrafe: 2 % monatlich bei verspäteten Zahlungen', aiComplete: 'KI-Analyse abgeschlossen' },
+      testimonialsLabel: 'Was Nutzer sagen',
+      testimonials: [
+        { text: 'DocThink hat meine Vertragsprüfungszeit um 80 % reduziert. Unverzichtbar für Freelancer.', name: 'Klaus B.', role: 'Selbstständiger' },
+        { text: 'Stapelanalyse von 20 Verträgen auf einmal — unglaubliche Zeitersparnis.', name: 'Petra M.', role: 'Unternehmensleiterin' },
+        { text: 'Endlich eine Übersetzung von Rechtsdokumenten, die wirklich Sinn ergibt.', name: 'Thomas R.', role: 'Übersetzer' },
+      ],
+    },
+    onboarding: {
+      title: 'Willkommen bei DocThink!',
+      steps: [
+        { icon: '📄', title: 'Dokument hochladen', desc: 'PDF, Word oder Text direkt einfügen — max. 10 MB' },
+        { icon: '🎯', title: 'Analyse auswählen', desc: 'Zusammenfassung, Risiken, Übersetzung und mehr' },
+        { icon: '⚡', title: 'Ergebnisse erhalten', desc: 'KI analysiert in Sekunden — sofort bereit' },
+      ],
+      cta: 'Los geht\'s →',
+      skip: 'Überspringen',
     },
     koupit: {
       back: 'Zurück', badge: 'Credits',
@@ -422,8 +470,8 @@ export const T = {
     },
   },
   sk: {
-    nav: { credits: 'kredity', buy: 'Kúpiť kredity' },
-    sidebar: { aiAssistant: 'AI asistent', docAnalysis: 'Analýza dokumentov', aiTools: 'AI nástroje', history: 'História', free: 'zadarmo' },
+    nav: { credits: 'kredity', buy: 'Kúpiť kredity', lowCredits: 'Málo kreditov' },
+    sidebar: { aiAssistant: 'AI asistent', docAnalysis: 'Analýza dokumentov', aiTools: 'AI nástroje', history: 'História', free: 'zadarmo', creditHistory: 'Použitie kreditov', noHistory: 'Zatiaľ žiadna aktivita' },
     modes: { chat: 'AI Chat', summary: 'Zhrnutie', actions: 'Akčné body', risks: 'Riziká', clauses: 'Klauzuly', deadlines: 'Termíny', finance: 'Finančný analytik', rewrite: 'Prepisovač', translate: 'Prekladač', email: 'Email generátor', template: 'Generátor šablón', compare: 'Porovnať dokumenty', interview: 'AI Spytovateľ', batch: 'Hromadná analýza' },
     chat: {
       welcome: 'Ako ti môžem pomôcť?',
@@ -525,6 +573,22 @@ export const T = {
       mostPopular: 'Najobľúbenejší',
       footer: '© 2025 DocThink · Pre freelancerov v EÚ',
       heroCard: { riskLabel: 'riziko', actionLabel: 'akcia', financeLabel: 'financie', riskText: 'Klauzula o ukončení nemá 30-dňovú výpovednú lehotu', actionText: 'Skontrolovať splátkový kalendár do 15. októbra', financeText: 'Zmluvná pokuta: 2 % mesačne za oneskorené platby', aiComplete: 'AI analýza dokončená' },
+      testimonialsLabel: 'Čo hovoria používatelia',
+      testimonials: [
+        { text: 'DocThink mi skrátil kontrolu zmlúv o 80 %. Nevyhnutný nástroj pre každého freelancera.', name: 'Zuzana H.', role: 'SZČO · právnička' },
+        { text: 'Hromadná analýza 20 zmlúv naraz — neuveriteľná úspora času.', name: 'Peter K.', role: 'Obchodný riaditeľ' },
+        { text: 'Konečne preklad právnych dokumentov, ktorý dáva zmysel.', name: 'Katarína S.', role: 'Prekladateľka' },
+      ],
+    },
+    onboarding: {
+      title: 'Vitaj v DocThink!',
+      steps: [
+        { icon: '📄', title: 'Nahraj dokument', desc: 'PDF, Word alebo vlož text priamo — max 10 MB' },
+        { icon: '🎯', title: 'Vyber analýzu', desc: 'Zhrnutie, riziká, preklad a desiatky ďalších nástrojov' },
+        { icon: '⚡', title: 'Získaj výsledky', desc: 'AI analyzuje za sekundy — výsledky ihneď k použitiu' },
+      ],
+      cta: 'Poďme na to →',
+      skip: 'Preskočiť',
     },
     koupit: {
       back: 'Späť', badge: 'Kredity',
@@ -558,8 +622,8 @@ export const T = {
     },
   },
   fr: {
-    nav: { credits: 'crédits', buy: 'Acheter des crédits' },
-    sidebar: { aiAssistant: 'Assistant IA', docAnalysis: 'Analyse de document', aiTools: 'Outils IA', history: 'Historique', free: 'gratuit' },
+    nav: { credits: 'crédits', buy: 'Acheter des crédits', lowCredits: 'Peu de crédits' },
+    sidebar: { aiAssistant: 'Assistant IA', docAnalysis: 'Analyse de document', aiTools: 'Outils IA', history: 'Historique', free: 'gratuit', creditHistory: 'Utilisation des crédits', noHistory: 'Aucune activité' },
     modes: { chat: 'Chat IA', summary: 'Résumé', actions: 'Actions', risks: 'Risques', clauses: 'Clauses', deadlines: 'Délais', finance: 'Analyste financier', rewrite: 'Réécriture', translate: 'Traducteur', email: 'Gén. e-mail', template: 'Générateur', compare: 'Comparer', interview: 'Entretien IA', batch: 'Analyse en lot' },
     chat: {
       welcome: 'Comment puis-je vous aider ?',
@@ -660,6 +724,22 @@ export const T = {
       mostPopular: 'Le plus populaire',
       footer: "© 2025 DocThink · Pour les freelances dans l'UE",
       heroCard: { riskLabel: 'risque', actionLabel: 'action', financeLabel: 'finance', riskText: "La clause de résiliation manque d'un préavis de 30 jours", actionText: "Réviser l'échéancier de paiement avant le 15 octobre", financeText: 'Clause pénale : 2 % mensuel sur les retards de paiement', aiComplete: 'Analyse IA terminée' },
+      testimonialsLabel: 'Ce que disent les utilisateurs',
+      testimonials: [
+        { text: 'DocThink a réduit mon temps de révision des contrats de 80 %. Indispensable pour les freelances.', name: 'Marie D.', role: 'Consultante freelance' },
+        { text: 'Analyse en lot de 20 contrats à la fois — gain de temps incroyable.', name: 'Pierre L.', role: 'Directeur des opérations' },
+        { text: 'Enfin une traduction de documents juridiques qui a vraiment du sens.', name: 'Sophie B.', role: 'Traductrice' },
+      ],
+    },
+    onboarding: {
+      title: 'Bienvenue sur DocThink !',
+      steps: [
+        { icon: '📄', title: 'Téléchargez un document', desc: 'PDF, Word ou collez du texte directement — max 10 Mo' },
+        { icon: '🎯', title: 'Choisissez une analyse', desc: 'Résumé, risques, traduction et dizaines d\'autres outils' },
+        { icon: '⚡', title: 'Obtenez les résultats', desc: "L'IA analyse en secondes — résultats prêts instantanément" },
+      ],
+      cta: 'C\'est parti →',
+      skip: 'Passer',
     },
     koupit: {
       back: 'Retour', badge: 'Crédits',
@@ -693,8 +773,8 @@ export const T = {
     },
   },
   es: {
-    nav: { credits: 'créditos', buy: 'Comprar créditos' },
-    sidebar: { aiAssistant: 'Asistente IA', docAnalysis: 'Análisis de documento', aiTools: 'Herramientas IA', history: 'Historial', free: 'gratis' },
+    nav: { credits: 'créditos', buy: 'Comprar créditos', lowCredits: 'Pocos créditos' },
+    sidebar: { aiAssistant: 'Asistente IA', docAnalysis: 'Análisis de documento', aiTools: 'Herramientas IA', history: 'Historial', free: 'gratis', creditHistory: 'Uso de créditos', noHistory: 'Sin actividad aún' },
     modes: { chat: 'Chat IA', summary: 'Resumen', actions: 'Acciones', risks: 'Riesgos', clauses: 'Cláusulas', deadlines: 'Plazos', finance: 'Analista financiero', rewrite: 'Reescritor', translate: 'Traductor', email: 'Gen. email', template: 'Generador', compare: 'Comparar', interview: 'Entrevista IA', batch: 'Análisis masivo' },
     chat: {
       welcome: '¿Cómo puedo ayudarte?',
@@ -795,6 +875,22 @@ export const T = {
       mostPopular: 'Más popular',
       footer: '© 2025 DocThink · Para freelancers en la UE',
       heroCard: { riskLabel: 'riesgo', actionLabel: 'acción', financeLabel: 'finanzas', riskText: 'La cláusula de rescisión carece de período de preaviso de 30 días', actionText: 'Revisar el calendario de pagos antes del 15 de octubre', financeText: 'Cláusula de penalización: 2% mensual por pagos tardíos', aiComplete: 'Análisis IA completado' },
+      testimonialsLabel: 'Lo que dicen los usuarios',
+      testimonials: [
+        { text: 'DocThink redujo mi tiempo de revisión de contratos en un 80 %. Imprescindible para freelancers.', name: 'Carlos M.', role: 'Consultor freelance' },
+        { text: 'Análisis por lotes de 20 contratos a la vez — ahorro de tiempo increíble.', name: 'Ana G.', role: 'Directora de operaciones' },
+        { text: 'Por fin una traducción de documentos legales que realmente tiene sentido.', name: 'Isabel R.', role: 'Traductora' },
+      ],
+    },
+    onboarding: {
+      title: '¡Bienvenido a DocThink!',
+      steps: [
+        { icon: '📄', title: 'Sube un documento', desc: 'PDF, Word o pega texto directamente — máx. 10 MB' },
+        { icon: '🎯', title: 'Elige el análisis', desc: 'Resumen, riesgos, traducción y docenas de herramientas más' },
+        { icon: '⚡', title: 'Obtén resultados', desc: 'La IA analiza en segundos — resultados listos al instante' },
+      ],
+      cta: 'Vamos →',
+      skip: 'Omitir',
     },
     koupit: {
       back: 'Volver', badge: 'Créditos',
@@ -828,8 +924,8 @@ export const T = {
     },
   },
   it: {
-    nav: { credits: 'crediti', buy: 'Acquista crediti' },
-    sidebar: { aiAssistant: 'Assistente IA', docAnalysis: 'Analisi documento', aiTools: 'Strumenti IA', history: 'Cronologia', free: 'gratis' },
+    nav: { credits: 'crediti', buy: 'Acquista crediti', lowCredits: 'Pochi crediti' },
+    sidebar: { aiAssistant: 'Assistente IA', docAnalysis: 'Analisi documento', aiTools: 'Strumenti IA', history: 'Cronologia', free: 'gratis', creditHistory: 'Utilizzo crediti', noHistory: 'Nessuna attività' },
     modes: { chat: 'Chat IA', summary: 'Riepilogo', actions: 'Azioni', risks: 'Rischi', clauses: 'Clausole', deadlines: 'Scadenze', finance: 'Analista finanziario', rewrite: 'Riscrittura', translate: 'Traduttore', email: 'Gen. email', template: 'Generatore', compare: 'Confronta', interview: 'Intervista IA', batch: 'Analisi batch' },
     chat: {
       welcome: 'Come posso aiutarti?',
@@ -926,6 +1022,22 @@ export const T = {
       mostPopular: 'Più popolare',
       footer: "© 2025 DocThink · Per freelance nell'UE",
       heroCard: { riskLabel: 'rischio', actionLabel: 'azione', financeLabel: 'finanza', riskText: 'La clausola di risoluzione manca del periodo di preavviso di 30 giorni', actionText: 'Rivedere il piano di pagamento entro il 15 ottobre', financeText: 'Clausola penale: 2% mensile sui pagamenti in ritardo', aiComplete: 'Analisi IA completata' },
+      testimonialsLabel: 'Cosa dicono gli utenti',
+      testimonials: [
+        { text: "DocThink ha ridotto dell'80% il tempo di revisione dei contratti. Indispensabile per i freelancer.", name: 'Marco F.', role: 'Consulente freelance' },
+        { text: 'Analisi batch di 20 contratti in una volta — risparmio di tempo incredibile.', name: 'Laura B.', role: 'Direttrice operativa' },
+        { text: 'Finalmente una traduzione di documenti legali che ha davvero senso.', name: 'Giorgio R.', role: 'Traduttore' },
+      ],
+    },
+    onboarding: {
+      title: 'Benvenuto su DocThink!',
+      steps: [
+        { icon: '📄', title: 'Carica un documento', desc: 'PDF, Word o incolla testo direttamente — max 10 MB' },
+        { icon: '🎯', title: 'Scegli l\'analisi', desc: 'Riassunto, rischi, traduzione e decine di altri strumenti' },
+        { icon: '⚡', title: 'Ottieni i risultati', desc: "L'IA analizza in secondi — risultati pronti istantaneamente" },
+      ],
+      cta: 'Iniziamo →',
+      skip: 'Salta',
     },
     koupit: {
       back: 'Indietro', badge: 'Crediti',
@@ -959,8 +1071,8 @@ export const T = {
     },
   },
   pl: {
-    nav: { credits: 'kredyty', buy: 'Kup kredyty' },
-    sidebar: { aiAssistant: 'Asystent AI', docAnalysis: 'Analiza dokumentu', aiTools: 'Narzędzia AI', history: 'Historia', free: 'za darmo' },
+    nav: { credits: 'kredyty', buy: 'Kup kredyty', lowCredits: 'Mało kredytów' },
+    sidebar: { aiAssistant: 'Asystent AI', docAnalysis: 'Analiza dokumentu', aiTools: 'Narzędzia AI', history: 'Historia', free: 'za darmo', creditHistory: 'Zużycie kredytów', noHistory: 'Brak aktywności' },
     modes: { chat: 'Chat AI', summary: 'Podsumowanie', actions: 'Zadania', risks: 'Ryzyka', clauses: 'Klauzule', deadlines: 'Terminy', finance: 'Analityk finansowy', rewrite: 'Przepisywanie', translate: 'Tłumacz', email: 'Gen. emaila', template: 'Generator szabl.', compare: 'Porównanie', interview: 'Wywiad AI', batch: 'Analiza wsadowa' },
     chat: {
       welcome: 'Jak mogę pomóc?',
@@ -1058,6 +1170,22 @@ export const T = {
       mostPopular: 'Najpopularniejszy',
       footer: '© 2025 DocThink · Dla freelancerów w UE',
       heroCard: { riskLabel: 'ryzyko', actionLabel: 'zadanie', financeLabel: 'finanse', riskText: 'Klauzula wypowiedzenia nie zawiera 30-dniowego okresu wypowiedzenia', actionText: 'Przejrzeć harmonogram płatności do 15 października', financeText: 'Klauzula karna: 2% miesięcznie za spóźnione płatności', aiComplete: 'Analiza AI zakończona' },
+      testimonialsLabel: 'Co mówią użytkownicy',
+      testimonials: [
+        { text: 'DocThink skrócił mój czas przeglądu umów o 80 %. Niezbędne narzędzie dla każdego freelancera.', name: 'Agnieszka W.', role: 'Prawnik freelancer' },
+        { text: 'Analiza wsadowa 20 umów naraz — niesamowita oszczędność czasu.', name: 'Tomasz K.', role: 'Dyrektor operacyjny' },
+        { text: 'W końcu tłumaczenie dokumentów prawnych, które naprawdę ma sens.', name: 'Monika S.', role: 'Tłumaczka' },
+      ],
+    },
+    onboarding: {
+      title: 'Witaj w DocThink!',
+      steps: [
+        { icon: '📄', title: 'Prześlij dokument', desc: 'PDF, Word lub wklej tekst bezpośrednio — maks. 10 MB' },
+        { icon: '🎯', title: 'Wybierz analizę', desc: 'Podsumowanie, ryzyka, tłumaczenie i dziesiątki innych narzędzi' },
+        { icon: '⚡', title: 'Uzyskaj wyniki', desc: 'AI analizuje w sekundy — wyniki gotowe natychmiast' },
+      ],
+      cta: 'Zaczynamy →',
+      skip: 'Pomiń',
     },
     koupit: {
       back: 'Wstecz', badge: 'Kredyty',
@@ -1091,8 +1219,8 @@ export const T = {
     },
   },
   nl: {
-    nav: { credits: 'credits', buy: 'Credits kopen' },
-    sidebar: { aiAssistant: 'AI-assistent', docAnalysis: 'Documentanalyse', aiTools: 'AI-tools', history: 'Geschiedenis', free: 'gratis' },
+    nav: { credits: 'credits', buy: 'Credits kopen', lowCredits: 'Weinig credits' },
+    sidebar: { aiAssistant: 'AI-assistent', docAnalysis: 'Documentanalyse', aiTools: 'AI-tools', history: 'Geschiedenis', free: 'gratis', creditHistory: 'Creditgebruik', noHistory: 'Nog geen activiteit' },
     modes: { chat: 'AI-chat', summary: 'Samenvatting', actions: 'Actiepunten', risks: "Risico's", clauses: 'Clausules', deadlines: 'Deadlines', finance: 'Financieel analist', rewrite: 'Herschrijven', translate: 'Vertaler', email: 'E-mailgen.', template: 'Sjabloongenerator', compare: 'Vergelijken', interview: 'AI-interview', batch: 'Batch-analyse' },
     chat: {
       welcome: 'Hoe kan ik u helpen?',
@@ -1189,6 +1317,22 @@ export const T = {
       mostPopular: 'Meest populair',
       footer: '© 2025 DocThink · Voor freelancers in de EU',
       heroCard: { riskLabel: 'risico', actionLabel: 'actie', financeLabel: 'financiën', riskText: 'Beëindigingsclausule mist opzegtermijn van 30 dagen', actionText: 'Betalingsschema beoordelen vóór 15 oktober', financeText: 'Boeteclausule: 2% per maand bij te late betalingen', aiComplete: 'AI-analyse voltooid' },
+      testimonialsLabel: 'Wat gebruikers zeggen',
+      testimonials: [
+        { text: 'DocThink verkortte mijn contractrevisietijd met 80 %. Onmisbaar voor elke freelancer.', name: 'Emma V.', role: 'Freelance consultant' },
+        { text: 'Batchanalyse van 20 contracten tegelijk — ongelooflijke tijdsbesparing.', name: 'Lars B.', role: 'Operationeel directeur' },
+        { text: 'Eindelijk een vertaling van juridische documenten die echt logisch is.', name: 'Nora K.', role: 'Vertaalster' },
+      ],
+    },
+    onboarding: {
+      title: 'Welkom bij DocThink!',
+      steps: [
+        { icon: '📄', title: 'Document uploaden', desc: 'PDF, Word of tekst direct plakken — max. 10 MB' },
+        { icon: '🎯', title: 'Analyse kiezen', desc: 'Samenvatting, risico\'s, vertaling en tientallen andere tools' },
+        { icon: '⚡', title: 'Resultaten ontvangen', desc: 'AI analyseert in seconden — resultaten direct klaar' },
+      ],
+      cta: 'Aan de slag →',
+      skip: 'Overslaan',
     },
     koupit: {
       back: 'Terug', badge: 'Credits',
@@ -1222,8 +1366,8 @@ export const T = {
     },
   },
   pt: {
-    nav: { credits: 'créditos', buy: 'Comprar créditos' },
-    sidebar: { aiAssistant: 'Assistente IA', docAnalysis: 'Análise de documento', aiTools: 'Ferramentas IA', history: 'Histórico', free: 'grátis' },
+    nav: { credits: 'créditos', buy: 'Comprar créditos', lowCredits: 'Poucos créditos' },
+    sidebar: { aiAssistant: 'Assistente IA', docAnalysis: 'Análise de documento', aiTools: 'Ferramentas IA', history: 'Histórico', free: 'grátis', creditHistory: 'Uso de créditos', noHistory: 'Sem atividade ainda' },
     modes: { chat: 'Chat IA', summary: 'Resumo', actions: 'Ações', risks: 'Riscos', clauses: 'Cláusulas', deadlines: 'Prazos', finance: 'Analista financeiro', rewrite: 'Reescrita', translate: 'Tradutor', email: 'Gen. email', template: 'Gerador', compare: 'Comparar', interview: 'Entrevista IA', batch: 'Análise em lote' },
     chat: {
       welcome: 'Como posso ajudar?',
@@ -1320,6 +1464,22 @@ export const T = {
       mostPopular: 'Mais popular',
       footer: '© 2025 DocThink · Para freelancers na UE',
       heroCard: { riskLabel: 'risco', actionLabel: 'ação', financeLabel: 'finanças', riskText: 'A cláusula de rescisão não tem período de aviso prévio de 30 dias', actionText: 'Rever o calendário de pagamentos até 15 de outubro', financeText: 'Cláusula de penalidade: 2% mensal sobre pagamentos em atraso', aiComplete: 'Análise IA concluída' },
+      testimonialsLabel: 'O que dizem os utilizadores',
+      testimonials: [
+        { text: 'O DocThink reduziu o meu tempo de revisão de contratos em 80 %. Indispensável para freelancers.', name: 'Ana S.', role: 'Consultora freelance' },
+        { text: 'Análise em lote de 20 contratos de uma vez — poupança de tempo incrível.', name: 'João M.', role: 'Diretor de operações' },
+        { text: 'Finalmente uma tradução de documentos legais que realmente faz sentido.', name: 'Rita P.', role: 'Tradutora' },
+      ],
+    },
+    onboarding: {
+      title: 'Bem-vindo ao DocThink!',
+      steps: [
+        { icon: '📄', title: 'Carregue um documento', desc: 'PDF, Word ou cole texto diretamente — máx. 10 MB' },
+        { icon: '🎯', title: 'Escolha a análise', desc: 'Resumo, riscos, tradução e dezenas de outras ferramentas' },
+        { icon: '⚡', title: 'Obtenha resultados', desc: 'A IA analisa em segundos — resultados prontos instantaneamente' },
+      ],
+      cta: 'Vamos lá →',
+      skip: 'Ignorar',
     },
     koupit: {
       back: 'Voltar', badge: 'Créditos',
