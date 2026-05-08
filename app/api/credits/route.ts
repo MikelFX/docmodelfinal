@@ -3,8 +3,9 @@ import { auth } from '@clerk/nextjs/server'
 import { Redis } from '@upstash/redis'
 
 const DEFAULT_CREDITS = 10
+const MAX_SPEND = 25 // max credits in a single operation (batch analysis limit)
+const REFUND_WINDOW_MS = 5 * 60 * 1000 // 5 minutes
 
-// Support both Vercel KV env var names and Upstash direct env var names
 const REST_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL
 const REST_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN
 
@@ -20,6 +21,12 @@ async function kvGet(key: string): Promise<number | null> {
 async function kvSet(key: string, value: number): Promise<void> {
   if (!redis) return
   try { await redis.set(key, value) } catch { /* silent */ }
+}
+
+function validateAmount(amount: unknown): number | null {
+  const n = Number(amount)
+  if (!Number.isInteger(n) || n <= 0 || n > MAX_SPEND) return null
+  return n
 }
 
 export async function GET() {
@@ -40,28 +47,81 @@ export async function POST(req: NextRequest) {
   const { userId } = await auth()
   if (!userId) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
 
-  const { action, amount } = await req.json()
+  let body: { action?: string; amount?: unknown }
+  try { body = await req.json() } catch { return NextResponse.json({ error: 'Invalid body' }, { status: 400 }) }
 
-  if (action === 'add') {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+  const { action, amount } = body
 
+  // ── SPEND ──────────────────────────────────────────────────────────
   if (action === 'spend') {
-    if (!redis) {
-      return NextResponse.json({ ok: true })
+    const amt = validateAmount(amount)
+    if (amt === null) {
+      return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
     }
+
+    if (!redis) return NextResponse.json({ ok: true })
+
     const current = (await kvGet(`credits:${userId}`)) ?? DEFAULT_CREDITS
-    if (current < amount) {
+    if (current < amt) {
       return NextResponse.json({ error: 'Insufficient credits' }, { status: 400 })
     }
-    const newVal = current - amount
+    const newVal = current - amt
     await kvSet(`credits:${userId}`, newVal)
+
+    // Record spend for potential refund within the time window
+    try {
+      await redis.set(`lastspend:${userId}`, `${amt}:${Date.now()}`, { ex: Math.ceil(REFUND_WINDOW_MS / 1000) })
+    } catch { /* non-critical */ }
+
     return NextResponse.json({ credits: newVal })
+  }
+
+  // ── REFUND (error recovery only — validates against last recorded spend) ──
+  if (action === 'refund') {
+    const amt = validateAmount(amount)
+    if (amt === null) {
+      return NextResponse.json({ error: 'Invalid amount' }, { status: 400 })
+    }
+
+    if (!redis) return NextResponse.json({ ok: true })
+
+    let lastSpend: string | null = null
+    try { lastSpend = await redis.get<string>(`lastspend:${userId}`) } catch { /* ignore */ }
+
+    if (!lastSpend) {
+      return NextResponse.json({ error: 'No recent spend to refund' }, { status: 400 })
+    }
+
+    const [spentAmtStr, tsStr] = lastSpend.split(':')
+    const spentAmt = parseInt(spentAmtStr, 10)
+    const age = Date.now() - parseInt(tsStr, 10)
+
+    if (age > REFUND_WINDOW_MS) {
+      return NextResponse.json({ error: 'Refund window expired' }, { status: 400 })
+    }
+    if (spentAmt !== amt) {
+      return NextResponse.json({ error: 'Amount mismatch' }, { status: 400 })
+    }
+
+    const current = (await kvGet(`credits:${userId}`)) ?? DEFAULT_CREDITS
+    const newVal = current + amt
+    await kvSet(`credits:${userId}`, newVal)
+
+    // Consume the refund token — one refund per spend
+    try { await redis.del(`lastspend:${userId}`) } catch { /* ignore */ }
+
+    return NextResponse.json({ credits: newVal })
+  }
+
+  // ── ADD (server-side only, blocked for clients) ────────────────────
+  if (action === 'add') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   return NextResponse.json({ error: 'Unknown action' }, { status: 400 })
 }
 
+// Server-side only — called from webhook and verify endpoints
 export async function addCredits(userId: string, amount: number): Promise<number> {
   const current = (await kvGet(`credits:${userId}`)) ?? DEFAULT_CREDITS
   const newVal = current + amount

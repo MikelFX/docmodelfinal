@@ -4,9 +4,11 @@ import { useRouter } from 'next/navigation'
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 import { useEffect } from 'react'
 import styles from './landing.module.css'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 export default function LandingPage() {
   const router = useRouter()
+  const { t } = useLanguage()
 
   useEffect(() => {
     const els = document.querySelectorAll('[data-anim]')
@@ -36,11 +38,11 @@ export default function LandingPage() {
         </div>
         <div className={styles.navRight}>
           <SignedOut>
-            <button className={styles.signInBtn} onClick={() => router.push('/sign-in')}>Sign in</button>
-            <button className={styles.ctaBtn} onClick={() => router.push('/sign-up')}>Get started free →</button>
+            <button className={styles.signInBtn} onClick={() => router.push('/sign-in')}>{t.hero.signIn}</button>
+            <button className={styles.ctaBtn} onClick={() => router.push('/sign-up')}>{t.hero.tryFree}</button>
           </SignedOut>
           <SignedIn>
-            <button className={styles.ctaBtn} onClick={() => router.push('/app')}>Open DocThink →</button>
+            <button className={styles.ctaBtn} onClick={() => router.push('/app')}>{t.hero.openApp}</button>
             <UserButton afterSignOutUrl='/' />
           </SignedIn>
         </div>
@@ -60,15 +62,15 @@ export default function LandingPage() {
         <div className={styles.heroActions}>
           <SignedOut>
             <button className={styles.heroCta} onClick={() => router.push('/sign-up')}>
-              Try free — 10 credits
+              {t.hero.tryFree}
             </button>
             <button className={styles.heroSecondary} onClick={() => router.push('/sign-in')}>
-              Sign in
+              {t.hero.signIn}
             </button>
           </SignedOut>
           <SignedIn>
             <button className={styles.heroCta} onClick={() => router.push('/app')}>
-              Open app →
+              {t.hero.openApp}
             </button>
           </SignedIn>
         </div>
@@ -102,6 +104,24 @@ export default function LandingPage() {
           </div>
           <div className={styles.heroCardGlow} />
         </div>
+      </div>
+
+      {/* TRUST BADGES */}
+      <div className={`${styles.trustStrip} ${styles.animate}`} data-anim>
+        {[
+          { icon: '🔒', label: 'Secure login', sub: 'Clerk Auth' },
+          { icon: '⚡', label: 'Powered by', sub: 'Claude AI' },
+          { icon: '🇪🇺', label: 'GDPR', sub: 'Compliant' },
+          { icon: '💳', label: 'Payments', sub: 'via Stripe' },
+          { icon: '🚫', label: 'No subscription', sub: 'Pay per use' },
+          { icon: '♾️', label: 'Credits', sub: 'never expire' },
+        ].map(b => (
+          <div key={b.label} className={styles.trustBadge}>
+            <span className={styles.trustIcon}>{b.icon}</span>
+            <span className={styles.trustLabel}>{b.label}</span>
+            <span className={styles.trustSub}>{b.sub}</span>
+          </div>
+        ))}
       </div>
 
       {/* STATS STRIP */}

@@ -200,7 +200,7 @@ export default function Analyzer() {
       const res = await fetch('/api/credits', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'add', amount: cost }),
+        body: JSON.stringify({ action: 'refund', amount: cost }),
       })
       const data = await res.json()
       if (data.credits !== undefined) {

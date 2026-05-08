@@ -73,6 +73,11 @@ export const T = {
     analyzeBtn: (label: string, credits: number) =>
       `${label} — ${credits} ${credits === 1 ? 'kredit' : 'kredity'}`,
     credit: (n: number) => `${n === 1 ? 'kredit' : 'kredity'}`,
+    hero: {
+      tryFree: 'Vyzkoušet zdarma — 10 kreditů',
+      signIn: 'Přihlásit se',
+      openApp: 'Otevřít aplikaci →',
+    },
   },
   en: {
     nav: { credits: 'credits', buy: 'Buy credits' },
@@ -133,6 +138,11 @@ export const T = {
     analyzeBtn: (label: string, credits: number) =>
       `${label} — ${credits} ${credits === 1 ? 'credit' : 'credits'}`,
     credit: (n: number) => `${n === 1 ? 'credit' : 'credits'}`,
+    hero: {
+      tryFree: 'Try free — 10 credits',
+      signIn: 'Sign in',
+      openApp: 'Open app →',
+    },
   },
   de: {
     nav: { credits: 'Credits', buy: 'Credits kaufen' },
@@ -192,6 +202,11 @@ export const T = {
     },
     analyzeBtn: (label: string, credits: number) => `${label} — ${credits} Credit${credits !== 1 ? 's' : ''}`,
     credit: (n: number) => `Credit${n !== 1 ? 's' : ''}`,
+    hero: {
+      tryFree: 'Kostenlos testen — 10 Credits',
+      signIn: 'Anmelden',
+      openApp: 'App öffnen →',
+    },
   },
   sk: {
     nav: { credits: 'kredity', buy: 'Kúpiť kredity' },
@@ -252,6 +267,11 @@ export const T = {
     analyzeBtn: (label: string, credits: number) =>
       `${label} — ${credits} ${credits === 1 ? 'kredit' : 'kredity'}`,
     credit: (n: number) => `${n === 1 ? 'kredit' : 'kredity'}`,
+    hero: {
+      tryFree: 'Vyskúšať zadarmo — 10 kreditov',
+      signIn: 'Prihlásiť sa',
+      openApp: 'Otvoriť aplikáciu →',
+    },
   },
   fr: {
     nav: { credits: 'crédits', buy: 'Acheter des crédits' },
@@ -311,6 +331,11 @@ export const T = {
     },
     analyzeBtn: (label: string, credits: number) => `${label} — ${credits} crédit${credits !== 1 ? 's' : ''}`,
     credit: (n: number) => `crédit${n !== 1 ? 's' : ''}`,
+    hero: {
+      tryFree: 'Essayer gratuitement — 10 crédits',
+      signIn: 'Se connecter',
+      openApp: "Ouvrir l'app →",
+    },
   },
   es: {
     nav: { credits: 'créditos', buy: 'Comprar créditos' },
@@ -370,6 +395,11 @@ export const T = {
     },
     analyzeBtn: (label: string, credits: number) => `${label} — ${credits} crédito${credits !== 1 ? 's' : ''}`,
     credit: (n: number) => `crédito${n !== 1 ? 's' : ''}`,
+    hero: {
+      tryFree: 'Prueba gratis — 10 créditos',
+      signIn: 'Iniciar sesión',
+      openApp: 'Abrir app →',
+    },
   },
   it: {
     nav: { credits: 'crediti', buy: 'Acquista crediti' },
@@ -429,6 +459,7 @@ export const T = {
     },
     analyzeBtn: (label: string, credits: number) => `${label} — ${credits} credit${credits !== 1 ? 'i' : 'o'}`,
     credit: (n: number) => `credit${n !== 1 ? 'i' : 'o'}`,
+    hero: { tryFree: 'Prova gratis — 10 crediti', signIn: 'Accedi', openApp: "Apri l'app →" },
   },
   pl: {
     nav: { credits: 'kredyty', buy: 'Kup kredyty' },
@@ -489,6 +520,7 @@ export const T = {
     analyzeBtn: (label: string, credits: number) =>
       `${label} — ${credits} ${credits === 1 ? 'kredyt' : credits < 5 ? 'kredyty' : 'kredytów'}`,
     credit: (n: number) => `${n === 1 ? 'kredyt' : n < 5 ? 'kredyty' : 'kredytów'}`,
+    hero: { tryFree: 'Wypróbuj za darmo — 10 kredytów', signIn: 'Zaloguj się', openApp: 'Otwórz aplikację →' },
   },
   nl: {
     nav: { credits: 'credits', buy: 'Credits kopen' },
@@ -548,6 +580,7 @@ export const T = {
     },
     analyzeBtn: (label: string, credits: number) => `${label} — ${credits} credit${credits !== 1 ? 's' : ''}`,
     credit: (n: number) => `credit${n !== 1 ? 's' : ''}`,
+    hero: { tryFree: 'Gratis proberen — 10 credits', signIn: 'Inloggen', openApp: 'Open app →' },
   },
   pt: {
     nav: { credits: 'créditos', buy: 'Comprar créditos' },
@@ -607,6 +640,7 @@ export const T = {
     },
     analyzeBtn: (label: string, credits: number) => `${label} — ${credits} crédito${credits !== 1 ? 's' : ''}`,
     credit: (n: number) => `crédito${n !== 1 ? 's' : ''}`,
+    hero: { tryFree: 'Experimentar grátis — 10 créditos', signIn: 'Entrar', openApp: 'Abrir app →' },
   },
 }
 
