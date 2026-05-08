@@ -117,6 +117,7 @@ export const T = {
       viewPlans: 'Zobrazit všechny plány →',
       mostPopular: 'Nejoblíbenější',
       footer: '© 2025 DocThink · Pro freelancery v EU',
+      heroCard: { riskLabel: 'riziko', actionLabel: 'akce', financeLabel: 'finance', riskText: 'Klauzule o ukončení postrádá 30denní výpovědní lhůtu', actionText: 'Zkontrolovat splátkový kalendář do 15. října', financeText: 'Smluvní pokuta: 2 % měsíčně za pozdní platby', aiComplete: 'AI analýza dokončena' },
     },
   },
   en: {
@@ -222,6 +223,7 @@ export const T = {
       viewPlans: 'View all plans →',
       mostPopular: 'Most popular',
       footer: '© 2025 DocThink · For freelancers in EU',
+      heroCard: { riskLabel: 'risk', actionLabel: 'action', financeLabel: 'finance', riskText: 'Termination clause lacks 30-day notice period', actionText: 'Review payment schedule by Oct 15', financeText: 'Penalty clause: 2% monthly on late payments', aiComplete: 'AI analysis complete' },
     },
   },
   de: {
@@ -326,6 +328,7 @@ export const T = {
       viewPlans: 'Alle Pläne ansehen →',
       mostPopular: 'Beliebteste',
       footer: '© 2025 DocThink · Für Freelancer in der EU',
+      heroCard: { riskLabel: 'Risiko', actionLabel: 'Aufgabe', financeLabel: 'Finanzen', riskText: 'Kündigungsklausel fehlt 30-tägige Kündigungsfrist', actionText: 'Zahlungsplan bis 15. Oktober überprüfen', financeText: 'Vertragsstrafe: 2 % monatlich bei verspäteten Zahlungen', aiComplete: 'KI-Analyse abgeschlossen' },
     },
   },
   sk: {
@@ -431,6 +434,7 @@ export const T = {
       viewPlans: 'Zobraziť všetky plány →',
       mostPopular: 'Najobľúbenejší',
       footer: '© 2025 DocThink · Pre freelancerov v EÚ',
+      heroCard: { riskLabel: 'riziko', actionLabel: 'akcia', financeLabel: 'financie', riskText: 'Klauzula o ukončení nemá 30-dňovú výpovednú lehotu', actionText: 'Skontrolovať splátkový kalendár do 15. októbra', financeText: 'Zmluvná pokuta: 2 % mesačne za oneskorené platby', aiComplete: 'AI analýza dokončená' },
     },
   },
   fr: {
@@ -535,6 +539,7 @@ export const T = {
       viewPlans: 'Voir tous les plans →',
       mostPopular: 'Le plus populaire',
       footer: "© 2025 DocThink · Pour les freelances dans l'UE",
+      heroCard: { riskLabel: 'risque', actionLabel: 'action', financeLabel: 'finance', riskText: "La clause de résiliation manque d'un préavis de 30 jours", actionText: "Réviser l'échéancier de paiement avant le 15 octobre", financeText: 'Clause pénale : 2 % mensuel sur les retards de paiement', aiComplete: 'Analyse IA terminée' },
     },
   },
   es: {
@@ -639,6 +644,7 @@ export const T = {
       viewPlans: 'Ver todos los planes →',
       mostPopular: 'Más popular',
       footer: '© 2025 DocThink · Para freelancers en la UE',
+      heroCard: { riskLabel: 'riesgo', actionLabel: 'acción', financeLabel: 'finanzas', riskText: 'La cláusula de rescisión carece de período de preaviso de 30 días', actionText: 'Revisar el calendario de pagos antes del 15 de octubre', financeText: 'Cláusula de penalización: 2% mensual por pagos tardíos', aiComplete: 'Análisis IA completado' },
     },
   },
   it: {
@@ -739,6 +745,7 @@ export const T = {
       viewPlans: 'Vedi tutti i piani →',
       mostPopular: 'Più popolare',
       footer: "© 2025 DocThink · Per freelance nell'UE",
+      heroCard: { riskLabel: 'rischio', actionLabel: 'azione', financeLabel: 'finanza', riskText: 'La clausola di risoluzione manca del periodo di preavviso di 30 giorni', actionText: 'Rivedere il piano di pagamento entro il 15 ottobre', financeText: 'Clausola penale: 2% mensile sui pagamenti in ritardo', aiComplete: 'Analisi IA completata' },
     },
   },
   pl: {
@@ -840,6 +847,7 @@ export const T = {
       viewPlans: 'Zobacz wszystkie plany →',
       mostPopular: 'Najpopularniejszy',
       footer: '© 2025 DocThink · Dla freelancerów w UE',
+      heroCard: { riskLabel: 'ryzyko', actionLabel: 'zadanie', financeLabel: 'finanse', riskText: 'Klauzula wypowiedzenia nie zawiera 30-dniowego okresu wypowiedzenia', actionText: 'Przejrzeć harmonogram płatności do 15 października', financeText: 'Klauzula karna: 2% miesięcznie za spóźnione płatności', aiComplete: 'Analiza AI zakończona' },
     },
   },
   nl: {
@@ -940,6 +948,7 @@ export const T = {
       viewPlans: 'Bekijk alle plannen →',
       mostPopular: 'Meest populair',
       footer: '© 2025 DocThink · Voor freelancers in de EU',
+      heroCard: { riskLabel: 'risico', actionLabel: 'actie', financeLabel: 'financiën', riskText: 'Beëindigingsclausule mist opzegtermijn van 30 dagen', actionText: 'Betalingsschema beoordelen vóór 15 oktober', financeText: 'Boeteclausule: 2% per maand bij te late betalingen', aiComplete: 'AI-analyse voltooid' },
     },
   },
   pt: {
@@ -1040,6 +1049,7 @@ export const T = {
       viewPlans: 'Ver todos os planos →',
       mostPopular: 'Mais popular',
       footer: '© 2025 DocThink · Para freelancers na UE',
+      heroCard: { riskLabel: 'risco', actionLabel: 'ação', financeLabel: 'finanças', riskText: 'A cláusula de rescisão não tem período de aviso prévio de 30 dias', actionText: 'Rever o calendário de pagamentos até 15 de outubro', financeText: 'Cláusula de penalidade: 2% mensal sobre pagamentos em atraso', aiComplete: 'Análise IA concluída' },
     },
   },
 }

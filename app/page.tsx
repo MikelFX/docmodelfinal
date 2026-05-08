@@ -99,20 +99,20 @@ export default function LandingPage() {
             </div>
             <div className={styles.heroCardBody}>
               <div className={styles.heroCardRow}>
-                <span className={styles.heroTagRisk}>risk</span>
-                <span className={styles.heroCardText}>Termination clause lacks 30-day notice period</span>
+                <span className={styles.heroTagRisk}>{l.heroCard.riskLabel}</span>
+                <span className={styles.heroCardText}>{l.heroCard.riskText}</span>
               </div>
               <div className={styles.heroCardRow}>
-                <span className={styles.heroTagAction}>action</span>
-                <span className={styles.heroCardText}>Review payment schedule by Oct 15</span>
+                <span className={styles.heroTagAction}>{l.heroCard.actionLabel}</span>
+                <span className={styles.heroCardText}>{l.heroCard.actionText}</span>
               </div>
               <div className={styles.heroCardRow}>
-                <span className={styles.heroTagFinance}>finance</span>
-                <span className={styles.heroCardText}>Penalty clause: 2% monthly on late payments</span>
+                <span className={styles.heroTagFinance}>{l.heroCard.financeLabel}</span>
+                <span className={styles.heroCardText}>{l.heroCard.financeText}</span>
               </div>
             </div>
             <div className={styles.heroCardFooter}>
-              <div className={styles.heroCardAiBadge}>⚡ AI analysis complete</div>
+              <div className={styles.heroCardAiBadge}>⚡ {l.heroCard.aiComplete}</div>
             </div>
           </div>
           <div className={styles.heroCardGlow} />
