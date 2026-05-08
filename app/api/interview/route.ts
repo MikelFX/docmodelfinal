@@ -26,7 +26,7 @@ ${langInstruction(lang ?? 'en')}`
   try {
     const message = await anthropic.messages.create({
       model: MODEL,
-      max_tokens: 1024,
+      max_tokens: 8192,
       system: systemPrompt,
       messages,
     })

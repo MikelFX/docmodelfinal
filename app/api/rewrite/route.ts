@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   try {
     const message = await anthropic.messages.create({
       model: MODEL,
-      max_tokens: 2048,
+      max_tokens: 8192,
       system: `You are a professional text editor. Rewrite texts according to the requested style. Return only the rewritten text, no commentary. ${langInstruction(lang ?? 'en')}`,
       messages: [{ role: 'user', content: `${prompt}\n\nTEXT:\n${content.slice(0, 4000)}` }],
     })

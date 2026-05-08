@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   try {
     const message = await anthropic.messages.create({
       model: MODEL,
-      max_tokens: 2048,
+      max_tokens: 8192,
       system: `You are a legal and business writing assistant. Generate professional documents and templates in ${langName}. Return only the finished document with no commentary.`,
       messages: [{
         role: 'user',

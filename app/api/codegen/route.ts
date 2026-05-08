@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
   try {
     const message = await anthropic.messages.create({
       model: MODEL,
-      max_tokens: 4096,
+      max_tokens: 8192,
       system: 'You are an expert web developer and programmer. Generate complete, production-ready code based on the description. Return ONLY the raw code — no markdown code fences, no explanations, no preamble. The code must be immediately usable and complete.',
       messages: [{
         role: 'user',

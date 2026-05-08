@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   try {
     const message = await anthropic.messages.create({
       model: MODEL,
-      max_tokens: 2048,
+      max_tokens: 8192,
       system: 'You are a professional translator. Translate accurately while preserving the style of the original. Return only the translated text.',
       messages: [{
         role: 'user',

@@ -45,7 +45,7 @@ ${content.slice(0, 3500)}`
   try {
     const message = await anthropic.messages.create({
       model: MODEL,
-      max_tokens: 1200,
+      max_tokens: 8192,
       system: 'You are an expert email writer. You write persuasive, clear emails adapted to context. Return only the finished email.',
       messages: [{ role: 'user', content: userMessage }],
     })
