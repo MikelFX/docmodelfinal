@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
 
@@ -14,10 +14,10 @@ const PLANS = [
     tag: null,
     desc: 'Vyzkoušej bez závazků',
     features: [
-      'Analýza, shrnutí, rizika, termíny',
-      'Překlad do 7 jazyků',
+      'Analýza, shrnutí, rizika, klauzule',
+      'Překlad do 24 EU jazyků',
       'Generátor emailů a šablon',
-      'Generátor kódu — web, landing, skripty',
+      'Porovnání dokumentů (compare)',
       'AI Chat (1 kredit / 5 zpráv)',
       'Export TXT a PDF',
     ],
@@ -61,7 +61,8 @@ const CREDIT_COSTS = [
   { icon: '✍️', label: 'Přepisovač stylu', credits: 2 },
   { icon: '📝', label: 'Generátor šablon a smluv', credits: 2 },
   { icon: '📧', label: 'Generátor emailů', credits: 2 },
-  { icon: '💻', label: 'Generátor kódu (web, app)', credits: 3 },
+  { icon: '⚖️', label: 'Analýza klauzulí smlouvy', credits: 2 },
+  { icon: '🔍', label: 'Porovnání dvou dokumentů', credits: 2 },
   { icon: '🤖', label: 'AI Tazatel', credits: 5 },
   { icon: '✨', label: 'AI Chat', credits: '1k / 5 zpráv' },
 ]
@@ -71,6 +72,21 @@ export default function KoupitPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
+
+  useEffect(() => {
+    const els = document.querySelectorAll('[data-anim]')
+    const obs = new IntersectionObserver(
+      (entries) => entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add(styles.visible)
+          obs.unobserve(e.target)
+        }
+      }),
+      { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+    )
+    els.forEach(el => obs.observe(el))
+    return () => obs.disconnect()
+  }, [])
 
   async function handleBuy() {
     setLoading(true)
@@ -94,6 +110,8 @@ export default function KoupitPage() {
 
   return (
     <div className={styles.wrap}>
+      <div className={styles.orb1} />
+      <div className={styles.orb2} />
       <nav className={styles.nav}>
         <button className={styles.back} onClick={() => router.push('/')}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -108,14 +126,14 @@ export default function KoupitPage() {
       <div className={styles.content}>
 
         {/* HEADER */}
-        <div className={styles.header}>
+        <div className={`${styles.header} ${styles.animate}`} data-anim>
           <div className={styles.headerBadge}>Kredity</div>
           <h1 className={styles.title}>Zaplať jen za to,<br />co skutečně použiješ</h1>
           <p className={styles.sub}>1 kredit = 10 Kč · Kredity nevyprší · Bez předplatného · Zrušení kdykoliv</p>
         </div>
 
         {/* VALUE BAR */}
-        <div className={styles.valueBar}>
+        <div className={`${styles.valueBar} ${styles.animate}`} data-anim>
           {[
             { icon: '⚖️', label: 'Analýza smlouvy', doc: 'Advokát', alt: '500 Kč', you: '10 Kč' },
             { icon: '🌍', label: 'Překlad dokumentu', doc: 'Překladatel', alt: '350 Kč', you: '20 Kč' },
@@ -136,7 +154,7 @@ export default function KoupitPage() {
         </div>
 
         {/* PLANS */}
-        <div className={styles.plans}>
+        <div className={`${styles.plans} ${styles.animate}`} data-anim>
           {PLANS.map(p => (
             <button
               key={p.id}
@@ -168,7 +186,7 @@ export default function KoupitPage() {
         </div>
 
         {/* CHECKOUT SUMMARY */}
-        <div className={styles.summary}>
+        <div className={`${styles.summary} ${styles.animate}`} data-anim>
           <div className={styles.summaryHeader}>
             <span className={styles.summaryPlanName}>{plan.name}</span>
             <span className={styles.summaryCredits}>{plan.credits} kreditů</span>
@@ -209,7 +227,7 @@ export default function KoupitPage() {
         </div>
 
         {/* CREDIT COSTS TABLE */}
-        <div className={styles.creditGuide}>
+        <div className={`${styles.creditGuide} ${styles.animate}`} data-anim>
           <div className={styles.creditGuideTitle}>Kolik stojí co?</div>
           <div className={styles.creditGuideGrid}>
             {CREDIT_COSTS.map(c => (
@@ -227,7 +245,7 @@ export default function KoupitPage() {
         </div>
 
         {/* FAQ */}
-        <div className={styles.faq}>
+        <div className={`${styles.faq} ${styles.animate}`} data-anim>
           {[
             { q: 'Vyprší kredity?', a: 'Ne. Kredity jsou trvalé, nevyprší a přecházejí do dalšího nákupu.' },
             { q: 'Co jsou kredity?', a: '1 kredit = 10 Kč. Každá AI operace stojí 1–5 kreditů v závislosti na složitosti. Viz tabulka výše.' },
