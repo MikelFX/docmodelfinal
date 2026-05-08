@@ -6,9 +6,25 @@ import { useEffect } from 'react'
 import styles from './landing.module.css'
 import { useLanguage } from '@/contexts/LanguageContext'
 
+const STAT_VALUES = ['14+', '24', '10×', '99%'] as const
+
+const SAVINGS_PRICES = [
+  { you: '€1', saving: '98%' },
+  { you: '€2', saving: '97%' },
+  { you: '€2', saving: '94%' },
+  { you: '€2', saving: '99%' },
+]
+
+const PLANS = [
+  { name: 'Starter', credits: 10, price: '€4', per: '€0.40 / credit' },
+  { name: 'Pro', credits: 40, price: '€14', per: '€0.35 / credit', highlight: true },
+  { name: 'Business', credits: 120, price: '€40', per: '€0.33 / credit' },
+]
+
 export default function LandingPage() {
   const router = useRouter()
   const { t } = useLanguage()
+  const l = t.landing
 
   useEffect(() => {
     const els = document.querySelectorAll('[data-anim]')
@@ -50,15 +66,12 @@ export default function LandingPage() {
 
       {/* HERO */}
       <div className={styles.hero}>
-        <div className={styles.badge}>✨ AI tool for documents & contracts</div>
+        <div className={styles.badge}>✨ {l.badge}</div>
         <h1 className={styles.title}>
-          Analyze documents<br />
-          <span className={styles.titleAccent}>10× faster</span>
+          {l.title1}<br />
+          <span className={styles.titleAccent}>{l.title2}</span>
         </h1>
-        <p className={styles.sub}>
-          Upload a PDF, Word, or TXT file and AI will instantly generate summaries,
-          action items, risks, legal clause reviews, or a brand-new document — in any EU language.
-        </p>
+        <p className={styles.sub}>{l.sub}</p>
         <div className={styles.heroActions}>
           <SignedOut>
             <button className={styles.heroCta} onClick={() => router.push('/sign-up')}>
@@ -108,14 +121,7 @@ export default function LandingPage() {
 
       {/* TRUST BADGES */}
       <div className={`${styles.trustStrip} ${styles.animate}`} data-anim>
-        {[
-          { icon: '🔒', label: 'Secure login', sub: 'Clerk Auth' },
-          { icon: '⚡', label: 'Powered by', sub: 'Claude AI' },
-          { icon: '🇪🇺', label: 'GDPR', sub: 'Compliant' },
-          { icon: '💳', label: 'Payments', sub: 'via Stripe' },
-          { icon: '🚫', label: 'No subscription', sub: 'Pay per use' },
-          { icon: '♾️', label: 'Credits', sub: 'never expire' },
-        ].map(b => (
+        {l.trust.map(b => (
           <div key={b.label} className={styles.trustBadge}>
             <span className={styles.trustIcon}>{b.icon}</span>
             <span className={styles.trustLabel}>{b.label}</span>
@@ -126,34 +132,19 @@ export default function LandingPage() {
 
       {/* STATS STRIP */}
       <div className={`${styles.stats} ${styles.animate}`} data-anim>
-        {[
-          { value: '14+', label: 'AI tools' },
-          { value: '24', label: 'EU languages' },
-          { value: '10×', label: 'faster than manual' },
-          { value: '99%', label: 'cost reduction' },
-        ].map(s => (
-          <div key={s.label} className={styles.statItem}>
-            <div className={styles.statValue}>{s.value}</div>
-            <div className={styles.statLabel}>{s.label}</div>
+        {STAT_VALUES.map((value, i) => (
+          <div key={i} className={styles.statItem}>
+            <div className={styles.statValue}>{value}</div>
+            <div className={styles.statLabel}>{l.statsLabels[i]}</div>
           </div>
         ))}
       </div>
 
       {/* FEATURES */}
       <div className={styles.featuresWrap}>
-        <div className={`${styles.sectionLabel} ${styles.animate}`} data-anim>What DocThink can do</div>
+        <div className={`${styles.sectionLabel} ${styles.animate}`} data-anim>{l.featuresLabel}</div>
         <div className={styles.features}>
-          {[
-            { icon: '📋', title: 'Summary', desc: 'A concise structured overview of any document in seconds.' },
-            { icon: '⚠️', title: 'Risks', desc: 'Identifies critical issues, red flags, and risky clauses before you sign.' },
-            { icon: '⚖️', title: 'Legal clauses', desc: 'Extracts every clause and rates it FAIR / REVIEW / UNFAVORABLE / MISSING.' },
-            { icon: '🔍', title: 'Compare docs', desc: 'Upload two versions — AI highlights every change and its impact.' },
-            { icon: '💰', title: 'Finance analyst', desc: 'Deep financial analysis: payments, hidden costs, cash flow implications.' },
-            { icon: '✅', title: 'Action items', desc: 'Extracts all tasks, owners, and deadlines grouped by priority.' },
-            { icon: '🌍', title: 'Translator', desc: 'Translates documents into 24 EU languages with full accuracy.' },
-            { icon: '📝', title: 'Template generator', desc: 'Generates contracts, NDAs, proposals, and more from a description.' },
-            { icon: '🤖', title: 'AI Interviewer', desc: 'Creates a complete professional document through Q&A dialogue.' },
-          ].map((f, i) => (
+          {l.features.map((f, i) => (
             <div
               key={f.title}
               className={`${styles.featureCard} ${styles.animate}`}
@@ -170,14 +161,9 @@ export default function LandingPage() {
 
       {/* SAVINGS STRIP */}
       <div className={`${styles.savings} ${styles.animate}`} data-anim>
-        <div className={styles.sectionLabel}>How much do you save?</div>
+        <div className={styles.sectionLabel}>{l.savingsLabel}</div>
         <div className={styles.savingsGrid}>
-          {[
-            { label: 'Contract review', alt: 'Lawyer €50', you: '€1', saving: '98%' },
-            { label: 'Legal clause analysis', alt: 'Legal consultant €80', you: '€2', saving: '97%' },
-            { label: 'Document translation', alt: 'Translator €35', you: '€2', saving: '94%' },
-            { label: 'Contract template', alt: 'Legal template €200', you: '€2', saving: '99%' },
-          ].map((s, i) => (
+          {l.savings.map((s, i) => (
             <div
               key={s.label}
               className={styles.savingsItem}
@@ -186,8 +172,8 @@ export default function LandingPage() {
               <div className={styles.savingsLabel}>{s.label}</div>
               <div className={styles.savingsAlt}>{s.alt}</div>
               <div className={styles.savingsArrow}>↓</div>
-              <div className={styles.savingsYou}>{s.you}</div>
-              <div className={styles.savingsPct}>−{s.saving}</div>
+              <div className={styles.savingsYou}>{SAVINGS_PRICES[i].you}</div>
+              <div className={styles.savingsPct}>−{SAVINGS_PRICES[i].saving}</div>
             </div>
           ))}
         </div>
@@ -195,21 +181,17 @@ export default function LandingPage() {
 
       {/* PRICING */}
       <div className={`${styles.pricing} ${styles.animate}`} data-anim>
-        <div className={styles.sectionLabel}>Pricing</div>
-        <h2 className={styles.pricingTitle}>Pay only for what you use</h2>
-        <p className={styles.pricingSub}>Credits never expire · No subscription · Cancel anytime</p>
+        <div className={styles.sectionLabel}>{l.pricingLabel}</div>
+        <h2 className={styles.pricingTitle}>{l.pricingTitle}</h2>
+        <p className={styles.pricingSub}>{l.pricingSub}</p>
         <div className={styles.plans}>
-          {[
-            { name: 'Starter', credits: 10, price: '€4', per: '€0.40 / credit' },
-            { name: 'Pro', credits: 40, price: '€14', per: '€0.35 / credit', highlight: true },
-            { name: 'Business', credits: 120, price: '€40', per: '€0.33 / credit' },
-          ].map((p, i) => (
+          {PLANS.map((p, i) => (
             <div
               key={p.name}
               className={`${styles.plan} ${p.highlight ? styles.planHighlight : ''}`}
               style={{ '--delay': `${i * 0.1}s` } as React.CSSProperties}
             >
-              {p.highlight && <div className={styles.planBadge}>Most popular</div>}
+              {p.highlight && <div className={styles.planBadge}>{l.mostPopular}</div>}
               <div className={styles.planName}>{p.name}</div>
               <div className={styles.planPrice}>{p.price}</div>
               <div className={styles.planCredits}>{p.credits} credits</div>
@@ -218,14 +200,14 @@ export default function LandingPage() {
           ))}
         </div>
         <button className={styles.heroCta} onClick={() => router.push('/koupit')}>
-          View all plans →
+          {l.viewPlans}
         </button>
       </div>
 
       <footer className={styles.footer}>
         <div className={styles.logo}><div className={styles.logoDot} />docthink</div>
         <div className={styles.footerLinks}>
-          <span>© 2025 DocThink · For freelancers in EU</span>
+          <span>{l.footer}</span>
         </div>
       </footer>
     </div>
