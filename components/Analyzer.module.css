@@ -946,6 +946,77 @@
   }
 }
 
+/* ═══════════════════════════════════════
+   DESKTOP CHAT LAYOUT
+   ═══════════════════════════════════════ */
+@media (min-width: 769px) {
+  /* Chat wrap fills the full viewport height so welcome is truly centered */
+  .chatWrap {
+    min-height: calc(100vh - 110px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Welcome: flex:1 so it claims all space above the input, then centers content */
+  .chatWelcome {
+    flex: 1;
+    justify-content: center;
+    padding: 24px 48px 20px;
+  }
+
+  .chatWelcomeTitle {
+    font-size: 30px;
+  }
+
+  .chatWelcomeSub {
+    font-size: 14px;
+    margin-bottom: 40px;
+  }
+
+  /* Wider 2-col suggestion grid, centered */
+  .chatSuggestions {
+    max-width: 760px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .chatSuggestion {
+    padding: 14px 18px;
+    font-size: 13.5px;
+  }
+
+  /* Thread fills remaining space above input */
+  .chatThread {
+    flex: 1;
+    max-height: calc(100vh - 230px);
+    padding: 0 0 8px;
+  }
+
+  /* Input bar sticky at bottom of the chat wrap */
+  .chatInputWrap {
+    position: sticky;
+    bottom: 0;
+    background: rgba(7, 7, 13, 0.97);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border-top: 0.5px solid rgba(127, 119, 221, 0.09);
+    padding: 14px 0 22px;
+    margin-top: 0;
+  }
+
+  .chatInputRow {
+    padding: 8px 8px 8px 18px;
+  }
+
+  .chatInput {
+    font-size: 14.5px;
+  }
+
+  .chatHint {
+    margin-top: 4px;
+  }
+}
+
 @media (max-width: 380px) {
   .nav { padding: 0 12px; }
   .content { padding: 12px 12px 90px; }
