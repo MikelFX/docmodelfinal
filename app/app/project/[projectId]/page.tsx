@@ -239,7 +239,6 @@ export default function ProjectPage({ params }: Props) {
                 </div>
                 <KnowledgeGraph
                   documents={project.documents}
-                  activeDocId={activeDocId ?? undefined}
                   onSelectDoc={id => { setActiveDocId(id); setSidebarOpen(false) }}
                 />
               </div>

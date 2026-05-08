@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
   const stream = anthropic.messages.stream({
     model: MODEL,
     max_tokens: 1024,
-    system: `You are DocThink AI assistant. Be concise, friendly, and practical. ${langInstruction(lang)}`,
+    system: `You are DocThink AI assistant. Be concise, friendly, and practical. Never use markdown formatting — no asterisks, no hashtags, no bullet dashes, no bold/italic syntax. Write in plain text only. ${langInstruction(lang)}`,
     messages: messages as { role: 'user' | 'assistant'; content: string }[],
   })
 

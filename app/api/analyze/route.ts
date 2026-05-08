@@ -198,7 +198,7 @@ export async function POST(req: NextRequest) {
   const langHint = langInstruction(lang ?? 'en')
 
   const systemPrompt = question
-    ? `You are an analytical assistant. Answer concisely and factually. ${langHint}`
+    ? `You are an analytical assistant. Answer concisely and factually. Never use markdown formatting — no asterisks, no hashtags, no bold/italic syntax. Plain text only. ${langHint}`
     : `You are an analytical assistant. Respond ONLY as HTML fragments. No markdown, no backticks, no DOCTYPE. ${langHint}`
 
   let userMessage: string
