@@ -23,7 +23,7 @@ const PLANS = [
 
 export default function LandingPage() {
   const router = useRouter()
-  const { t } = useLanguage()
+  const { t, lang } = useLanguage()
   const l = t.landing
 
   useEffect(() => {
@@ -37,9 +37,12 @@ export default function LandingPage() {
       }),
       { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
     )
-    els.forEach(el => obs.observe(el))
+    els.forEach(el => {
+      el.classList.remove(styles.visible)
+      obs.observe(el)
+    })
     return () => obs.disconnect()
-  }, [])
+  }, [lang])
 
   return (
     <div className={styles.wrap}>
@@ -121,8 +124,8 @@ export default function LandingPage() {
 
       {/* TRUST BADGES */}
       <div className={`${styles.trustStrip} ${styles.animate}`} data-anim>
-        {l.trust.map(b => (
-          <div key={b.label} className={styles.trustBadge}>
+        {l.trust.map((b, i) => (
+          <div key={i} className={styles.trustBadge}>
             <span className={styles.trustIcon}>{b.icon}</span>
             <span className={styles.trustLabel}>{b.label}</span>
             <span className={styles.trustSub}>{b.sub}</span>
@@ -146,7 +149,7 @@ export default function LandingPage() {
         <div className={styles.features}>
           {l.features.map((f, i) => (
             <div
-              key={f.title}
+              key={i}
               className={`${styles.featureCard} ${styles.animate}`}
               data-anim
               style={{ '--delay': `${i * 0.06}s` } as React.CSSProperties}
@@ -165,7 +168,7 @@ export default function LandingPage() {
         <div className={styles.savingsGrid}>
           {l.savings.map((s, i) => (
             <div
-              key={s.label}
+              key={i}
               className={styles.savingsItem}
               style={{ '--delay': `${i * 0.08}s` } as React.CSSProperties}
             >
