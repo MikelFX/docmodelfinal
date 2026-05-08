@@ -292,19 +292,54 @@ export default function ProjectPage({ params }: Props) {
 
         {/* ANALYZER */}
         <div className={styles.analyzerWrap}>
+          {/* Desktop: floating hint over analyzer */}
           {!activeDocId && project.documents.length > 0 && !showGraph && (
             <div className={styles.selectDocHint}>
               <div className={styles.selectDocIcon}>📂</div>
               <div>{p.selectDoc} <button className={styles.selectDocLink} onClick={() => fileRef.current?.click()}>{p.uploadNew}</button></div>
             </div>
           )}
-          <Analyzer
-            key={activeDocId ?? 'empty'}
-            initialContent={activeDoc?.content}
-            initialFileName={activeDoc?.name}
-            onAnalysisResult={handleAnalysisResult}
-            hideNav
-          />
+
+          {/* Mobile: clean empty state instead of overlapping hint */}
+          {!activeDocId && (
+            <div className={styles.mobileEmptyState}>
+              <div className={styles.mobileEmptyIcon}>📂</div>
+              <div className={styles.mobileEmptyTitle}>
+                {project.documents.length === 0 ? 'Žádné dokumenty' : 'Vyber dokument'}
+              </div>
+              <div className={styles.mobileEmptyDesc}>
+                {project.documents.length === 0
+                  ? 'Nahraj první dokument a začni analyzovat'
+                  : 'Otevři seznam dokumentů nebo nahraj nový'}
+              </div>
+              <div className={styles.mobileEmptyActions}>
+                {project.documents.length > 0 && (
+                  <button className={styles.mobileEmptyBtnPrimary} onClick={() => setSidebarOpen(true)}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    Dokumenty projektu
+                  </button>
+                )}
+                <button className={styles.mobileEmptyBtnSecondary} onClick={() => fileRef.current?.click()}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                  </svg>
+                  Nahrát dokument
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className={!activeDocId ? styles.analyzerHiddenMobile : ''}>
+            <Analyzer
+              key={activeDocId ?? 'empty'}
+              initialContent={activeDoc?.content}
+              initialFileName={activeDoc?.name}
+              onAnalysisResult={handleAnalysisResult}
+              hideNav
+            />
+          </div>
         </div>
       </div>
 
