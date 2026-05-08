@@ -9,6 +9,13 @@
   position: relative;
 }
 
+.wrapEmbedded {
+  min-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+}
+
 /* ── AMBIENT ORBS ── */
 .orbApp1 {
   position: fixed;

@@ -73,13 +73,21 @@ function stripHtml(html: string) {
   return html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
 }
 
-export default function Analyzer() {
+interface AnalyzerProps {
+  initialContent?: string
+  initialFileName?: string
+  initialFileSize?: string
+  onAnalysisResult?: (mode: string, result: string, fileName: string) => void
+  hideNav?: boolean
+}
+
+export default function Analyzer({ initialContent, initialFileName, initialFileSize, onAnalysisResult, hideNav }: AnalyzerProps = {}) {
   const { t, lang } = useLanguage()
 
   const [mode, setMode] = useState<Mode>('chat')
-  const [fileContent, setFileContent] = useState('')
-  const [fileName, setFileName] = useState('')
-  const [fileSize, setFileSize] = useState('')
+  const [fileContent, setFileContent] = useState(initialContent ?? '')
+  const [fileName, setFileName] = useState(initialFileName ?? '')
+  const [fileSize, setFileSize] = useState(initialFileSize ?? '')
   const [dragging, setDragging] = useState(false)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState('')
@@ -145,6 +153,16 @@ export default function Analyzer() {
   const chatBottomRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const { user } = useUser()
+
+  useEffect(() => {
+    if (initialContent !== undefined) {
+      setFileContent(initialContent)
+      setFileName(initialFileName ?? '')
+      setFileSize(initialFileSize ?? '')
+      setResult('')
+      setAnswers([])
+    }
+  }, [initialContent, initialFileName, initialFileSize])
 
   useEffect(() => {
     const saved = localStorage.getItem('docthink_credits')
@@ -329,6 +347,7 @@ export default function Analyzer() {
       if (data.error) throw new Error(data.error)
       setResult(data.result)
       saveToHistory(data.result, fileName, mode)
+      onAnalysisResult?.(mode, data.result, fileName)
     } catch (err: any) {
       const msg = err instanceof Error ? err.message : 'Chyba. Zkus znovu.'
       setResult(`<p style="color:#F09595;font-size:13px">${msg}</p>`)
@@ -530,6 +549,7 @@ export default function Analyzer() {
       if (data.error) throw new Error(data.error)
       setResult(data.result)
       saveToHistory(data.result, fileName || t.result.demoText, mode)
+      onAnalysisResult?.(mode, data.result, fileName || t.result.demoText)
     } catch (err: any) {
       const msg = err instanceof Error ? err.message : 'Chyba. Zkus znovu.'
       setResult(`<p style="color:#F09595;font-size:13px">${msg}</p>`)
@@ -659,21 +679,23 @@ export default function Analyzer() {
   const showUpload = needsFile
 
   return (
-    <div className={styles.wrap}>
-      <div className={styles.orbApp1} />
-      <div className={styles.orbApp2} />
-      <nav className={styles.nav}>
-        <div className={styles.logo}><div className={styles.logoDot} />docthink</div>
-        <div className={styles.navRight}>
-          <div className={`${styles.credits} ${credits <= 3 && credits > 0 ? styles.creditsLow : ''}`}>
-            <span className={styles.creditsN}>{credits}</span> {t.nav.credits}
+    <div className={`${styles.wrap} ${hideNav ? styles.wrapEmbedded : ''}`}>
+      {!hideNav && <div className={styles.orbApp1} />}
+      {!hideNav && <div className={styles.orbApp2} />}
+      {!hideNav && (
+        <nav className={styles.nav}>
+          <div className={styles.logo}><div className={styles.logoDot} />docthink</div>
+          <div className={styles.navRight}>
+            <div className={`${styles.credits} ${credits <= 3 && credits > 0 ? styles.creditsLow : ''}`}>
+              <span className={styles.creditsN}>{credits}</span> {t.nav.credits}
+            </div>
+            <button className={styles.buyBtn} onClick={() => router.push('/koupit')}>{t.nav.buy}</button>
+            <UserButton afterSignOutUrl='/' />
           </div>
-          <button className={styles.buyBtn} onClick={() => router.push('/koupit')}>{t.nav.buy}</button>
-          <UserButton afterSignOutUrl='/' />
-        </div>
-      </nav>
+        </nav>
+      )}
 
-      {credits <= 3 && credits > 0 && (
+      {!hideNav && credits <= 3 && credits > 0 && (
         <div className={styles.lowCreditBanner}>
           <span>⚠️ {t.nav.lowCredits} — {credits} {t.nav.credits}</span>
           <button className={styles.lowCreditCta} onClick={() => router.push('/koupit')}>{t.nav.buy} →</button>

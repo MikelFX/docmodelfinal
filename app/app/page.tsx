@@ -1,5 +1,5 @@
-import Analyzer from '@/components/Analyzer'
+import ProjectsDashboard from '@/components/ProjectsDashboard'
 
 export default function AppPage() {
-  return <Analyzer />
+  return <ProjectsDashboard />
 }
