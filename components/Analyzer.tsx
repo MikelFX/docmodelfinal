@@ -722,7 +722,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
             <div className={styles.logo}><div className={styles.logoDot} />docthink</div>
           </div>
           <div className={styles.navRight}>
-            <div className={`${styles.credits} ${credits <= 3 && credits > 0 ? styles.creditsLow : ''}`}>
+            <div className={`${styles.credits} ${credits <= 3 ? styles.creditsLow : ''}`}>
               <span className={styles.creditsN}>{credits}</span> {t.nav.credits}
             </div>
             <button className={styles.buyBtn} onClick={() => router.push('/koupit')}>{t.nav.buy}</button>
@@ -731,7 +731,13 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
         </nav>
       )}
 
-      {!hideNav && credits <= 3 && credits > 0 && (
+      {!hideNav && credits === 0 && (
+        <div className={styles.lowCreditBanner} style={{ background: 'rgba(240,80,80,0.08)', borderBottomColor: 'rgba(240,80,80,0.2)' }}>
+          <span>🔴 Nemáš žádné kredity — analýzy nefungují</span>
+          <button className={styles.lowCreditCta} style={{ background: 'rgba(240,80,80,0.15)', borderColor: 'rgba(240,80,80,0.3)', color: '#F09595' }} onClick={() => router.push('/koupit')}>{t.nav.buy} →</button>
+        </div>
+      )}
+      {!hideNav && credits > 0 && credits <= 3 && (
         <div className={styles.lowCreditBanner}>
           <span>⚠️ {t.nav.lowCredits} — {credits} {t.nav.credits}</span>
           <button className={styles.lowCreditCta} onClick={() => router.push('/koupit')}>{t.nav.buy} →</button>

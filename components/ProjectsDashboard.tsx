@@ -88,7 +88,7 @@ export default function ProjectsDashboard() {
           docthink
         </div>
         <div className={styles.navRight}>
-          <div className={`${styles.credits} ${credits <= 3 && credits > 0 ? styles.creditsLow : ''}`}>
+          <div className={`${styles.credits} ${credits <= 3 ? styles.creditsLow : ''}`}>
             <span className={styles.creditsN}>{credits}</span>
             <span className={styles.creditsLabel}>{t.nav.credits}</span>
           </div>
