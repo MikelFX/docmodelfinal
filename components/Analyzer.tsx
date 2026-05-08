@@ -176,6 +176,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
   const fileRef = useRef<HTMLInputElement>(null)
   const batchFileRef = useRef<HTMLInputElement>(null)
   const chatBottomRef = useRef<HTMLDivElement>(null)
+  const chatThreadRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const { user } = useUser()
 
@@ -222,7 +223,12 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
   }, [user])
 
   useEffect(() => {
-    chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    const thread = chatThreadRef.current
+    if (thread) {
+      thread.scrollTop = thread.scrollHeight
+    } else {
+      chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    }
   }, [chatMessages])
 
   function logCreditUsage(label: string, cost: number) {
@@ -845,7 +851,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
                   </div>
                 </div>
               ) : (
-                <div className={styles.chatThread}>
+                <div className={styles.chatThread} ref={chatThreadRef}>
                   {chatMessages.map((msg, i) => (
                     <div key={i} className={msg.role === 'assistant' ? styles.chatRowAi : styles.chatRowUser}>
                       {msg.role === 'assistant' && (

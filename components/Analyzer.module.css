@@ -11,9 +11,13 @@
 
 .wrapEmbedded {
   min-height: 100%;
-  height: 100%;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   background: transparent;
+}
+.wrapEmbedded .chatThread {
+  max-height: none;
+  overflow-y: visible;
 }
 
 /* ── AMBIENT ORBS ── */
