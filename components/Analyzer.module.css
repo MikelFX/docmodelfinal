@@ -802,45 +802,62 @@
   .wrap { font-size: 14px; }
 
   /* Nav */
-  .nav { padding: 0 16px; height: 50px; }
+  .nav { padding: 0 14px; height: 50px; }
+  .navLeft { gap: 7px; }
   .buyBtn { display: none; }
   .credits { font-size: 11px; padding: 3px 10px; }
+  .backText { display: none; }
+  .backBtn { padding: 5px 6px; }
+  .navDivider { display: none; }
 
   /* Layout: single column, sidebar hidden */
   .main { grid-template-columns: 1fr; display: flex; flex-direction: column; }
   .sidebar { display: none; }
 
   /* Content gets padding for bottom bar */
-  .content { padding: 14px 16px 90px; gap: 12px; max-width: 100%; }
+  .content { padding: 12px 14px 88px; gap: 10px; max-width: 100%; }
+
+  /* Service context card — compact on mobile */
+  .serviceCtx { padding: 10px 13px; gap: 10px; border-radius: 10px; }
+  .serviceCtxIcon { width: 34px; height: 34px; font-size: 16px; border-radius: 8px; flex-shrink: 0; }
+  .serviceCtxName { font-size: 12.5px; margin-bottom: 0; }
+  .serviceCtxDesc { display: none; }
+  .serviceCtxBadge { font-size: 10px; padding: 2px 8px; }
 
   /* Upload */
-  .upload { padding: 28px 16px; }
+  .upload { padding: 24px 14px; border-radius: 10px; }
+  .uploadIcon { width: 38px; height: 38px; margin-bottom: 12px; }
   .uploadTitle { font-size: 13px; }
   .uploadSub { font-size: 11px; }
 
   /* Analyze button */
-  .analyzeBtn { padding: 13px; font-size: 13px; }
+  .analyzeBtn { padding: 13px; font-size: 13px; border-radius: 10px; }
 
   /* Result */
+  .resultBox { border-radius: 10px; }
   .resultBody { padding: 14px; font-size: 13px; }
-  .resultHeader { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .resultActions { flex-wrap: wrap; }
+  .resultHeader { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 14px; }
+  .resultActions { flex-wrap: wrap; gap: 6px; }
+  .resultMeta { font-size: 10px; }
+  .saveProjectBtn { font-size: 10.5px; padding: 4px 10px; }
 
   /* Question bar */
-  .questionBar { flex-direction: column; padding: 10px 12px; }
-  .questionBtn { width: 100%; text-align: center; }
+  .questionBar { flex-direction: column; padding: 10px 12px; gap: 8px; }
+  .questionInput { font-size: 14px; }
+  .questionBtn { width: 100%; text-align: center; padding: 9px; }
 
   /* Chat */
-  .chatWelcome { padding: 32px 16px 20px; }
-  .chatWelcomeTitle { font-size: 22px; }
+  .chatWelcome { padding: 28px 14px 16px; }
+  .chatWelcomeTitle { font-size: 20px; }
+  .chatWelcomeSub { font-size: 13px; }
   .chatSuggestions { grid-template-columns: 1fr; max-width: 100%; }
   .chatSuggestion { font-size: 12px; padding: 10px 14px; }
   .chatThread { max-height: calc(100vh - 290px); min-height: 200px; }
   .chatBubbleAi, .chatBubbleUser { max-width: 92%; font-size: 13px; }
   .chatInputWrap {
     position: sticky;
-    bottom: 68px;
-    background: rgba(7, 7, 13, 0.96);
+    bottom: 66px;
+    background: rgba(7, 7, 13, 0.97);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     padding: 10px 0 6px;
@@ -848,17 +865,43 @@
     border-top: 0.5px solid rgba(127, 119, 221, 0.08);
   }
   .chatInput { font-size: 16px; }
+  .chatAvatar { width: 26px; height: 26px; }
 
   /* Interview */
   .chatArea { max-height: 260px; }
   .interviewDoc { max-height: 200px; }
 
   /* Options */
-  .optionRow { gap: 6px; }
+  .optionRow { flex-wrap: wrap; gap: 6px; }
   .optionBtn { font-size: 11px; padding: 5px 10px; }
+  .selectInput, .langSelect { font-size: 13px; }
 
   /* Tool cards */
-  .toolCard { padding: 16px; gap: 12px; }
+  .toolCard { padding: 14px; gap: 10px; border-radius: 10px; }
+  .toolCardTitle { font-size: 13px; }
+  .toolCardDesc { font-size: 12px; }
+  .textInput { font-size: 14px; }
+  .textareaInput { font-size: 13px; }
+
+  /* File bar */
+  .fileBar { padding: 8px 12px; }
+  .fileName { font-size: 12px; }
+  .fileSize { font-size: 11px; }
+
+  /* Input mode toggle */
+  .inputModeToggle { width: 100%; }
+  .inputModeBtn { flex: 1; text-align: center; font-size: 12px; }
+
+  /* Paste area */
+  .pasteTextarea { font-size: 13px; }
+
+  /* Save modal — full-width sheet on mobile */
+  .saveModal { width: 100%; max-width: 100%; border-radius: 20px 20px 0 0; position: fixed; bottom: 0; left: 0; right: 0; }
+  .saveOverlay { align-items: flex-end; }
+  .saveProjectList { max-height: 50vh; }
+  .saveProjectItem { padding: 12px 14px; }
+  .saveProjectItemIcon { width: 36px; height: 36px; font-size: 18px; }
+  .saveProjectItemName { font-size: 13.5px; }
 
   /* ── Bottom bar ── */
   .mobileBar {
@@ -968,10 +1011,19 @@
   }
 
   .mobileSheetSection {
-    font-size: 10px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.12em;
-    color: #2e2b42;
+    font-size: 9.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.13em;
+    color: #4a4668;
     padding: 18px 2px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mobileSheetSection::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(127,119,221,0.1);
   }
 
   /* ── Grid ── */
@@ -1003,11 +1055,23 @@
     box-shadow: 0 0 0 1px rgba(127, 119, 221, 0.15), 0 4px 20px rgba(127, 119, 221, 0.12);
   }
 
-  .mobileGridIcon { font-size: 24px; line-height: 1; }
+  .mobileGridIcon {
+    font-size: 22px;
+    line-height: 1;
+    width: 44px; height: 44px;
+    background: rgba(19, 17, 31, 0.9);
+    border: 0.5px solid rgba(127,119,221,0.1);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mobileGridItemActive .mobileGridIcon {
+    background: rgba(127, 119, 221, 0.15);
+    border-color: rgba(127, 119, 221, 0.3);
+  }
 
   .mobileGridLabel {
-    font-size: 10px; font-weight: 500;
-    color: #5a5680; text-align: center; line-height: 1.35;
+    font-size: 10.5px; font-weight: 500;
+    color: #5a5680; text-align: center; line-height: 1.3;
   }
   .mobileGridItemActive .mobileGridLabel { color: #AFA9EC; }
 
@@ -1016,6 +1080,10 @@
     color: #534AB7; background: rgba(127, 119, 221, 0.09);
     padding: 2px 7px; border-radius: 8px;
   }
+
+  /* Bottom bar mode pill */
+  .mobileBarMode { height: 48px; border-radius: 12px; }
+  .mobileBarMenu { width: 48px; height: 48px; border-radius: 12px; }
 }
 
 /* ═══════════════════════════════════════
@@ -1090,6 +1158,10 @@
 }
 
 @media (max-width: 380px) {
+  .content { padding: 10px 12px 88px; }
+  .serviceCtx { padding: 9px 11px; }
+  .chatWelcomeTitle { font-size: 18px; }
+  .logo { font-size: 13px; }
   .nav { padding: 0 12px; }
   .content { padding: 12px 12px 90px; }
   .chatWelcomeTitle { font-size: 20px; }
