@@ -19,22 +19,39 @@ interface HistoryItem {
 interface ChatMsg { role: 'ai' | 'user'; text: string }
 interface ChatMessage { role: 'user' | 'assistant'; content: string; streaming?: boolean }
 
-const MODES: { id: Mode; icon: string; credits: number; group: 'chat' | 'analyze' | 'tools' }[] = [
-  { id: 'chat',      icon: '✨', credits: 0, group: 'chat'    },
-  { id: 'summary',   icon: '📋', credits: 1, group: 'analyze' },
-  { id: 'actions',   icon: '✅', credits: 1, group: 'analyze' },
-  { id: 'risks',     icon: '⚠️', credits: 1, group: 'analyze' },
-  { id: 'clauses',   icon: '⚖️', credits: 2, group: 'analyze' },
-  { id: 'deadlines', icon: '📅', credits: 1, group: 'analyze' },
-  { id: 'rewrite',   icon: '✍️', credits: 2, group: 'tools'   },
-  { id: 'translate', icon: '🌍', credits: 2, group: 'tools'   },
-  { id: 'template',  icon: '📝', credits: 2, group: 'tools'   },
-  { id: 'email',     icon: '📧', credits: 2, group: 'tools'   },
-  { id: 'interview', icon: '🤖', credits: 5, group: 'tools'   },
-  { id: 'compare',   icon: '🔍', credits: 2, group: 'tools'   },
-  { id: 'finance',   icon: '💰', credits: 3, group: 'tools'   },
-  { id: 'batch',     icon: '📦', credits: 1, group: 'tools'   },
+const MODES: { id: Mode; icon: string; credits: number; group: 'chat' | 'analyze' | 'tools'; desc: string }[] = [
+  { id: 'chat',      icon: '✨', credits: 0, group: 'chat',    desc: 'AI asistent'        },
+  { id: 'summary',   icon: '📋', credits: 1, group: 'analyze', desc: 'Přehled dokumentu'  },
+  { id: 'actions',   icon: '✅', credits: 1, group: 'analyze', desc: 'Úkoly a priority'   },
+  { id: 'risks',     icon: '⚠️', credits: 1, group: 'analyze', desc: 'Rizika a problémy'  },
+  { id: 'clauses',   icon: '⚖️', credits: 2, group: 'analyze', desc: 'Klauzule smlouvy'   },
+  { id: 'deadlines', icon: '📅', credits: 1, group: 'analyze', desc: 'Data a termíny'     },
+  { id: 'finance',   icon: '💰', credits: 3, group: 'analyze', desc: 'Finanční analýza'   },
+  { id: 'rewrite',   icon: '✍️', credits: 2, group: 'tools',   desc: 'Jiný styl textu'    },
+  { id: 'translate', icon: '🌍', credits: 2, group: 'tools',   desc: 'Překlad jazyka'     },
+  { id: 'template',  icon: '📝', credits: 2, group: 'tools',   desc: 'Šablona dokumentu'  },
+  { id: 'email',     icon: '📧', credits: 2, group: 'tools',   desc: 'Napsat email'       },
+  { id: 'interview', icon: '🤖', credits: 5, group: 'tools',   desc: 'AI interview'       },
+  { id: 'compare',   icon: '🔍', credits: 2, group: 'tools',   desc: 'Porovnat verze'     },
+  { id: 'batch',     icon: '📦', credits: 1, group: 'tools',   desc: 'Hromadná analýza'   },
 ]
+
+const SERVICE_DETAIL: Record<Mode, string> = {
+  chat:      '',
+  summary:   'Komplexní přehled dokumentu — klíčové body, podmínky, strany a doporučení.',
+  actions:   'Extrahuje všechny úkoly a akční body seřazené podle priority a termínů.',
+  risks:     'Identifikuje rizika, červené vlajky a problematické podmínky v dokumentu.',
+  clauses:   'Analyzuje smluvní klauzule a vysvětluje je srozumitelně v plain language.',
+  deadlines: 'Přehled všech dat, termínů a časově vázaných závazků v dokumentu.',
+  finance:   'Hloubková finanční analýza — platební závazky, rizika a peněžní toky.',
+  rewrite:   'Přepíše text do jiného stylu — formální, jednoduché, kratší nebo přesvědčivé.',
+  translate: 'Přeloží celý dokument do libovolného jazyka s zachováním struktury.',
+  template:  'Vygeneruje šablonu dokumentu na základě tvého popisu.',
+  email:     'Napíše profesionální email na základě obsahu dokumentu.',
+  interview: 'AI interview k vytvoření dokumentu krok za krokem.',
+  compare:   'Porovná dvě verze dokumentu a zobrazí všechny změny a jejich dopad.',
+  batch:     'Analyzuje 10–25 dokumentů najednou a zobrazí výsledky jednotlivě.',
+}
 
 const DEMO_TEXT = `DocThink Demo: Toto je ukázkový analytický dokument.
 Projekt: Implementace CRM systému Q3 2025.
@@ -73,15 +90,20 @@ function stripHtml(html: string) {
   return html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
 }
 
+interface SimpleProject { id: string; name: string; icon: string; color: string }
+
 interface AnalyzerProps {
   initialContent?: string
   initialFileName?: string
   initialFileSize?: string
   onAnalysisResult?: (mode: string, result: string, fileName: string) => void
   hideNav?: boolean
+  backHref?: string
+  savedProjects?: SimpleProject[]
+  onSaveToProject?: (projectId: string, content: string, fileName: string, mode: string, result: string) => void
 }
 
-export default function Analyzer({ initialContent, initialFileName, initialFileSize, onAnalysisResult, hideNav }: AnalyzerProps = {}) {
+export default function Analyzer({ initialContent, initialFileName, initialFileSize, onAnalysisResult, hideNav, backHref, savedProjects, onSaveToProject }: AnalyzerProps = {}) {
   const { t, lang } = useLanguage()
 
   const [mode, setMode] = useState<Mode>('chat')
@@ -140,6 +162,9 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
 
   // Credit history
   const [creditHistory, setCreditHistory] = useState<{ label: string; credits: number; date: string }[]>([])
+
+  // Save to project
+  const [showSaveModal, setShowSaveModal] = useState(false)
 
   // Batch
   const [batchFiles, setBatchFiles] = useState<File[]>([])
@@ -684,7 +709,18 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
       {!hideNav && <div className={styles.orbApp2} />}
       {!hideNav && (
         <nav className={styles.nav}>
-          <div className={styles.logo}><div className={styles.logoDot} />docthink</div>
+          <div className={styles.navLeft}>
+            {backHref && (
+              <button className={styles.backBtn} onClick={() => router.push(backHref)}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
+                </svg>
+                <span className={styles.backText}>Projekty</span>
+              </button>
+            )}
+            {backHref && <div className={styles.navDivider} />}
+            <div className={styles.logo}><div className={styles.logoDot} />docthink</div>
+          </div>
           <div className={styles.navRight}>
             <div className={`${styles.credits} ${credits <= 3 && credits > 0 ? styles.creditsLow : ''}`}>
               <span className={styles.creditsN}>{credits}</span> {t.nav.credits}
@@ -708,41 +744,53 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
           {MODES.filter(m => m.group === 'chat').map((m, i) => (
             <button key={m.id}
               className={`${styles.modeBtn} ${styles.sidebarIn} ${mode === m.id ? styles.modeBtnActive : ''}`}
+              data-group="chat"
               style={{ '--delay': `${(i + 1) * 0.04}s` } as React.CSSProperties}
               onClick={() => { setMode(m.id); setResult(''); setAnswers([]) }}>
               <span className={styles.modeIcon}>{m.icon}</span>
-              <span className={styles.modeLabelText}>{(t.modes as any)[m.id]}</span>
-              <span className={styles.modeCredits} style={{ color: '#5DCAA5', background: 'rgba(93,202,165,0.08)' }}>1k/5</span>
+              <div className={styles.modeLabelWrap}>
+                <span className={styles.modeLabelText}>{(t.modes as any)[m.id]}</span>
+                <span className={styles.modeDesc}>{m.desc}</span>
+              </div>
+              <span className={styles.modeCredits} style={{ color: '#5DCAA5', background: 'rgba(93,202,165,0.08)' }}>free</span>
             </button>
           ))}
 
-          <div className={`${styles.sidebarLabel} ${styles.sidebarIn}`} style={{ marginTop: 16, '--delay': '0.08s' } as React.CSSProperties}>{t.sidebar.docAnalysis}</div>
+          <div className={`${styles.sidebarLabel} ${styles.sidebarIn}`} style={{ marginTop: 8, '--delay': '0.08s' } as React.CSSProperties}>{t.sidebar.docAnalysis}</div>
           {MODES.filter(m => m.group === 'analyze').map((m, i) => (
             <button key={m.id}
               className={`${styles.modeBtn} ${styles.sidebarIn} ${mode === m.id ? styles.modeBtnActive : ''}`}
+              data-group="analyze"
               style={{ '--delay': `${(i + 2) * 0.05}s` } as React.CSSProperties}
               onClick={() => { setMode(m.id); setResult(''); setAnswers([]) }}>
               <span className={styles.modeIcon}>{m.icon}</span>
-              <span className={styles.modeLabelText}>{(t.modes as any)[m.id]}</span>
+              <div className={styles.modeLabelWrap}>
+                <span className={styles.modeLabelText}>{(t.modes as any)[m.id]}</span>
+                <span className={styles.modeDesc}>{m.desc}</span>
+              </div>
               <span className={styles.modeCredits}>{m.credits}k</span>
             </button>
           ))}
 
-          <div className={`${styles.sidebarLabel} ${styles.sidebarIn}`} style={{ marginTop: 16, '--delay': '0.32s' } as React.CSSProperties}>{t.sidebar.aiTools}</div>
+          <div className={`${styles.sidebarLabel} ${styles.sidebarIn}`} style={{ marginTop: 8, '--delay': '0.32s' } as React.CSSProperties}>{t.sidebar.aiTools}</div>
           {MODES.filter(m => m.group === 'tools').map((m, i) => (
             <button key={m.id}
               className={`${styles.modeBtn} ${styles.sidebarIn} ${mode === m.id ? styles.modeBtnActive : ''}`}
+              data-group="tools"
               style={{ '--delay': `${(i + 7) * 0.05}s` } as React.CSSProperties}
               onClick={() => { setMode(m.id); setResult(''); setAnswers([]); setInterviewStarted(false) }}>
               <span className={styles.modeIcon}>{m.icon}</span>
-              <span className={styles.modeLabelText}>{(t.modes as any)[m.id]}</span>
+              <div className={styles.modeLabelWrap}>
+                <span className={styles.modeLabelText}>{(t.modes as any)[m.id]}</span>
+                <span className={styles.modeDesc}>{m.desc}</span>
+              </div>
               <span className={styles.modeCredits}>{m.credits}k</span>
             </button>
           ))}
 
           {history.length > 0 && (
             <>
-              <div className={styles.sidebarLabel} style={{ marginTop: 16 }}>{t.sidebar.history}</div>
+              <div className={styles.sidebarLabel} style={{ marginTop: 8 }}>{t.sidebar.history}</div>
               {history.map(item => (
                 <button key={item.id} className={styles.historyItem}
                   onClick={() => { setResult(item.result); setMode(item.mode); setFileName(item.fileName); setAnswers([]) }}
@@ -754,7 +802,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
             </>
           )}
 
-          <div className={styles.sidebarLabel} style={{ marginTop: 16 }}>{t.sidebar.creditHistory}</div>
+          <div className={styles.sidebarLabel} style={{ marginTop: 8 }}>{t.sidebar.creditHistory}</div>
           {creditHistory.length === 0
             ? <div className={styles.creditHistoryEmpty}>{t.sidebar.noHistory}</div>
             : creditHistory.map((h, i) => (
@@ -842,6 +890,20 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
                   </button>
                 </div>
                 <p className={styles.chatHint}>{t.chat.hint}</p>
+              </div>
+            </div>
+          )}
+
+          {/* ── SERVICE CONTEXT CARD ── */}
+          {mode !== 'chat' && SERVICE_DETAIL[mode] && (
+            <div className={styles.serviceCtx}>
+              <div className={styles.serviceCtxIcon}>{currentMode.icon}</div>
+              <div className={styles.serviceCtxBody}>
+                <div className={styles.serviceCtxName}>{(t.modes as any)[mode]}</div>
+                <div className={styles.serviceCtxDesc}>{SERVICE_DETAIL[mode]}</div>
+              </div>
+              <div className={styles.serviceCtxBadge}>
+                {currentMode.credits === 0 ? <span style={{ color: '#5DCAA5' }}>free</span> : `${currentMode.credits} kr`}
               </div>
             </div>
           )}
@@ -1214,6 +1276,14 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
                       <button className={styles.actionBtn} onClick={copyResult}>{copied ? t.result.copied : t.result.copy}</button>
                       <button className={styles.actionBtn} onClick={exportTxt}>{t.result.txt}</button>
                       <button className={styles.actionBtn} onClick={exportPdf}>{t.result.pdf}</button>
+                      {!hideNav && savedProjects && savedProjects.length > 0 && (
+                        <button className={styles.saveProjectBtn} onClick={() => setShowSaveModal(true)}>
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                          </svg>
+                          Uložit do projektu
+                        </button>
+                      )}
                     </>
                   )}
                   <span className={styles.resultMeta}>{fileName || t.result.demoText}</span>
@@ -1267,6 +1337,43 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
         </button>
       </div>
 
+      {/* ── SAVE TO PROJECT MODAL ── */}
+      {showSaveModal && savedProjects && (
+        <div className={styles.saveOverlay} onClick={() => setShowSaveModal(false)}>
+          <div className={styles.saveModal} onClick={e => e.stopPropagation()}>
+            <div className={styles.saveModalHeader}>
+              <div className={styles.saveModalTitle}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                </svg>
+                Uložit do projektu
+              </div>
+              <button className={styles.saveModalClose} onClick={() => setShowSaveModal(false)}>×</button>
+            </div>
+            {savedProjects.length === 0 ? (
+              <div className={styles.saveModalEmpty}>Nejdříve vytvoř projekt v sekci Projekty.</div>
+            ) : (
+              <div className={styles.saveProjectList}>
+                {savedProjects.map(p => (
+                  <button key={p.id} className={styles.saveProjectItem}
+                    style={{ '--proj-color': p.color } as React.CSSProperties}
+                    onClick={() => {
+                      onSaveToProject?.(p.id, fileContent, fileName, mode, result)
+                      setShowSaveModal(false)
+                    }}>
+                    <span className={styles.saveProjectItemIcon}>{p.icon}</span>
+                    <span className={styles.saveProjectItemName}>{p.name}</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: 'auto', opacity: 0.4 }}>
+                      <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ── ONBOARDING MODAL ── */}
       {showOnboarding && (
         <div className={styles.onboardingOverlay} onClick={() => { setShowOnboarding(false); localStorage.setItem('docthink_onboarded', '1') }}>
@@ -1314,7 +1421,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
                     onClick={() => { setMode(m.id); setResult(''); setAnswers([]); setMobileSheetOpen(false) }}>
                     <span className={styles.mobileGridIcon}>{m.icon}</span>
                     <span className={styles.mobileGridLabel}>{(t.modes as any)[m.id]}</span>
-                    <span className={styles.mobileGridCost} style={{ color: '#5DCAA5', background: 'rgba(93,202,165,0.07)' }}>1k/5</span>
+                    <span className={styles.mobileGridCost} style={{ color: '#5DCAA5', background: 'rgba(93,202,165,0.07)' }}>free</span>
                   </button>
                 ))}
               </div>

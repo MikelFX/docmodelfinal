@@ -52,28 +52,24 @@ export default function ProjectPage({ params }: Props) {
       const text = await file.text()
       return { content: text, size }
     }
-    if (file.name.endsWith('.pdf')) {
-      const { getDocument, GlobalWorkerOptions } = await import('pdfjs-dist')
-      GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.min.mjs`
+    if (file.name.toLowerCase().endsWith('.pdf')) {
+      const pdfjsLib = await import('pdfjs-dist')
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`
       const buf = await file.arrayBuffer()
-      const pdf = await getDocument({ data: buf }).promise
+      const pdf = await pdfjsLib.getDocument({ data: buf }).promise
       const pages: string[] = []
       for (let i = 1; i <= Math.min(pdf.numPages, 30); i++) {
         const pg = await pdf.getPage(i)
         const tc = await pg.getTextContent()
-        pages.push(tc.items.map((it: any) => it.str).join(' '))
+        pages.push(tc.items.map((it: any) => ('str' in it ? it.str : '')).join(' '))
       }
-      return { content: pages.join('\n'), size }
+      return { content: pages.join('\n').trim() || 'PDF neobsahuje čitelný text.', size }
     }
-    if (file.name.endsWith('.docx')) {
-      const formData = new FormData()
-      formData.append('file', file)
-      const res = await fetch('/api/analyze', { method: 'POST', body: formData })
-      const data = await res.json()
-      return { content: data.content ?? '', size }
-    }
-    const text = await file.text()
-    return { content: text, size }
+    return new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onload = (e) => resolve({ content: (e.target?.result as string) || '', size })
+      reader.readAsText(file)
+    })
   }
 
   async function handleFileUpload(files: FileList | null) {
