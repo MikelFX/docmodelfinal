@@ -48,14 +48,14 @@ export default function LandingPage() {
 
       {/* HERO */}
       <div className={styles.hero}>
-        <div className={styles.badge}>✨ AI tool for documents & code</div>
+        <div className={styles.badge}>✨ AI tool for documents & contracts</div>
         <h1 className={styles.title}>
           Analyze documents<br />
           <span className={styles.titleAccent}>10× faster</span>
         </h1>
         <p className={styles.sub}>
           Upload a PDF, Word, or TXT file and AI will instantly generate summaries,
-          action items, risks, or a brand-new document. Or generate a fully working website.
+          action items, risks, legal clause reviews, or a brand-new document — in any EU language.
         </p>
         <div className={styles.heroActions}>
           <SignedOut>
@@ -107,7 +107,7 @@ export default function LandingPage() {
       {/* STATS STRIP */}
       <div className={`${styles.stats} ${styles.animate}`} data-anim>
         {[
-          { value: '13+', label: 'AI tools' },
+          { value: '14+', label: 'AI tools' },
           { value: '24', label: 'EU languages' },
           { value: '10×', label: 'faster than manual' },
           { value: '99%', label: 'cost reduction' },
@@ -124,15 +124,15 @@ export default function LandingPage() {
         <div className={`${styles.sectionLabel} ${styles.animate}`} data-anim>What DocThink can do</div>
         <div className={styles.features}>
           {[
-            { icon: '📋', title: 'Summary', desc: 'A concise overview of any document in seconds.' },
-            { icon: '⚠️', title: 'Risks', desc: 'Identifies issues, red flags, and risky clauses.' },
-            { icon: '🌍', title: 'Translator', desc: 'Translates documents into 24 EU languages accurately.' },
-            { icon: '📝', title: 'Template generator', desc: 'Generates contracts, NDAs, proposals, and more.' },
-            { icon: '💻', title: 'Code generator', desc: 'Describe a website or script — AI generates working code.' },
-            { icon: '🤖', title: 'AI Interviewer', desc: 'Creates a complete professional document through dialogue.' },
-            { icon: '💰', title: 'Finance analyst', desc: 'Deep financial analysis: payments, risks, hidden costs.' },
-            { icon: '📦', title: 'Batch analysis', desc: 'Analyze up to 25 documents at once and get summaries for all.' },
-            { icon: '💬', title: 'AI Chat', desc: 'Ask any question about your document and get instant answers.' },
+            { icon: '📋', title: 'Summary', desc: 'A concise structured overview of any document in seconds.' },
+            { icon: '⚠️', title: 'Risks', desc: 'Identifies critical issues, red flags, and risky clauses before you sign.' },
+            { icon: '⚖️', title: 'Legal clauses', desc: 'Extracts every clause and rates it FAIR / REVIEW / UNFAVORABLE / MISSING.' },
+            { icon: '🔍', title: 'Compare docs', desc: 'Upload two versions — AI highlights every change and its impact.' },
+            { icon: '💰', title: 'Finance analyst', desc: 'Deep financial analysis: payments, hidden costs, cash flow implications.' },
+            { icon: '✅', title: 'Action items', desc: 'Extracts all tasks, owners, and deadlines grouped by priority.' },
+            { icon: '🌍', title: 'Translator', desc: 'Translates documents into 24 EU languages with full accuracy.' },
+            { icon: '📝', title: 'Template generator', desc: 'Generates contracts, NDAs, proposals, and more from a description.' },
+            { icon: '🤖', title: 'AI Interviewer', desc: 'Creates a complete professional document through Q&A dialogue.' },
           ].map((f, i) => (
             <div
               key={f.title}
@@ -154,9 +154,9 @@ export default function LandingPage() {
         <div className={styles.savingsGrid}>
           {[
             { label: 'Contract review', alt: 'Lawyer €50', you: '€1', saving: '98%' },
+            { label: 'Legal clause analysis', alt: 'Legal consultant €80', you: '€2', saving: '97%' },
             { label: 'Document translation', alt: 'Translator €35', you: '€2', saving: '94%' },
             { label: 'Contract template', alt: 'Legal template €200', you: '€2', saving: '99%' },
-            { label: 'Code generator', alt: 'Developer €150', you: '€3', saving: '98%' },
           ].map((s, i) => (
             <div
               key={s.label}
