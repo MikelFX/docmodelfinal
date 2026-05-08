@@ -6,7 +6,7 @@ import { UserButton, useUser } from '@clerk/nextjs'
 import { useLanguage } from '@/contexts/LanguageContext'
 import styles from './Analyzer.module.css'
 
-type Mode = 'chat' | 'summary' | 'actions' | 'risks' | 'qa' | 'deadlines' | 'rewrite' | 'translate' | 'template' | 'interview' | 'codegen' | 'email' | 'batch' | 'finance'
+type Mode = 'chat' | 'summary' | 'actions' | 'risks' | 'clauses' | 'deadlines' | 'rewrite' | 'translate' | 'template' | 'interview' | 'compare' | 'email' | 'batch' | 'finance'
 
 interface HistoryItem {
   id: string
@@ -24,14 +24,14 @@ const MODES: { id: Mode; icon: string; credits: number; group: 'chat' | 'analyze
   { id: 'summary',   icon: '📋', credits: 1, group: 'analyze' },
   { id: 'actions',   icon: '✅', credits: 1, group: 'analyze' },
   { id: 'risks',     icon: '⚠️', credits: 1, group: 'analyze' },
-  { id: 'qa',        icon: '💬', credits: 1, group: 'analyze' },
+  { id: 'clauses',   icon: '⚖️', credits: 2, group: 'analyze' },
   { id: 'deadlines', icon: '📅', credits: 1, group: 'analyze' },
   { id: 'rewrite',   icon: '✍️', credits: 2, group: 'tools'   },
   { id: 'translate', icon: '🌍', credits: 2, group: 'tools'   },
   { id: 'template',  icon: '📝', credits: 2, group: 'tools'   },
   { id: 'email',     icon: '📧', credits: 2, group: 'tools'   },
   { id: 'interview', icon: '🤖', credits: 5, group: 'tools'   },
-  { id: 'codegen',   icon: '💻', credits: 3, group: 'tools'   },
+  { id: 'compare',   icon: '🔍', credits: 2, group: 'tools'   },
   { id: 'finance',   icon: '💰', credits: 3, group: 'tools'   },
   { id: 'batch',     icon: '📦', credits: 1, group: 'tools'   },
 ]
@@ -92,7 +92,7 @@ export default function Analyzer() {
   const [mobileSheetOpen, setMobileSheetOpen] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  const [rewriteStyle, setRewriteStyle] = useState<'formal' | 'simple'>('formal')
+  const [rewriteStyle, setRewriteStyle] = useState<'formal' | 'simple' | 'shorter' | 'persuasive'>('formal')
   const [targetLang, setTargetLang] = useState('en')
   const [templateDesc, setTemplateDesc] = useState('')
   const [templateLang, setTemplateLang] = useState('en')
@@ -120,12 +120,8 @@ export default function Analyzer() {
   const [emailTone, setEmailTone] = useState<'formal' | 'friendly'>('formal')
   const [emailLang, setEmailLang] = useState('en')
 
-  // Codegen
-  const [codegenDesc, setCodegenDesc] = useState('')
-  const [codegenType, setCodegenType] = useState('website')
-  const [codegenLang, setCodegenLang] = useState('en')
-  const [codegenResult, setCodegenResult] = useState('')
-  const [codegenLoading, setCodegenLoading] = useState(false)
+  // Compare
+  const [compareContent2, setCompareContent2] = useState('')
 
   // Chat credit tracking (1 credit per 5 AI responses)
   const [chatResponseCount, setChatResponseCount] = useState(0)
@@ -264,8 +260,8 @@ export default function Analyzer() {
   }
 
   const currentMode = MODES.find(m => m.id === mode)!
-  const needsFile = ['summary', 'actions', 'risks', 'qa', 'deadlines', 'rewrite', 'translate', 'email', 'finance'].includes(mode)
-  const showAnalyzeBtn = ['summary', 'actions', 'risks', 'qa', 'deadlines', 'rewrite', 'translate', 'finance'].includes(mode)
+  const needsFile = ['summary', 'actions', 'risks', 'clauses', 'deadlines', 'rewrite', 'translate', 'email', 'finance', 'compare'].includes(mode)
+  const showAnalyzeBtn = ['summary', 'actions', 'risks', 'clauses', 'deadlines', 'rewrite', 'translate', 'finance', 'compare'].includes(mode)
 
   // ── ANALYZE ──
   async function analyze() {
@@ -290,6 +286,12 @@ export default function Analyzer() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ content, targetLang }),
+        })
+      } else if (mode === 'compare') {
+        res = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content, content2: compareContent2, mode: 'compare', lang }),
         })
       } else {
         res = await fetch('/api/analyze', {
@@ -513,31 +515,6 @@ export default function Analyzer() {
     }
   }
 
-  // ── CODEGEN ──
-  async function generateCodegen() {
-    if (!codegenDesc.trim()) return
-    const cost = 3
-    setCodegenLoading(true)
-    setCodegenResult('')
-    if (!(await spendCredits(cost))) { setCodegenLoading(false); return }
-    try {
-      const res = await fetch('/api/codegen', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description: codegenDesc, type: codegenType, language: codegenLang }),
-      })
-      const data = await res.json()
-      if (data.error) throw new Error(data.error)
-      setCodegenResult(data.result)
-      saveToHistory(data.result, 'Kód: ' + codegenDesc.slice(0, 30), mode)
-    } catch (err: any) {
-      setCodegenResult('Chyba: ' + (err instanceof Error ? err.message : 'Zkus znovu.'))
-      restoreCredits(cost)
-    } finally {
-      setCodegenLoading(false)
-    }
-  }
-
   // ── BATCH ──
   async function readFileContent(file: File): Promise<string> {
     if (file.name.toLowerCase().endsWith('.pdf')) {
@@ -703,7 +680,7 @@ export default function Analyzer() {
             <button key={m.id}
               className={`${styles.modeBtn} ${styles.sidebarIn} ${mode === m.id ? styles.modeBtnActive : ''}`}
               style={{ '--delay': `${(i + 7) * 0.05}s` } as React.CSSProperties}
-              onClick={() => { setMode(m.id); setResult(''); setAnswers([]); setInterviewStarted(false); setCodegenResult('') }}>
+              onClick={() => { setMode(m.id); setResult(''); setAnswers([]); setInterviewStarted(false) }}>
               <span className={styles.modeIcon}>{m.icon}</span>
               <span className={styles.modeLabelText}>{(t.modes as any)[m.id]}</span>
               <span className={styles.modeCredits}>{m.credits}k</span>
@@ -910,6 +887,8 @@ export default function Analyzer() {
               <span className={styles.optionLabel}>{t.rewrite.style}</span>
               <button className={`${styles.optionBtn} ${rewriteStyle === 'formal' ? styles.optionBtnActive : ''}`} onClick={() => setRewriteStyle('formal')}>{t.rewrite.formal}</button>
               <button className={`${styles.optionBtn} ${rewriteStyle === 'simple' ? styles.optionBtnActive : ''}`} onClick={() => setRewriteStyle('simple')}>{t.rewrite.simple}</button>
+              <button className={`${styles.optionBtn} ${rewriteStyle === 'shorter' ? styles.optionBtnActive : ''}`} onClick={() => setRewriteStyle('shorter')}>{t.rewrite.shorter}</button>
+              <button className={`${styles.optionBtn} ${rewriteStyle === 'persuasive' ? styles.optionBtnActive : ''}`} onClick={() => setRewriteStyle('persuasive')}>{t.rewrite.persuasive}</button>
             </div>
           )}
 
@@ -997,54 +976,29 @@ export default function Analyzer() {
             </div>
           )}
 
-          {/* ── CODEGEN ── */}
-          {mode === 'codegen' && (
+          {/* ── CLAUSES ── */}
+          {mode === 'clauses' && (
             <div className={styles.toolCard}>
-              <div className={styles.toolCardTitle}>💻 {t.modes.codegen} <span className={styles.creditBadge}>3 kredity</span></div>
-              <p className={styles.toolCardDesc}>{t.codegen.desc}</p>
-              <textarea className={styles.textareaInput} placeholder={t.codegen.placeholder}
-                value={codegenDesc} onChange={e => setCodegenDesc(e.target.value)} rows={4} />
-              <div className={styles.optionRow}>
-                <span className={styles.optionLabel}>{t.codegen.typeLabel}</span>
-                {(['website', 'landing', 'component', 'script'] as const).map(type => (
-                  <button key={type}
-                    className={`${styles.optionBtn} ${codegenType === type ? styles.optionBtnActive : ''}`}
-                    onClick={() => setCodegenType(type)}>
-                    {(t.codegen.types as any)[type]}
-                  </button>
-                ))}
+              <div className={styles.toolCardTitle}>⚖️ {t.modes.clauses} <span className={styles.creditBadge}>2k</span></div>
+              <p className={styles.toolCardDesc}>{t.clauses.desc}</p>
+            </div>
+          )}
+
+          {/* ── COMPARE ── */}
+          {mode === 'compare' && (
+            <div className={styles.toolCard}>
+              <div className={styles.toolCardTitle}>🔍 {t.modes.compare} <span className={styles.creditBadge}>2k</span></div>
+              <p className={styles.toolCardDesc}>{t.compare.desc}</p>
+              <div style={{ marginTop: 12 }}>
+                <span className={styles.optionLabel} style={{ display: 'block', marginBottom: 8 }}>{t.compare.doc2Label}</span>
+                <textarea
+                  className={styles.textareaInput}
+                  placeholder={t.compare.doc2Placeholder}
+                  value={compareContent2}
+                  onChange={e => setCompareContent2(e.target.value)}
+                  rows={7}
+                />
               </div>
-              <div className={styles.optionRow}>
-                <span className={styles.optionLabel}>{t.codegen.langLabel}</span>
-                <select className={styles.langSelect} value={codegenLang} onChange={e => setCodegenLang(e.target.value)}>
-                  {TRANSLATE_LANGS.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}
-                </select>
-              </div>
-              <button className={styles.analyzeBtn} onClick={generateCodegen}
-                disabled={codegenLoading || !codegenDesc.trim()}>
-                {codegenLoading
-                  ? <span className={styles.loadingDots}><span /><span /><span /></span>
-                  : t.codegen.generate}
-              </button>
-              {codegenLoading && (
-                <p style={{ color: '#9590c8', fontSize: 13, margin: '8px 0 0' }}>{t.codegen.loading}</p>
-              )}
-              {codegenResult && !codegenLoading && (
-                <div style={{ marginTop: 16 }}>
-                  <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-                    <button className={styles.actionBtn} onClick={() => navigator.clipboard.writeText(codegenResult)}>{t.codegen.copy}</button>
-                    <button className={styles.actionBtn} onClick={() => {
-                      const ext = codegenType === 'component' ? '.tsx' : codegenType === 'script' ? '.js' : '.html'
-                      const blob = new Blob([codegenResult], { type: 'text/plain;charset=utf-8' })
-                      const a = document.createElement('a')
-                      a.href = URL.createObjectURL(blob)
-                      a.download = `docthink-code${ext}`
-                      a.click()
-                    }}>{t.codegen.download}</button>
-                  </div>
-                  <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: 12, lineHeight: 1.6, color: '#c8c4e8', background: 'rgba(255,255,255,0.04)', padding: 16, borderRadius: 8, maxHeight: 520, overflowY: 'auto', margin: 0 }}>{codegenResult}</pre>
-                </div>
-              )}
             </div>
           )}
 
@@ -1215,7 +1169,7 @@ export default function Analyzer() {
                   </div>
                 ))}
               </div>
-              {result && !loading && ['summary', 'actions', 'risks', 'qa'].includes(mode) && (
+              {result && !loading && ['summary', 'actions', 'risks', 'clauses', 'compare', 'finance'].includes(mode) && (
                 <div className={styles.questionBar}>
                   <input className={styles.questionInput} placeholder={t.result.ask}
                     value={question} onChange={e => setQuestion(e.target.value)}
@@ -1283,7 +1237,7 @@ export default function Analyzer() {
                 {MODES.filter(m => m.group === 'tools').map(m => (
                   <button key={m.id}
                     className={`${styles.mobileGridItem} ${mode === m.id ? styles.mobileGridItemActive : ''}`}
-                    onClick={() => { setMode(m.id); setResult(''); setAnswers([]); setInterviewStarted(false); setCodegenResult(''); setMobileSheetOpen(false) }}>
+                    onClick={() => { setMode(m.id); setResult(''); setAnswers([]); setInterviewStarted(false); setMobileSheetOpen(false) }}>
                     <span className={styles.mobileGridIcon}>{m.icon}</span>
                     <span className={styles.mobileGridLabel}>{(t.modes as any)[m.id]}</span>
                     <span className={styles.mobileGridCost}>{m.credits}k</span>

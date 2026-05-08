@@ -17,7 +17,7 @@ export const T = {
   cs: {
     nav: { credits: 'kredity', buy: 'Koupit kredity' },
     sidebar: { aiAssistant: 'AI asistent', docAnalysis: 'Analýza dokumentu', aiTools: 'Nástroje AI', history: 'Historie', free: 'zdarma' },
-    modes: { chat: 'AI Chat', summary: 'Shrnutí', actions: 'Akční body', risks: 'Rizika', qa: 'Q & A', deadlines: 'Termíny', rewrite: 'Přepisovač', translate: 'Překladač', template: 'Generátor šablon', interview: 'AI Tazatel', codegen: 'Generátor kódu', email: 'Emailový generátor', batch: 'Hromadná analýza', finance: 'Finanční analytik' },
+    modes: { chat: 'AI Chat', summary: 'Shrnutí', actions: 'Akční body', risks: 'Rizika', clauses: 'Klauzule', deadlines: 'Termíny', finance: 'Finanční analytik', rewrite: 'Přepisovač', translate: 'Překladač', email: 'Email generátor', template: 'Generátor šablon', compare: 'Porovnat dokumenty', interview: 'AI Tazatel', batch: 'Hromadná analýza' },
     chat: {
       welcome: 'Jak ti mohu pomoci?',
       sub: 'AI Chat — 1 kredit za každých 5 odpovědí AI',
@@ -32,16 +32,14 @@ export const T = {
       ],
     },
     upload: { title: 'Přetáhni nebo klikni pro nahrání', sub: 'PDF · Word · TXT · max 10 MB' },
-    codegen: {
-      desc: 'Popiš web, aplikaci nebo skript a AI vygeneruje kompletní funkční kód připravený k použití.',
-      placeholder: 'Např: Jednoduchá landing page pro fitness studio s formulářem, tmavý moderní design, sekce s cenami a recenzemi…',
-      typeLabel: 'Typ projektu:',
-      types: { website: 'Webová stránka', landing: 'Landing page', component: 'React komponent', script: 'Skript' },
-      langLabel: 'Jazyk obsahu:',
-      generate: '💻 Vygenerovat kód',
-      loading: 'Generuji kód… může trvat 15–30 sekund',
-      copy: 'Kopírovat kód',
-      download: '⬇ Stáhnout',
+    compare: {
+      desc: 'Nahraj nebo vlož první dokument, pak vlož druhý dokument níže. AI najde všechny rozdíly, zhodnotí jejich dopad a upozorní na nevýhodné změny.',
+      doc2Label: 'Druhý dokument (nová verze):',
+      doc2Placeholder: 'Vlož sem druhý dokument pro porovnání…',
+      generate: '🔍 Porovnat dokumenty',
+    },
+    clauses: {
+      desc: 'AI extrahuje a analyzuje všechny klíčové právní klauzule smlouvy — platební podmínky, ukončení, odpovědnost, IP práva, NDA a další. Každá klauzule je ohodnocena jako FAIR / ZKONTROLOVAT / NEVÝHODNÁ / CHYBÍ.',
     },
     inputMode: { file: '📎 Soubor', text: '✏️ Vložit text', placeholder: 'Vlož nebo napiš text, který chceš analyzovat…', chars: 'znaků', clear: 'Vymazat' },
     email: {
@@ -54,7 +52,7 @@ export const T = {
       langLabel: 'Jazyk emailu:',
       generate: '📧 Vygenerovat email',
     },
-    rewrite: { style: 'Styl přepisu:', formal: 'Formálnější', simple: 'Jednodušší' },
+    rewrite: { style: 'Styl přepisu:', formal: 'Formálnější', simple: 'Jednodušší', shorter: 'Kratší', persuasive: 'Přesvědčivější' },
     translate: { to: 'Přeložit do:' },
     template: {
       desc: 'Popiš jaký dokument potřebuješ a AI ho vygeneruje připravený k použití.',
@@ -79,7 +77,7 @@ export const T = {
   en: {
     nav: { credits: 'credits', buy: 'Buy credits' },
     sidebar: { aiAssistant: 'AI assistant', docAnalysis: 'Document analysis', aiTools: 'AI tools', history: 'History', free: 'free' },
-    modes: { chat: 'AI Chat', summary: 'Summary', actions: 'Action items', risks: 'Risks', qa: 'Q & A', deadlines: 'Deadlines', rewrite: 'Rewriter', translate: 'Translator', template: 'Template gen.', interview: 'AI Interviewer', codegen: 'Code generator', email: 'Email generator', batch: 'Batch analysis', finance: 'Finance analyst' },
+    modes: { chat: 'AI Chat', summary: 'Summary', actions: 'Action items', risks: 'Risks', clauses: 'Legal clauses', deadlines: 'Deadlines', finance: 'Finance analyst', rewrite: 'Rewriter', translate: 'Translator', email: 'Email generator', template: 'Template gen.', compare: 'Compare docs', interview: 'AI Interviewer', batch: 'Batch analysis' },
     chat: {
       welcome: 'How can I help you?',
       sub: 'AI Chat — 1 credit per every 5 AI responses',
@@ -94,16 +92,14 @@ export const T = {
       ],
     },
     upload: { title: 'Drag & drop or click to upload', sub: 'PDF · Word · TXT · max 10 MB' },
-    codegen: {
-      desc: 'Describe a website, app, or script and AI will generate complete, working code ready to use.',
-      placeholder: 'E.g.: Simple landing page for a fitness studio with a contact form, dark modern design, pricing section and reviews…',
-      typeLabel: 'Project type:',
-      types: { website: 'Website', landing: 'Landing page', component: 'React component', script: 'Script' },
-      langLabel: 'Content language:',
-      generate: '💻 Generate code',
-      loading: 'Generating code… may take 15–30 seconds',
-      copy: 'Copy code',
-      download: '⬇ Download',
+    compare: {
+      desc: 'Upload or paste the first document, then paste the second document below. AI will find all differences, assess their impact, and flag unfavorable changes.',
+      doc2Label: 'Second document (new version):',
+      doc2Placeholder: 'Paste the second document here for comparison…',
+      generate: '🔍 Compare documents',
+    },
+    clauses: {
+      desc: 'AI extracts and analyzes all key legal clauses — payment terms, termination, liability, IP rights, NDA and more. Each clause is rated FAIR / REVIEW / UNFAVORABLE / MISSING.',
     },
     inputMode: { file: '📎 File', text: '✏️ Paste text', placeholder: 'Paste or type the text you want to analyze…', chars: 'characters', clear: 'Clear' },
     email: {
@@ -116,7 +112,7 @@ export const T = {
       langLabel: 'Email language:',
       generate: '📧 Generate email',
     },
-    rewrite: { style: 'Rewrite style:', formal: 'More formal', simple: 'Simpler' },
+    rewrite: { style: 'Rewrite style:', formal: 'More formal', simple: 'Simpler', shorter: 'Shorter', persuasive: 'Persuasive' },
     translate: { to: 'Translate to:' },
     template: {
       desc: 'Describe what document you need and AI will generate it ready to use.',
@@ -141,7 +137,7 @@ export const T = {
   de: {
     nav: { credits: 'Credits', buy: 'Credits kaufen' },
     sidebar: { aiAssistant: 'KI-Assistent', docAnalysis: 'Dokumentenanalyse', aiTools: 'KI-Tools', history: 'Verlauf', free: 'kostenlos' },
-    modes: { chat: 'KI-Chat', summary: 'Zusammenfassung', actions: 'Aktionspunkte', risks: 'Risiken', qa: 'Q & A', deadlines: 'Termine', rewrite: 'Umschreiben', translate: 'Übersetzer', template: 'Vorlagen-Gen.', interview: 'KI-Interviewer', codegen: 'Code-Generator', email: 'E-Mail-Generator', batch: 'Stapelanalyse', finance: 'Finanzanalyst' },
+    modes: { chat: 'KI-Chat', summary: 'Zusammenfassung', actions: 'Aktionspunkte', risks: 'Risiken', clauses: 'Klauseln', deadlines: 'Termine', finance: 'Finanzanalyst', rewrite: 'Umschreiben', translate: 'Übersetzer', email: 'E-Mail-Gen.', template: 'Vorlagen-Gen.', compare: 'Vergleichen', interview: 'KI-Interviewer', batch: 'Stapelanalyse' },
     chat: {
       welcome: 'Wie kann ich helfen?',
       sub: 'KI-Chat — 1 Credit pro 5 KI-Antworten',
@@ -156,16 +152,14 @@ export const T = {
       ],
     },
     upload: { title: 'Ziehen oder klicken zum Hochladen', sub: 'PDF · Word · TXT · max 10 MB' },
-    codegen: {
-      desc: 'Beschreibe eine Website, App oder Skript und KI generiert vollständigen, funktionsfähigen Code.',
-      placeholder: 'z.B.: Einfache Landing-Page für ein Fitnessstudio mit Kontaktformular, dunkles modernes Design…',
-      typeLabel: 'Projekttyp:',
-      types: { website: 'Website', landing: 'Landing Page', component: 'React Komponente', script: 'Skript' },
-      langLabel: 'Inhaltssprache:',
-      generate: '💻 Code generieren',
-      loading: 'Code wird generiert… kann 15–30 Sekunden dauern',
-      copy: 'Code kopieren',
-      download: '⬇ Herunterladen',
+    compare: {
+      desc: 'Lade das erste Dokument hoch oder füge es ein, dann füge das zweite Dokument unten ein. KI findet alle Unterschiede, bewertet deren Auswirkungen und markiert ungünstige Änderungen.',
+      doc2Label: 'Zweites Dokument (neue Version):',
+      doc2Placeholder: 'Zweites Dokument hier zum Vergleich einfügen…',
+      generate: '🔍 Dokumente vergleichen',
+    },
+    clauses: {
+      desc: 'KI extrahiert und analysiert alle wichtigen rechtlichen Klauseln — Zahlungsbedingungen, Kündigung, Haftung, IP-Rechte, NDA und mehr. Jede Klausel wird als FAIR / PRÜFEN / UNGÜNSTIG / FEHLT bewertet.',
     },
     inputMode: { file: '📎 Datei', text: '✏️ Text einfügen', placeholder: 'Text zum Analysieren einfügen oder eingeben…', chars: 'Zeichen', clear: 'Löschen' },
     email: {
@@ -178,7 +172,7 @@ export const T = {
       langLabel: 'E-Mail-Sprache:',
       generate: '📧 E-Mail generieren',
     },
-    rewrite: { style: 'Umschreibstil:', formal: 'Formeller', simple: 'Einfacher' },
+    rewrite: { style: 'Umschreibstil:', formal: 'Formeller', simple: 'Einfacher', shorter: 'Kürzer', persuasive: 'Überzeugender' },
     translate: { to: 'Übersetzen nach:' },
     template: {
       desc: 'Beschreibe das benötigte Dokument und KI erstellt es.',
@@ -202,7 +196,7 @@ export const T = {
   sk: {
     nav: { credits: 'kredity', buy: 'Kúpiť kredity' },
     sidebar: { aiAssistant: 'AI asistent', docAnalysis: 'Analýza dokumentov', aiTools: 'AI nástroje', history: 'História', free: 'zadarmo' },
-    modes: { chat: 'AI Chat', summary: 'Zhrnutie', actions: 'Akčné body', risks: 'Riziká', qa: 'Q & A', deadlines: 'Termíny', rewrite: 'Prepisovač', translate: 'Prekladač', template: 'Generátor šablón', interview: 'AI Spytovateľ', codegen: 'Generátor kódu', email: 'Emailový generátor', batch: 'Hromadná analýza', finance: 'Finančný analytik' },
+    modes: { chat: 'AI Chat', summary: 'Zhrnutie', actions: 'Akčné body', risks: 'Riziká', clauses: 'Klauzuly', deadlines: 'Termíny', finance: 'Finančný analytik', rewrite: 'Prepisovač', translate: 'Prekladač', email: 'Email generátor', template: 'Generátor šablón', compare: 'Porovnať dokumenty', interview: 'AI Spytovateľ', batch: 'Hromadná analýza' },
     chat: {
       welcome: 'Ako ti môžem pomôcť?',
       sub: 'AI Chat — 1 kredit za každých 5 odpovedí AI',
@@ -217,16 +211,14 @@ export const T = {
       ],
     },
     upload: { title: 'Pretiahni alebo klikni pre nahratie', sub: 'PDF · Word · TXT · max 10 MB' },
-    codegen: {
-      desc: 'Popíš web, aplikáciu alebo skript a AI vygeneruje kompletný funkčný kód pripravený na použitie.',
-      placeholder: 'Napr: Jednoduchá landing page pre fitness štúdio s formulárom, tmavý moderný dizajn…',
-      typeLabel: 'Typ projektu:',
-      types: { website: 'Webová stránka', landing: 'Landing page', component: 'React komponent', script: 'Skript' },
-      langLabel: 'Jazyk obsahu:',
-      generate: '💻 Vygenerovať kód',
-      loading: 'Generujem kód… môže trvať 15–30 sekúnd',
-      copy: 'Kopírovať kód',
-      download: '⬇ Stiahnuť',
+    compare: {
+      desc: 'Nahraj alebo vlož prvý dokument, potom vlož druhý dokument nižšie. AI nájde všetky rozdiely, zhodnotí ich dopad a upozorní na nevýhodné zmeny.',
+      doc2Label: 'Druhý dokument (nová verzia):',
+      doc2Placeholder: 'Vlož sem druhý dokument na porovnanie…',
+      generate: '🔍 Porovnať dokumenty',
+    },
+    clauses: {
+      desc: 'AI extrahuje a analyzuje všetky kľúčové právne klauzuly — platobné podmienky, ukončenie, zodpovednosť, IP práva, NDA a ďalšie. Každá klauzula je hodnotená ako FAIR / SKONTROLOVAŤ / NEVÝHODNÁ / CHÝBA.',
     },
     inputMode: { file: '📎 Súbor', text: '✏️ Vložiť text', placeholder: 'Vlož alebo napíš text, ktorý chceš analyzovať…', chars: 'znakov', clear: 'Vymazať' },
     email: {
@@ -239,7 +231,7 @@ export const T = {
       langLabel: 'Jazyk emailu:',
       generate: '📧 Vygenerovať email',
     },
-    rewrite: { style: 'Štýl prepisu:', formal: 'Formálnejší', simple: 'Jednoduchší' },
+    rewrite: { style: 'Štýl prepisu:', formal: 'Formálnejší', simple: 'Jednoduchší', shorter: 'Kratší', persuasive: 'Presvedčivejší' },
     translate: { to: 'Preložiť do:' },
     template: {
       desc: 'Popíš aký dokument potrebuješ a AI ho vygeneruje pripravený na použitie.',
@@ -264,7 +256,7 @@ export const T = {
   fr: {
     nav: { credits: 'crédits', buy: 'Acheter des crédits' },
     sidebar: { aiAssistant: 'Assistant IA', docAnalysis: 'Analyse de document', aiTools: 'Outils IA', history: 'Historique', free: 'gratuit' },
-    modes: { chat: 'Chat IA', summary: 'Résumé', actions: 'Actions', risks: 'Risques', qa: 'Q & R', deadlines: 'Délais', rewrite: 'Réécriture', translate: 'Traducteur', template: 'Générateur', interview: 'Entretien IA', codegen: 'Gén. code', email: 'Gén. e-mail', batch: 'Analyse en lot', finance: 'Analyste financier' },
+    modes: { chat: 'Chat IA', summary: 'Résumé', actions: 'Actions', risks: 'Risques', clauses: 'Clauses', deadlines: 'Délais', finance: 'Analyste financier', rewrite: 'Réécriture', translate: 'Traducteur', email: 'Gén. e-mail', template: 'Générateur', compare: 'Comparer', interview: 'Entretien IA', batch: 'Analyse en lot' },
     chat: {
       welcome: 'Comment puis-je vous aider ?',
       sub: 'Chat IA — 1 crédit par 5 réponses IA',
@@ -279,16 +271,14 @@ export const T = {
       ],
     },
     upload: { title: 'Glisser-déposer ou cliquer pour télécharger', sub: 'PDF · Word · TXT · max 10 Mo' },
-    codegen: {
-      desc: "Décrivez un site, une app ou un script et l'IA génère du code complet prêt à utiliser.",
-      placeholder: "Ex. : Page d'accueil pour studio fitness avec formulaire, design sombre moderne…",
-      typeLabel: 'Type de projet :',
-      types: { website: 'Site web', landing: 'Landing page', component: 'Composant React', script: 'Script' },
-      langLabel: 'Langue du contenu :',
-      generate: '💻 Générer le code',
-      loading: 'Génération du code… peut prendre 15–30 secondes',
-      copy: 'Copier le code',
-      download: '⬇ Télécharger',
+    compare: {
+      desc: "Chargez ou collez le premier document, puis collez le second document ci-dessous. L'IA trouvera toutes les différences, évaluera leur impact et signalera les changements défavorables.",
+      doc2Label: 'Second document (nouvelle version) :',
+      doc2Placeholder: 'Collez le second document ici pour comparaison…',
+      generate: '🔍 Comparer les documents',
+    },
+    clauses: {
+      desc: "L'IA extrait et analyse toutes les clauses juridiques clés — conditions de paiement, résiliation, responsabilité, droits de PI, NDA et plus. Chaque clause est notée ÉQUITABLE / RÉVISION / DÉFAVORABLE / MANQUANTE.",
     },
     inputMode: { file: '📎 Fichier', text: '✏️ Coller du texte', placeholder: 'Collez ou écrivez le texte à analyser…', chars: 'caractères', clear: 'Effacer' },
     email: {
@@ -301,7 +291,7 @@ export const T = {
       langLabel: "Langue de l'email :",
       generate: '📧 Générer l\'email',
     },
-    rewrite: { style: 'Style de réécriture :', formal: 'Plus formel', simple: 'Plus simple' },
+    rewrite: { style: 'Style de réécriture :', formal: 'Plus formel', simple: 'Plus simple', shorter: 'Plus court', persuasive: 'Persuasif' },
     translate: { to: 'Traduire en :' },
     template: {
       desc: "Décrivez le document dont vous avez besoin et l'IA le génère prêt à utiliser.",
@@ -325,7 +315,7 @@ export const T = {
   es: {
     nav: { credits: 'créditos', buy: 'Comprar créditos' },
     sidebar: { aiAssistant: 'Asistente IA', docAnalysis: 'Análisis de documento', aiTools: 'Herramientas IA', history: 'Historial', free: 'gratis' },
-    modes: { chat: 'Chat IA', summary: 'Resumen', actions: 'Acciones', risks: 'Riesgos', qa: 'P & R', deadlines: 'Plazos', rewrite: 'Reescritor', translate: 'Traductor', template: 'Generador', interview: 'Entrevista IA', codegen: 'Gen. código', email: 'Gen. email', batch: 'Análisis masivo', finance: 'Analista financiero' },
+    modes: { chat: 'Chat IA', summary: 'Resumen', actions: 'Acciones', risks: 'Riesgos', clauses: 'Cláusulas', deadlines: 'Plazos', finance: 'Analista financiero', rewrite: 'Reescritor', translate: 'Traductor', email: 'Gen. email', template: 'Generador', compare: 'Comparar', interview: 'Entrevista IA', batch: 'Análisis masivo' },
     chat: {
       welcome: '¿Cómo puedo ayudarte?',
       sub: 'Chat IA — 1 crédito por cada 5 respuestas IA',
@@ -340,16 +330,14 @@ export const T = {
       ],
     },
     upload: { title: 'Arrastra o haz clic para cargar', sub: 'PDF · Word · TXT · máx. 10 MB' },
-    codegen: {
-      desc: 'Describe un sitio web, app o script y la IA generará código completo listo para usar.',
-      placeholder: 'Ej.: Página de inicio para estudio de fitness con formulario, diseño oscuro moderno…',
-      typeLabel: 'Tipo de proyecto:',
-      types: { website: 'Sitio web', landing: 'Landing page', component: 'Componente React', script: 'Script' },
-      langLabel: 'Idioma del contenido:',
-      generate: '💻 Generar código',
-      loading: 'Generando código… puede tardar 15–30 segundos',
-      copy: 'Copiar código',
-      download: '⬇ Descargar',
+    compare: {
+      desc: 'Sube o pega el primer documento, luego pega el segundo documento abajo. La IA encontrará todas las diferencias, evaluará su impacto y señalará cambios desfavorables.',
+      doc2Label: 'Segundo documento (nueva versión):',
+      doc2Placeholder: 'Pega aquí el segundo documento para comparar…',
+      generate: '🔍 Comparar documentos',
+    },
+    clauses: {
+      desc: 'La IA extrae y analiza todas las cláusulas legales clave — términos de pago, rescisión, responsabilidad, derechos de PI, NDA y más. Cada cláusula se califica como JUSTO / REVISAR / DESFAVORABLE / FALTA.',
     },
     inputMode: { file: '📎 Archivo', text: '✏️ Pegar texto', placeholder: 'Pega o escribe el texto que quieres analizar…', chars: 'caracteres', clear: 'Borrar' },
     email: {
@@ -362,7 +350,7 @@ export const T = {
       langLabel: 'Idioma del email:',
       generate: '📧 Generar email',
     },
-    rewrite: { style: 'Estilo de reescritura:', formal: 'Más formal', simple: 'Más simple' },
+    rewrite: { style: 'Estilo de reescritura:', formal: 'Más formal', simple: 'Más simple', shorter: 'Más corto', persuasive: 'Persuasivo' },
     translate: { to: 'Traducir a:' },
     template: {
       desc: 'Describe el documento que necesitas y la IA lo generará listo para usar.',
@@ -386,7 +374,7 @@ export const T = {
   it: {
     nav: { credits: 'crediti', buy: 'Acquista crediti' },
     sidebar: { aiAssistant: 'Assistente IA', docAnalysis: 'Analisi documento', aiTools: 'Strumenti IA', history: 'Cronologia', free: 'gratis' },
-    modes: { chat: 'Chat IA', summary: 'Riepilogo', actions: 'Azioni', risks: 'Rischi', qa: 'D & R', deadlines: 'Scadenze', rewrite: 'Riscrittura', translate: 'Traduttore', template: 'Generatore', interview: 'Intervista IA', codegen: 'Gen. codice', email: 'Gen. email', batch: 'Analisi batch', finance: 'Analista finanziario' },
+    modes: { chat: 'Chat IA', summary: 'Riepilogo', actions: 'Azioni', risks: 'Rischi', clauses: 'Clausole', deadlines: 'Scadenze', finance: 'Analista finanziario', rewrite: 'Riscrittura', translate: 'Traduttore', email: 'Gen. email', template: 'Generatore', compare: 'Confronta', interview: 'Intervista IA', batch: 'Analisi batch' },
     chat: {
       welcome: 'Come posso aiutarti?',
       sub: 'Chat IA — 1 credito ogni 5 risposte IA',
@@ -401,16 +389,14 @@ export const T = {
       ],
     },
     upload: { title: 'Trascina o clicca per caricare', sub: 'PDF · Word · TXT · max 10 MB' },
-    codegen: {
-      desc: "Descrivi un sito web, un'app o uno script e l'IA genererà codice completo pronto all'uso.",
-      placeholder: 'Es.: Landing page per studio fitness con modulo contatto, design scuro moderno…',
-      typeLabel: 'Tipo di progetto:',
-      types: { website: 'Sito web', landing: 'Landing page', component: 'Componente React', script: 'Script' },
-      langLabel: 'Lingua del contenuto:',
-      generate: '💻 Genera codice',
-      loading: 'Generazione codice… può richiedere 15–30 secondi',
-      copy: 'Copia codice',
-      download: '⬇ Scarica',
+    compare: {
+      desc: "Carica o incolla il primo documento, poi incolla il secondo documento in basso. L'IA troverà tutte le differenze, valuterà il loro impatto e segnalerà le modifiche sfavorevoli.",
+      doc2Label: 'Secondo documento (nuova versione):',
+      doc2Placeholder: 'Incolla qui il secondo documento per il confronto…',
+      generate: '🔍 Confronta documenti',
+    },
+    clauses: {
+      desc: "L'IA estrae e analizza tutte le clausole legali chiave — termini di pagamento, risoluzione, responsabilità, diritti IP, NDA e altro. Ogni clausola è valutata EQUA / REVISIONARE / SFAVOREVOLE / MANCANTE.",
     },
     inputMode: { file: '📎 File', text: '✏️ Incolla testo', placeholder: 'Incolla o scrivi il testo da analizzare…', chars: 'caratteri', clear: 'Cancella' },
     email: {
@@ -423,7 +409,7 @@ export const T = {
       langLabel: 'Lingua email:',
       generate: '📧 Genera email',
     },
-    rewrite: { style: 'Stile riscrittura:', formal: 'Più formale', simple: 'Più semplice' },
+    rewrite: { style: 'Stile riscrittura:', formal: 'Più formale', simple: 'Più semplice', shorter: 'Più breve', persuasive: 'Persuasivo' },
     translate: { to: 'Traduci in:' },
     template: {
       desc: "Descrivi il documento di cui hai bisogno e l'IA lo genererà pronto all'uso.",
@@ -447,7 +433,7 @@ export const T = {
   pl: {
     nav: { credits: 'kredyty', buy: 'Kup kredyty' },
     sidebar: { aiAssistant: 'Asystent AI', docAnalysis: 'Analiza dokumentu', aiTools: 'Narzędzia AI', history: 'Historia', free: 'za darmo' },
-    modes: { chat: 'Chat AI', summary: 'Podsumowanie', actions: 'Zadania', risks: 'Ryzyka', qa: 'P & O', deadlines: 'Terminy', rewrite: 'Przepisywanie', translate: 'Tłumacz', template: 'Generator szabl.', interview: 'Wywiad AI', codegen: 'Gen. kodu', email: 'Gen. emaila', batch: 'Analiza wsadowa', finance: 'Analityk finansowy' },
+    modes: { chat: 'Chat AI', summary: 'Podsumowanie', actions: 'Zadania', risks: 'Ryzyka', clauses: 'Klauzule', deadlines: 'Terminy', finance: 'Analityk finansowy', rewrite: 'Przepisywanie', translate: 'Tłumacz', email: 'Gen. emaila', template: 'Generator szabl.', compare: 'Porównanie', interview: 'Wywiad AI', batch: 'Analiza wsadowa' },
     chat: {
       welcome: 'Jak mogę pomóc?',
       sub: 'Chat AI — 1 kredyt za każde 5 odpowiedzi AI',
@@ -462,16 +448,14 @@ export const T = {
       ],
     },
     upload: { title: 'Przeciągnij lub kliknij, aby przesłać', sub: 'PDF · Word · TXT · maks. 10 MB' },
-    codegen: {
-      desc: 'Opisz stronę, aplikację lub skrypt, a AI wygeneruje kompletny, gotowy do użycia kod.',
-      placeholder: 'Np.: Prosta landing page dla studia fitness z formularzem kontaktowym, ciemny nowoczesny design…',
-      typeLabel: 'Typ projektu:',
-      types: { website: 'Strona internetowa', landing: 'Landing page', component: 'Komponent React', script: 'Skrypt' },
-      langLabel: 'Język treści:',
-      generate: '💻 Generuj kod',
-      loading: 'Generowanie kodu… może potrwać 15–30 sekund',
-      copy: 'Kopiuj kod',
-      download: '⬇ Pobierz',
+    compare: {
+      desc: 'Prześlij lub wklej pierwszy dokument, a następnie wklej drugi dokument poniżej. AI znajdzie wszystkie różnice, oceni ich wpływ i oznaczy niekorzystne zmiany.',
+      doc2Label: 'Drugi dokument (nowa wersja):',
+      doc2Placeholder: 'Wklej tutaj drugi dokument do porównania…',
+      generate: '🔍 Porównaj dokumenty',
+    },
+    clauses: {
+      desc: 'AI wyodrębnia i analizuje wszystkie kluczowe klauzule prawne — warunki płatności, rozwiązanie, odpowiedzialność, prawa własności intelektualnej, NDA i inne. Każda klauzula jest oceniana jako FAIR / DO PRZEGLĄDU / NIEKORZYSTNA / BRAKUJE.',
     },
     inputMode: { file: '📎 Plik', text: '✏️ Wklej tekst', placeholder: 'Wklej lub wpisz tekst do analizy…', chars: 'znaków', clear: 'Wyczyść' },
     email: {
@@ -484,7 +468,7 @@ export const T = {
       langLabel: 'Język emaila:',
       generate: '📧 Generuj email',
     },
-    rewrite: { style: 'Styl przepisania:', formal: 'Bardziej formalny', simple: 'Prostszy' },
+    rewrite: { style: 'Styl przepisania:', formal: 'Bardziej formalny', simple: 'Prostszy', shorter: 'Krótszy', persuasive: 'Przekonujący' },
     translate: { to: 'Przetłumacz na:' },
     template: {
       desc: 'Opisz jakiego dokumentu potrzebujesz, a AI wygeneruje go gotowy do użycia.',
@@ -509,7 +493,7 @@ export const T = {
   nl: {
     nav: { credits: 'credits', buy: 'Credits kopen' },
     sidebar: { aiAssistant: 'AI-assistent', docAnalysis: 'Documentanalyse', aiTools: 'AI-tools', history: 'Geschiedenis', free: 'gratis' },
-    modes: { chat: 'AI-chat', summary: 'Samenvatting', actions: 'Actiepunten', risks: "Risico's", qa: 'V & A', deadlines: 'Deadlines', rewrite: 'Herschrijven', translate: 'Vertaler', template: 'Sjabloongenerator', interview: 'AI-interview', codegen: 'Codegenerator', email: 'E-mailgenerator', batch: 'Batch-analyse', finance: 'Financieel analist' },
+    modes: { chat: 'AI-chat', summary: 'Samenvatting', actions: 'Actiepunten', risks: "Risico's", clauses: 'Clausules', deadlines: 'Deadlines', finance: 'Financieel analist', rewrite: 'Herschrijven', translate: 'Vertaler', email: 'E-mailgen.', template: 'Sjabloongenerator', compare: 'Vergelijken', interview: 'AI-interview', batch: 'Batch-analyse' },
     chat: {
       welcome: 'Hoe kan ik u helpen?',
       sub: 'AI-chat — 1 credit per 5 AI-antwoorden',
@@ -524,16 +508,14 @@ export const T = {
       ],
     },
     upload: { title: 'Slepen of klikken om te uploaden', sub: 'PDF · Word · TXT · max. 10 MB' },
-    codegen: {
-      desc: 'Beschrijf een website, app of script en AI genereert volledige, werkende code.',
-      placeholder: 'Bijv.: Eenvoudige landingspagina voor fitnessclub met contactformulier, donker modern design…',
-      typeLabel: 'Projecttype:',
-      types: { website: 'Website', landing: 'Landingspagina', component: 'React-component', script: 'Script' },
-      langLabel: 'Taal van de inhoud:',
-      generate: '💻 Code genereren',
-      loading: 'Code genereren… kan 15–30 seconden duren',
-      copy: 'Code kopiëren',
-      download: '⬇ Downloaden',
+    compare: {
+      desc: 'Upload of plak het eerste document en plak het tweede document hieronder. AI vindt alle verschillen, beoordeelt hun impact en markeert ongunstige wijzigingen.',
+      doc2Label: 'Tweede document (nieuwe versie):',
+      doc2Placeholder: 'Plak hier het tweede document voor vergelijking…',
+      generate: '🔍 Documenten vergelijken',
+    },
+    clauses: {
+      desc: 'AI extraheert en analyseert alle belangrijke juridische clausules — betalingsvoorwaarden, beëindiging, aansprakelijkheid, IE-rechten, NDA en meer. Elke clausule wordt beoordeeld als EERLIJK / BEOORDELEN / ONGUNSTIG / ONTBREEKT.',
     },
     inputMode: { file: '📎 Bestand', text: '✏️ Tekst plakken', placeholder: 'Plak of typ de tekst die u wilt analyseren…', chars: 'tekens', clear: 'Wissen' },
     email: {
@@ -546,7 +528,7 @@ export const T = {
       langLabel: 'E-mailtaal:',
       generate: '📧 E-mail genereren',
     },
-    rewrite: { style: 'Herschrijfstijl:', formal: 'Formeler', simple: 'Eenvoudiger' },
+    rewrite: { style: 'Herschrijfstijl:', formal: 'Formeler', simple: 'Eenvoudiger', shorter: 'Korter', persuasive: 'Overtuigend' },
     translate: { to: 'Vertalen naar:' },
     template: {
       desc: 'Beschrijf welk document u nodig hebt en AI genereert het klaar voor gebruik.',
@@ -570,7 +552,7 @@ export const T = {
   pt: {
     nav: { credits: 'créditos', buy: 'Comprar créditos' },
     sidebar: { aiAssistant: 'Assistente IA', docAnalysis: 'Análise de documento', aiTools: 'Ferramentas IA', history: 'Histórico', free: 'grátis' },
-    modes: { chat: 'Chat IA', summary: 'Resumo', actions: 'Ações', risks: 'Riscos', qa: 'P & R', deadlines: 'Prazos', rewrite: 'Reescrita', translate: 'Tradutor', template: 'Gerador', interview: 'Entrevista IA', codegen: 'Gen. código', email: 'Gen. email', batch: 'Análise em lote', finance: 'Analista financeiro' },
+    modes: { chat: 'Chat IA', summary: 'Resumo', actions: 'Ações', risks: 'Riscos', clauses: 'Cláusulas', deadlines: 'Prazos', finance: 'Analista financeiro', rewrite: 'Reescrita', translate: 'Tradutor', email: 'Gen. email', template: 'Gerador', compare: 'Comparar', interview: 'Entrevista IA', batch: 'Análise em lote' },
     chat: {
       welcome: 'Como posso ajudar?',
       sub: 'Chat IA — 1 crédito por cada 5 respostas IA',
@@ -585,16 +567,14 @@ export const T = {
       ],
     },
     upload: { title: 'Arrastar ou clicar para carregar', sub: 'PDF · Word · TXT · máx. 10 MB' },
-    codegen: {
-      desc: 'Descreva um site, app ou script e a IA gerará código completo pronto a usar.',
-      placeholder: 'Ex.: Página inicial para estúdio de fitness com formulário, design escuro moderno…',
-      typeLabel: 'Tipo de projeto:',
-      types: { website: 'Site web', landing: 'Landing page', component: 'Componente React', script: 'Script' },
-      langLabel: 'Idioma do conteúdo:',
-      generate: '💻 Gerar código',
-      loading: 'Gerando código… pode levar 15–30 segundos',
-      copy: 'Copiar código',
-      download: '⬇ Baixar',
+    compare: {
+      desc: 'Carregue ou cole o primeiro documento, depois cole o segundo documento abaixo. A IA encontrará todas as diferenças, avaliará o impacto e sinalizará mudanças desfavoráveis.',
+      doc2Label: 'Segundo documento (nova versão):',
+      doc2Placeholder: 'Cole aqui o segundo documento para comparação…',
+      generate: '🔍 Comparar documentos',
+    },
+    clauses: {
+      desc: 'A IA extrai e analisa todas as cláusulas legais principais — condições de pagamento, rescisão, responsabilidade, direitos de PI, NDA e mais. Cada cláusula é avaliada como JUSTO / REVER / DESFAVORÁVEL / FALTA.',
     },
     inputMode: { file: '📎 Ficheiro', text: '✏️ Colar texto', placeholder: 'Cole ou escreva o texto que quer analisar…', chars: 'caracteres', clear: 'Limpar' },
     email: {
@@ -607,7 +587,7 @@ export const T = {
       langLabel: 'Idioma do email:',
       generate: '📧 Gerar email',
     },
-    rewrite: { style: 'Estilo de reescrita:', formal: 'Mais formal', simple: 'Mais simples' },
+    rewrite: { style: 'Estilo de reescrita:', formal: 'Mais formal', simple: 'Mais simples', shorter: 'Mais curto', persuasive: 'Persuasivo' },
     translate: { to: 'Traduzir para:' },
     template: {
       desc: 'Descreva o documento de que precisa e a IA vai gerá-lo pronto a usar.',

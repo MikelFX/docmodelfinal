@@ -9,8 +9,10 @@ export async function POST(req: NextRequest) {
   if (!content) return NextResponse.json({ error: 'Missing document content.' }, { status: 400 })
 
   const stylePrompts: Record<string, string> = {
-    formal: 'Rewrite this text in formal, professional language suitable for business communication and official documents. Preserve all information, only change the style and tone.',
-    simple: 'Rewrite this text in simple, clear language. Remove complex words and long sentences. Preserve all information.',
+    formal: 'Rewrite this text in formal, professional language suitable for business communication and official documents. Use precise vocabulary, proper structure, and a neutral authoritative tone. Preserve all information.',
+    simple: 'Rewrite this text in simple, clear language anyone can understand. Replace complex words with plain alternatives. Break long sentences into shorter ones. Preserve all key information.',
+    shorter: 'Condense this text to approximately 40-50% of its original length while keeping all critical information and key points. Remove redundancy, filler words, and repetition. Keep the same language and tone.',
+    persuasive: 'Rewrite this text with persuasive, compelling language. Emphasize benefits and value, use active voice, create a sense of urgency where appropriate, and make it more engaging. Preserve the core message but optimize for impact.',
   }
 
   const prompt = stylePrompts[style] || stylePrompts.formal
