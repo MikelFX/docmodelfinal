@@ -202,13 +202,14 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
 
   useEffect(() => {
     if (!localStorage.getItem('docthink_onboarded')) setShowOnboarding(true)
-    const savedCreditHistory = localStorage.getItem('docthink_credit_history')
-    if (savedCreditHistory) setCreditHistory(JSON.parse(savedCreditHistory))
   }, [])
 
   useEffect(() => {
-    const saved = localStorage.getItem('docmind_history')
-    if (saved) setHistory(JSON.parse(saved))
+    if (!user?.id) return
+    const savedCreditHistory = localStorage.getItem(`docthink_credit_history_${user.id}`)
+    if (savedCreditHistory) setCreditHistory(JSON.parse(savedCreditHistory))
+    const savedHistory = localStorage.getItem(`docmind_history_${user.id}`)
+    setHistory(savedHistory ? JSON.parse(savedHistory) : [])
     fetch('/api/credits')
       .then(r => r.json())
       .then(d => {
@@ -229,7 +230,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
     const entry = { label, credits: cost, date: new Date().toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' }) }
     setCreditHistory(prev => {
       const next = [entry, ...prev].slice(0, 15)
-      localStorage.setItem('docthink_credit_history', JSON.stringify(next))
+      if (user?.id) localStorage.setItem(`docthink_credit_history_${user.id}`, JSON.stringify(next))
       return next
     })
   }
@@ -287,7 +288,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
     }
     const updated = [item, ...history].slice(0, 5)
     setHistory(updated)
-    localStorage.setItem('docmind_history', JSON.stringify(updated))
+    if (user?.id) localStorage.setItem(`docmind_history_${user.id}`, JSON.stringify(updated))
   }
 
   async function handleFile(file: File) {
