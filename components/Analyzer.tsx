@@ -927,31 +927,38 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
           {/* ── UPLOAD ── */}
           {showUpload && inputMode === 'file' && (
             <>
-              <div className={`${styles.upload} ${dragging ? styles.uploadDrag : ''}`}
-                onClick={() => fileRef.current?.click()}
-                onDragOver={e => { e.preventDefault(); setDragging(true) }}
-                onDrop={onDrop}
-                onDragLeave={() => setDragging(false)}>
-                <div className={`${styles.uploadIcon} ${styles.uploadIconFloat}`}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7F77DD" strokeWidth="1.5" strokeLinecap="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                    <line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
-                  </svg>
+              {/* Full upload zone — only when no document loaded yet */}
+              {!fileContent && (
+                <div className={`${styles.upload} ${dragging ? styles.uploadDrag : ''}`}
+                  onClick={() => fileRef.current?.click()}
+                  onDragOver={e => { e.preventDefault(); setDragging(true) }}
+                  onDrop={onDrop}
+                  onDragLeave={() => setDragging(false)}>
+                  <div className={`${styles.uploadIcon} ${styles.uploadIconFloat}`}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7F77DD" strokeWidth="1.5" strokeLinecap="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                      <polyline points="14 2 14 8 20 8"/>
+                      <line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
+                    </svg>
+                  </div>
+                  <div className={styles.uploadTitle}>{t.upload.title}</div>
+                  <div className={styles.uploadSub}>{t.upload.sub}</div>
+                  <input ref={fileRef} type="file" accept=".pdf,.doc,.docx,.txt" style={{ display: 'none' }}
+                    onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
                 </div>
-                <div className={styles.uploadTitle}>{t.upload.title}</div>
-                <div className={styles.uploadSub}>{t.upload.sub}</div>
-                <input ref={fileRef} type="file" accept=".pdf,.doc,.docx,.txt" style={{ display: 'none' }}
-                  onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />
-              </div>
+              )}
+              {/* File bar — shown when document is loaded */}
               {fileName && (
                 <div className={styles.fileBar}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7F77DD" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                   <span className={styles.fileName}>{fileName}</span>
                   <span className={styles.fileSize}>{fileSize}</span>
-                  <button className={styles.fileRemove} onClick={() => { setFileName(''); setFileContent('') }}>×</button>
+                  {!hideNav && <button className={styles.fileRemove} onClick={() => { setFileName(''); setFileContent('') }}>×</button>}
                 </div>
               )}
+              {/* Hidden input for re-upload in quick mode */}
+              {!fileContent && <input ref={fileRef} type="file" accept=".pdf,.doc,.docx,.txt" style={{ display: 'none' }}
+                onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])} />}
             </>
           )}
 
