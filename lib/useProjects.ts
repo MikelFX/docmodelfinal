@@ -1,28 +1,37 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useAuth } from '@clerk/nextjs'
 import type { Project, ProjectDocument, DocumentAnalysis } from './types'
 
-const KEY = 'docthink_projects'
+function getKey(userId: string | null | undefined) {
+  return userId ? `docthink_projects_${userId}` : null
+}
 
 function uid() {
   return Math.random().toString(36).slice(2, 9) + Date.now().toString(36)
 }
 
 export function useProjects() {
+  const { userId } = useAuth()
   const [projects, setProjects] = useState<Project[]>([])
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
+    if (!userId) return
     try {
-      const raw = localStorage.getItem(KEY)
+      const key = getKey(userId)!
+      const raw = localStorage.getItem(key)
       if (raw) setProjects(JSON.parse(raw))
+      else setProjects([])
     } catch {}
     setLoaded(true)
-  }, [])
+  }, [userId])
 
   function persist(updated: Project[]) {
+    const key = getKey(userId)
+    if (!key) return
     setProjects(updated)
-    try { localStorage.setItem(KEY, JSON.stringify(updated)) } catch {}
+    try { localStorage.setItem(key, JSON.stringify(updated)) } catch {}
   }
 
   function createProject(name: string, description: string, icon: string, color: string): Project {
