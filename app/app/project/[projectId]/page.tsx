@@ -166,7 +166,7 @@ export default function ProjectPage({ params }: Props) {
           </button>
           <button
             className={`${styles.graphToggleBtn} ${showGraph ? styles.graphToggleBtnActive : ''}`}
-            onClick={() => setShowGraph(v => !v)}
+            onClick={() => { setShowGraph(v => !v); if (!showGraph) setActiveDocId(null) }}
             title={showGraph ? p.hideGraph : p.showGraph}
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -279,68 +279,66 @@ export default function ProjectPage({ params }: Props) {
         {/* SIDEBAR OVERLAY (mobile) */}
         {sidebarOpen && <div className={styles.sidebarOverlay} onClick={() => setSidebarOpen(false)} />}
 
-        {/* KNOWLEDGE GRAPH FULLSCREEN (desktop, when no doc selected) */}
-        {showGraph && !activeDocId && project.documents.length > 0 && (
-          <div className={styles.graphPanel}>
-            <div className={styles.graphPanelTitle}>{p.graphTitle}</div>
+        {showGraph && !activeDocId ? (
+          <div className={styles.graphFullArea}>
             {project.documents.length < 2
-              ? <div className={styles.graphEmptyMsg}>{p.graphEmpty}</div>
-              : <KnowledgeGraph documents={project.documents} onSelectDoc={id => setActiveDocId(id)} />
+              ? <div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100%',color:'#3d3a55',fontSize:13}}>{p.graphEmpty}</div>
+              : <KnowledgeGraph documents={project.documents} onSelectDoc={id => { setActiveDocId(id); setShowGraph(false) }} />
             }
           </div>
-        )}
-
-        {/* ANALYZER */}
-        <div className={styles.analyzerWrap}>
-          {/* Desktop: floating hint over analyzer */}
-          {!activeDocId && project.documents.length > 0 && !showGraph && (
-            <div className={styles.selectDocHint}>
-              <div className={styles.selectDocIcon}>📂</div>
-              <div>{p.selectDoc} <button className={styles.selectDocLink} onClick={() => fileRef.current?.click()}>{p.uploadNew}</button></div>
-            </div>
-          )}
-
-          {/* Mobile: clean empty state instead of overlapping hint */}
-          {!activeDocId && (
-            <div className={styles.mobileEmptyState}>
-              <div className={styles.mobileEmptyIcon}>📂</div>
-              <div className={styles.mobileEmptyTitle}>
-                {project.documents.length === 0 ? 'Žádné dokumenty' : 'Vyber dokument'}
+        ) : (
+          <div className={styles.analyzerWrap}>
+            {/* Desktop: floating hint over analyzer */}
+            {!activeDocId && project.documents.length > 0 && !showGraph && (
+              <div className={styles.selectDocHint}>
+                <div className={styles.selectDocIcon}>📂</div>
+                <div>{p.selectDoc} <button className={styles.selectDocLink} onClick={() => fileRef.current?.click()}>{p.uploadNew}</button></div>
               </div>
-              <div className={styles.mobileEmptyDesc}>
-                {project.documents.length === 0
-                  ? 'Nahraj první dokument a začni analyzovat'
-                  : 'Otevři seznam dokumentů nebo nahraj nový'}
-              </div>
-              <div className={styles.mobileEmptyActions}>
-                {project.documents.length > 0 && (
-                  <button className={styles.mobileEmptyBtnPrimary} onClick={() => setSidebarOpen(true)}>
+            )}
+
+            {/* Mobile: clean empty state instead of overlapping hint */}
+            {!activeDocId && (
+              <div className={styles.mobileEmptyState}>
+                <div className={styles.mobileEmptyIcon}>📂</div>
+                <div className={styles.mobileEmptyTitle}>
+                  {project.documents.length === 0 ? 'Žádné dokumenty' : 'Vyber dokument'}
+                </div>
+                <div className={styles.mobileEmptyDesc}>
+                  {project.documents.length === 0
+                    ? 'Nahraj první dokument a začni analyzovat'
+                    : 'Otevři seznam dokumentů nebo nahraj nový'}
+                </div>
+                <div className={styles.mobileEmptyActions}>
+                  {project.documents.length > 0 && (
+                    <button className={styles.mobileEmptyBtnPrimary} onClick={() => setSidebarOpen(true)}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                      </svg>
+                      Dokumenty projektu
+                    </button>
+                  )}
+                  <button className={styles.mobileEmptyBtnSecondary} onClick={() => fileRef.current?.click()}>
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                     </svg>
-                    Dokumenty projektu
+                    Nahrát dokument
                   </button>
-                )}
-                <button className={styles.mobileEmptyBtnSecondary} onClick={() => fileRef.current?.click()}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                  </svg>
-                  Nahrát dokument
-                </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <div className={!activeDocId ? styles.analyzerHiddenMobile : ''}>
-            <Analyzer
-              key={activeDocId ?? 'empty'}
-              initialContent={activeDoc?.content}
-              initialFileName={activeDoc?.name}
-              onAnalysisResult={handleAnalysisResult}
-              hideNav
-            />
+            <div className={!activeDocId ? styles.analyzerHiddenMobile : ''}>
+              <Analyzer
+                key={activeDocId ?? 'empty'}
+                initialContent={activeDoc?.content}
+                initialFileName={activeDoc?.name}
+                onAnalysisResult={handleAnalysisResult}
+                onCreditsChange={(n) => setCredits(n)}
+                hideNav
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* CONFIRM REMOVE DOC */}

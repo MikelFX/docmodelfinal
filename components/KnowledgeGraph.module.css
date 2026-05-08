@@ -1,105 +1,114 @@
 .wrap {
   width: 100%;
-  background: rgba(7, 7, 13, 0.5);
-  border-radius: 12px;
-  overflow: hidden;
-  border: 0.5px solid rgba(127, 119, 221, 0.1);
+  height: 100%;
   display: flex;
   flex-direction: column;
+  background: #07070d;
+  overflow: hidden;
 }
 
 .svg {
+  flex: 1;
   display: block;
   width: 100%;
-  height: auto;
+  min-height: 0;
 }
 
-/* ── EDGE INFO PANEL ── */
+@keyframes nodeFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-11px); }
+}
+
+.nodeFloat {
+  animation: nodeFloat 4s ease-in-out infinite;
+}
+
+/* PANELS */
 .panel {
-  position: relative;
-  margin: 0;
-  padding: 12px 14px 12px 14px;
-  background: rgba(13, 11, 24, 0.95);
+  background: rgba(9, 8, 22, 0.97);
   border-top: 0.5px solid rgba(127, 119, 221, 0.15);
-  animation: panelIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 13px 16px;
+  position: relative;
+  animation: panelIn 0.2s ease;
+  flex-shrink: 0;
 }
 
-@keyframes panelIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.panelHeader {
+.nodePanel {
+  background: rgba(9, 8, 22, 0.97);
+  border-top: 0.5px solid rgba(127, 119, 221, 0.1);
+  padding: 11px 16px;
   display: flex;
   flex-direction: column;
   gap: 7px;
+  animation: panelIn 0.18s ease;
+  flex-shrink: 0;
+}
+
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panelRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
   margin-bottom: 10px;
-  padding-right: 24px;
+  padding-right: 28px;
 }
 
 .panelDocs {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 11.5px;
-  font-weight: 500;
-  flex-wrap: wrap;
 }
 
 .panelDocName {
+  font-size: 11.5px;
   color: #c8c4e8;
   background: rgba(127, 119, 221, 0.1);
-  border: 0.5px solid rgba(127, 119, 221, 0.18);
-  padding: 2px 9px;
+  border: 0.5px solid rgba(127, 119, 221, 0.2);
+  padding: 3px 10px;
   border-radius: 6px;
-  max-width: 140px;
+  max-width: 160px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.panelArrow {
-  color: #4a4668;
-  font-size: 13px;
-  flex-shrink: 0;
-}
+.panelArrow { color: #3d3a55; font-size: 13px; flex-shrink: 0; }
 
-.panelStrength {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 10px;
-  color: #4a4668;
-}
+.panelStrengthWrap { display: flex; align-items: center; gap: 8px; }
 
-.panelStrengthBar {
+.panelStrengthTrack {
+  width: 80px;
   height: 3px;
-  max-width: 80px;
-  min-width: 8px;
+  background: rgba(127, 119, 221, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.panelStrengthFill {
+  height: 100%;
   background: linear-gradient(90deg, #7F77DD, #a78bfa);
   border-radius: 2px;
   transition: width 0.3s ease;
+  min-width: 4px;
 }
 
-.panelBody {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+.panelStrengthLabel { font-size: 10px; color: #5a5678; white-space: nowrap; }
 
-.panelLabel {
+.panelSectionLabel {
   font-size: 9.5px;
   color: #3d3a55;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-weight: 700;
+  margin-bottom: 6px;
 }
 
-.panelKeywords {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
+.panelKeywords { display: flex; flex-wrap: wrap; gap: 5px; }
 
 .keyword {
   font-size: 11px;
@@ -108,49 +117,35 @@
   border: 0.5px solid rgba(127, 119, 221, 0.18);
   border-radius: 6px;
   padding: 2px 9px;
-  cursor: default;
 }
 
-.panelEmpty {
-  font-size: 12px;
-  color: #3a3655;
-  font-style: italic;
-}
+.panelEmpty { font-size: 12px; color: #3a3655; font-style: italic; }
 
 .panelClose {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 11px;
+  right: 12px;
   background: none;
   border: none;
-  color: #3a3655;
+  color: #3d3a55;
+  font-size: 20px;
   cursor: pointer;
-  padding: 4px;
-  border-radius: 5px;
+  padding: 0 4px;
+  border-radius: 4px;
   line-height: 1;
-  transition: color 0.15s, background 0.15s;
-  display: flex;
-  align-items: center;
+  transition: color 0.15s;
+  font-family: inherit;
 }
-.panelClose:hover { color: #c8c4e8; background: rgba(127,119,221,0.1); }
+.panelClose:hover { color: #c8c4e8; }
 
-/* ── NODE PANEL (hover) ── */
-.nodePanel {
-  padding: 10px 14px;
-  background: rgba(11, 10, 22, 0.9);
-  border-top: 0.5px solid rgba(127, 119, 221, 0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  animation: panelIn 0.15s ease;
-}
+.nodePanelHint { font-size: 10px; color: #2e2b42; font-style: italic; }
 
-/* ── HINT ── */
 .hint {
-  padding: 8px 14px;
+  padding: 9px 16px;
   font-size: 10.5px;
-  color: #2e2b42;
+  color: #2a2740;
   text-align: center;
   border-top: 0.5px solid rgba(127, 119, 221, 0.06);
   font-style: italic;
+  flex-shrink: 0;
 }

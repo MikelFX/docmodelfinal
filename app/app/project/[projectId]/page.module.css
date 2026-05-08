@@ -349,6 +349,14 @@
 .refreshMemoryBtn:hover:not(:disabled) { color: #7F77DD; border-color: rgba(127,119,221,0.3); }
 .refreshMemoryBtn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+.graphFullArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #07070d;
+}
+
 /* GRAPH PANEL */
 .graphPanel {
   flex: 1;

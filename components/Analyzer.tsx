@@ -101,9 +101,10 @@ interface AnalyzerProps {
   backHref?: string
   savedProjects?: SimpleProject[]
   onSaveToProject?: (projectId: string, content: string, fileName: string, mode: string, result: string) => void
+  onCreditsChange?: (credits: number) => void
 }
 
-export default function Analyzer({ initialContent, initialFileName, initialFileSize, onAnalysisResult, hideNav, backHref, savedProjects, onSaveToProject }: AnalyzerProps = {}) {
+export default function Analyzer({ initialContent, initialFileName, initialFileSize, onAnalysisResult, hideNav, backHref, savedProjects, onSaveToProject, onCreditsChange }: AnalyzerProps = {}) {
   const { t, lang } = useLanguage()
 
   const [mode, setMode] = useState<Mode>('chat')
@@ -217,6 +218,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
         if (d.credits !== undefined) {
           setCredits(d.credits)
           localStorage.setItem('docthink_credits', d.credits.toString())
+          onCreditsChange?.(d.credits)
         }
       })
       .catch(() => { /* KV unavailable — localStorage value used */ })
@@ -246,6 +248,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
     if (credits < cost) { router.push('/koupit'); return false }
     const next = credits - cost
     setCredits(next)
+    onCreditsChange?.(next)
     localStorage.setItem('docthink_credits', next.toString())
     logCreditUsage((t.modes as any)[mode] ?? mode, cost)
     try {
@@ -257,6 +260,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
       const data = await res.json()
       if (data.credits !== undefined) {
         setCredits(data.credits)
+        onCreditsChange?.(data.credits)
         localStorage.setItem('docthink_credits', data.credits.toString())
       }
     } catch { /* KV unreachable — localStorage already updated */ }
@@ -268,6 +272,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
     setCredits(prev => {
       const next = prev + cost
       localStorage.setItem('docthink_credits', next.toString())
+      onCreditsChange?.(next)
       return next
     })
     try {
@@ -279,6 +284,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
       const data = await res.json()
       if (data.credits !== undefined) {
         setCredits(data.credits)
+        onCreditsChange?.(data.credits)
         localStorage.setItem('docthink_credits', data.credits.toString())
       }
     } catch { /* KV unreachable — localStorage already updated */ }
