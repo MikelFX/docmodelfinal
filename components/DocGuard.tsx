@@ -64,21 +64,32 @@ async function extractTextFromPDF(file: File): Promise<string> {
   return text
 }
 
+async function resizeImage(file: File, maxWidth = 1600, quality = 0.82): Promise<{ imageBase64: string; imageType: string }> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      const scale = Math.min(1, maxWidth / img.width)
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.round(img.width * scale)
+      canvas.height = Math.round(img.height * scale)
+      canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
+      const dataUrl = canvas.toDataURL('image/jpeg', quality)
+      const [, data] = dataUrl.split(',')
+      resolve({ imageBase64: data, imageType: 'image/jpeg' })
+    }
+    img.onerror = reject
+    img.src = url
+  })
+}
+
 async function extractTextFromFile(file: File): Promise<{ text?: string; imageBase64?: string; imageType?: string }> {
   const ext = file.name.split('.').pop()?.toLowerCase()
 
   if (file.type.startsWith('image/') || ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext ?? '')) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const dataUrl = e.target?.result as string
-        const [header, data] = dataUrl.split(',')
-        const mediaType = header.match(/:(.*?);/)?.[1] ?? 'image/jpeg'
-        resolve({ imageBase64: data, imageType: mediaType })
-      }
-      reader.onerror = reject
-      reader.readAsDataURL(file)
-    })
+    const resized = await resizeImage(file)
+    return resized
   }
 
   if (file.type === 'application/pdf' || ext === 'pdf') {

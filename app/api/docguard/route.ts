@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+
+export const config = { api: { bodyParser: { sizeLimit: '10mb' } } }
+
+export const maxDuration = 60
 import { auth } from '@clerk/nextjs/server'
 import { anthropic, MODEL } from '@/lib/anthropic'
 import { Redis } from '@upstash/redis'
