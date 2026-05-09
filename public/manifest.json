@@ -1,6 +1,6 @@
 {
-  "name": "DocGuard",
-  "short_name": "DocGuard",
+  "name": "DocThink",
+  "short_name": "DocThink",
   "description": "Chráním tě před špatnou smlouvou",
   "start_url": "/app",
   "display": "standalone",

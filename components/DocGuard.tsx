@@ -348,7 +348,7 @@ export default function DocGuard() {
       <nav className={styles.nav}>
         <div className={styles.navLogo}>
           <span className={styles.navLogoIcon}>🛡️</span>
-          <span className={styles.navLogoText}>DocGuard</span>
+          <span className={styles.navLogoText}>DocThink</span>
         </div>
         <div className={styles.navRight}>
           {isSignedIn && credits !== null && (
@@ -598,7 +598,7 @@ export default function DocGuard() {
         <div className={styles.paywallOverlay} onClick={() => setShowPaywall(false)}>
           <div className={styles.paywallModal} onClick={e => e.stopPropagation()}>
             <div className={styles.paywallShield}>🛡️</div>
-            <h2 className={styles.paywallTitle}>Líbí se ti DocGuard?</h2>
+            <h2 className={styles.paywallTitle}>Líbí se ti DocThink?</h2>
             <p className={styles.paywallSub}>
               Využil jsi {FREE_LIMIT} bezplatné analýzy. Zaregistruj se zdarma a pokračuj dál.
             </p>

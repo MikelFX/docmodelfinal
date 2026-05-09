@@ -3,9 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import styles from './page.module.css'
-import { useLanguage } from '@/contexts/LanguageContext'
-
-const PLAN_IDS = ['starter', 'pro', 'team'] as const
 
 const PLANS = [
   { id: 'starter', credits: 10, price: 99, perCredit: '9,90', eur: '€4' },
@@ -14,28 +11,45 @@ const PLANS = [
 ]
 
 const CREDIT_COSTS = [
-  { icon: '📋', credits: 1 },
-  { icon: '📅', credits: 1 },
-  { icon: '🌍', credits: 2 },
-  { icon: '✍️', credits: 2 },
-  { icon: '📝', credits: 2 },
-  { icon: '📧', credits: 2 },
-  { icon: '⚖️', credits: 2 },
-  { icon: '🔍', credits: 2 },
-  { icon: '🤖', credits: 5 },
-  { icon: '✨', credits: null },
+  { icon: '🛡️', label: 'Analýza smlouvy', credits: 1 },
+  { icon: '⚠️', label: 'Detekce rizik', credits: 1 },
+  { icon: '🔍', label: 'Hluboká kontrola dokumentu', credits: 2 },
+  { icon: '📋', label: 'Kontrola pracovní smlouvy', credits: 2 },
+  { icon: '🏠', label: 'Analýza nájemní smlouvy', credits: 2 },
+  { icon: '💬', label: 'Chat s dokumentem', credits: null },
 ]
 
-const VALUE_ICONS = ['⚖️', '🌍', '📝']
+const VALUE_ITEMS = [
+  { icon: '⚖️', label: 'Advokát', doc: 'Konzultace', alt: '1 500–5 000 Kč', you: '10–20 Kč' },
+  { icon: '🛡️', label: 'Ochrana', doc: 'Nevýhodná klauzule', alt: 'stojí tisíce', you: 'zachytí za sekundy' },
+  { icon: '📋', label: 'Rychlost', doc: 'Čtení smlouvy', alt: '30–60 min', you: '30 sekund' },
+]
+
+const PLAN_TAGS = [null, '⭐ Nejoblíbenější', '💼 Pro firmy']
+const PLAN_NAMES = ['Starter', 'Pro', 'Business']
+const PLAN_DESCS = [
+  'Ideální pro příležitostnou kontrolu smluv — nájemní, pracovní nebo obchodní.',
+  'Pro pravidelné uživatele — kontrolujte smlouvy bez omezení a bez starostí.',
+  'Pro firmy a právníky — hromadné analýzy dokumentů za nejlepší cenu.',
+]
+const PLAN_FEATURES = [
+  ['10 analýz smluv', 'Detekce rizik', 'Chat s dokumentem', 'Verdikt: podepsat / upravit / odmítnout'],
+  ['40 analýz smluv', 'Prioritní zpracování', 'Chat s dokumentem', 'Kompletní rozbor každé smlouvy'],
+  ['120 analýz smluv', 'Nejnižší cena za analýzu', 'Vhodné pro tým', 'Neomezený chat s dokumentem'],
+]
+
+function creditLabel(n: number | null) {
+  if (n === null) return 'zdarma'
+  if (n === 1) return '1 kredit'
+  if (n >= 2 && n <= 4) return `${n} kredity`
+  return `${n} kreditů`
+}
 
 export default function KoupitPage() {
   const [selected, setSelected] = useState('pro')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
-  const { t, lang } = useLanguage()
-  const k = t.koupit
-  const currency = (lang === 'cs' || lang === 'sk') ? 'Kč' : 'CZK'
 
   useEffect(() => {
     const els = document.querySelectorAll('[data-anim]')
@@ -53,7 +67,7 @@ export default function KoupitPage() {
       obs.observe(el)
     })
     return () => obs.disconnect()
-  }, [lang])
+  }, [])
 
   async function handleBuy() {
     setLoading(true)
@@ -68,12 +82,13 @@ export default function KoupitPage() {
       if (data.error) throw new Error(data.error)
       window.location.href = data.url
     } catch (err: any) {
-      setError(err.message || 'Payment failed. Please try again.')
+      setError(err.message || 'Platba selhala. Zkuste to prosím znovu.')
       setLoading(false)
     }
   }
 
   const plan = PLANS.find(p => p.id === selected)!
+  const planIdx = PLANS.findIndex(p => p.id === selected)
 
   return (
     <div className={styles.wrap}>
@@ -84,9 +99,9 @@ export default function KoupitPage() {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
           </svg>
-          {k.back}
+          Zpět
         </button>
-        <div className={styles.logo}><div className={styles.logoDot} />docthink</div>
+        <div className={styles.logo}>🛡️ DocThink</div>
         <div style={{ width: 80 }} />
       </nav>
 
@@ -94,22 +109,22 @@ export default function KoupitPage() {
 
         {/* HEADER */}
         <div className={`${styles.header} ${styles.animate}`} data-anim>
-          <div className={styles.headerBadge}>{k.badge}</div>
-          <h1 className={styles.title}>{k.title}</h1>
-          <p className={styles.sub}>{k.sub}</p>
+          <div className={styles.headerBadge}>🛡️ Ochrana smluv s AI</div>
+          <h1 className={styles.title}>Získejte kredity a chraňte se</h1>
+          <p className={styles.sub}>Každý kredit = jedna analýza smlouvy s verdiktem, riziky a doporučením.</p>
         </div>
 
         {/* VALUE BAR */}
         <div className={`${styles.valueBar} ${styles.animate}`} data-anim>
-          {k.valueItems.map((v, i) => (
+          {VALUE_ITEMS.map((v, i) => (
             <div key={i} className={styles.valueItem}>
-              <span className={styles.valueIcon}>{VALUE_ICONS[i]}</span>
+              <span className={styles.valueIcon}>{v.icon}</span>
               <div className={styles.valueText}>
                 <span className={styles.valueLabel}>{v.label}</span>
                 <div className={styles.valuePrices}>
-                  <span className={styles.valueAlt}>{v.doc} {v.alt}</span>
+                  <span className={styles.valueAlt}>{v.doc}: {v.alt}</span>
                   <span className={styles.valueSep}>→</span>
-                  <span className={styles.valueYou}>DocThink {v.you}</span>
+                  <span className={styles.valueYou}>DocThink: {v.you}</span>
                 </div>
               </div>
             </div>
@@ -118,59 +133,55 @@ export default function KoupitPage() {
 
         {/* PLANS */}
         <div className={`${styles.plans} ${styles.animate}`} data-anim>
-          {PLANS.map((p, i) => {
-            const tag = i === 1 ? k.planTag1 : i === 2 ? k.planTag2 : null
-            return (
-              <button
-                key={p.id}
-                className={`${styles.plan} ${selected === p.id ? styles.planActive : ''} ${i === 1 ? styles.planFeatured : ''}`}
-                onClick={() => setSelected(p.id)}
-              >
-                {tag && (
-                  <div className={`${styles.planTag} ${i === 2 ? styles.planTagGreen : ''}`}>
-                    {tag}
-                  </div>
-                )}
-                <div className={styles.planName}>{p.id === 'team' ? 'Business' : p.id.charAt(0).toUpperCase() + p.id.slice(1)}</div>
-                <div className={styles.planPriceRow}>
-                  <span className={styles.planAmount}>{p.price}</span>
-                  <span className={styles.planCurrency}>{currency}</span>
-                  {currency !== 'Kč' && <span className={styles.planEur}>≈ {p.eur}</span>}
+          {PLANS.map((p, i) => (
+            <button
+              key={p.id}
+              className={`${styles.plan} ${selected === p.id ? styles.planActive : ''} ${i === 1 ? styles.planFeatured : ''}`}
+              onClick={() => setSelected(p.id)}
+            >
+              {PLAN_TAGS[i] && (
+                <div className={`${styles.planTag} ${i === 2 ? styles.planTagGreen : ''}`}>
+                  {PLAN_TAGS[i]}
                 </div>
-                <div className={styles.planCreditsRow}>
-                  <span className={styles.planCredits}>{p.credits} {t.credit(p.credits)}</span>
-                  <span className={styles.planPerCredit}>{p.perCredit} {currency}/k</span>
-                </div>
-                <p className={styles.planDesc}>{k.planDescs[i]}</p>
-                <ul className={styles.planFeatures}>
-                  {k.planFeatures[i].map((f, j) => (
-                    <li key={j} className={styles.planFeatureItem}>{f}</li>
-                  ))}
-                </ul>
-              </button>
-            )
-          })}
+              )}
+              <div className={styles.planName}>{PLAN_NAMES[i]}</div>
+              <div className={styles.planPriceRow}>
+                <span className={styles.planAmount}>{p.price}</span>
+                <span className={styles.planCurrency}>Kč</span>
+              </div>
+              <div className={styles.planCreditsRow}>
+                <span className={styles.planCredits}>{creditLabel(p.credits)}</span>
+                <span className={styles.planPerCredit}>{p.perCredit} Kč/k</span>
+              </div>
+              <p className={styles.planDesc}>{PLAN_DESCS[i]}</p>
+              <ul className={styles.planFeatures}>
+                {PLAN_FEATURES[i].map((f, j) => (
+                  <li key={j} className={styles.planFeatureItem}>{f}</li>
+                ))}
+              </ul>
+            </button>
+          ))}
         </div>
 
         {/* CHECKOUT SUMMARY */}
         <div className={`${styles.summary} ${styles.animate}`} data-anim>
           <div className={styles.summaryHeader}>
-            <span className={styles.summaryPlanName}>{plan.id === 'team' ? 'Business' : plan.id.charAt(0).toUpperCase() + plan.id.slice(1)}</span>
-            <span className={styles.summaryCredits}>{plan.credits} {t.credit(plan.credits)}</span>
+            <span className={styles.summaryPlanName}>{PLAN_NAMES[planIdx]}</span>
+            <span className={styles.summaryCredits}>{creditLabel(plan.credits)}</span>
           </div>
           <div className={styles.summaryBody}>
             <div className={styles.summaryRow}>
-              <span className={styles.summaryLabel}>{k.priceLabel}</span>
-              <span className={styles.summaryVal}>{plan.perCredit} {currency}</span>
+              <span className={styles.summaryLabel}>Cena za kredit</span>
+              <span className={styles.summaryVal}>{plan.perCredit} Kč</span>
             </div>
             <div className={styles.summaryRow}>
-              <span className={styles.summaryLabel}>{k.countLabel}</span>
+              <span className={styles.summaryLabel}>Počet kreditů</span>
               <span className={styles.summaryVal}>{plan.credits}×</span>
             </div>
             <div className={styles.summaryDivider} />
             <div className={styles.summaryRow}>
-              <span className={styles.summaryTotal}>{k.totalLabel}</span>
-              <span className={styles.summaryTotalVal}>{plan.price} {currency}</span>
+              <span className={styles.summaryTotal}>Celkem</span>
+              <span className={styles.summaryTotalVal}>{plan.price} Kč</span>
             </div>
           </div>
 
@@ -184,26 +195,22 @@ export default function KoupitPage() {
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                   <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
                 </svg>
-                {k.payBtnPrefix} {plan.price} {k.payBtnSuffix}
+                Zaplatit {plan.price} Kč
               </>
             )}
           </button>
-          <p className={styles.legal}>{k.legal}</p>
+          <p className={styles.legal}>Jednorázová platba · Bez předplatného · Kredity nevypršejí</p>
         </div>
 
         {/* CREDIT COSTS TABLE */}
         <div className={`${styles.creditGuide} ${styles.animate}`} data-anim>
-          <div className={styles.creditGuideTitle}>{k.guideTitle}</div>
+          <div className={styles.creditGuideTitle}>Co stojí jeden kredit?</div>
           <div className={styles.creditGuideGrid}>
             {CREDIT_COSTS.map((c, i) => (
               <div key={i} className={styles.creditGuideRow}>
                 <span className={styles.creditGuideIcon}>{c.icon}</span>
-                <span className={styles.creditGuideLabel}>{k.guideLabels[i]}</span>
-                <span className={styles.creditGuideCost}>
-                  {c.credits !== null
-                    ? `${c.credits} ${t.credit(c.credits)}`
-                    : k.guideChatCredits}
-                </span>
+                <span className={styles.creditGuideLabel}>{c.label}</span>
+                <span className={styles.creditGuideCost}>{creditLabel(c.credits)}</span>
               </div>
             ))}
           </div>
@@ -211,7 +218,12 @@ export default function KoupitPage() {
 
         {/* FAQ */}
         <div className={`${styles.faq} ${styles.animate}`} data-anim>
-          {k.faq.map((item, i) => (
+          {[
+            { q: 'Jak dlouho kredity platí?', a: 'Kredity nevypršejí — zůstávají na vašem účtu, dokud je nespotřebujete.' },
+            { q: 'Co přesně dostanu za jeden kredit?', a: 'Kompletní analýzu smlouvy: verdikt (podepsat / upravit / odmítnout), seznam rizik, chybějící klauzule a doporučení. Plus chat s dokumentem zdarma.' },
+            { q: 'Je platba bezpečná?', a: 'Platby zpracovává Stripe — světový standard pro online platby. Vaše karta ani údaje nejsou ukládány na našich serverech.' },
+            { q: 'Mohu dostat fakturu?', a: 'Ano, po platbě Stripe automaticky pošle potvrzení na váš email. Pro fakturu s IČ nás kontaktujte.' },
+          ].map((item, i) => (
             <div key={i} className={styles.faqItem}>
               <div className={styles.faqQ}>{item.q}</div>
               <div className={styles.faqA}>{item.a}</div>

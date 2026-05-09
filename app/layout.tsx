@@ -8,13 +8,13 @@ import './globals.css'
 const geist = Geist({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'DocGuard — Chráním tě před špatnou smlouvou',
+  title: 'DocThink — Chráním tě před špatnou smlouvou',
   description: 'Nahraj smlouvu, AI analyzuje rizika za 10 sekund. Verdikt: podepsat / upravit / odmítnout.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'DocGuard',
+    title: 'DocThink',
   },
 }
 
@@ -34,7 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <meta name="mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-          <meta name="apple-mobile-web-app-title" content="DocGuard" />
+          <meta name="apple-mobile-web-app-title" content="DocThink" />
         </head>
         <body className={geist.className}>
           <LanguageProvider>
