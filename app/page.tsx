@@ -2,176 +2,167 @@
 
 import { useRouter } from 'next/navigation'
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
-import { useEffect } from 'react'
-import styles from './landing.module.css'
-import { useLanguage } from '@/contexts/LanguageContext'
+import { useEffect, useRef } from 'react'
+import styles from './docguard-landing.module.css'
 
-const STAT_VALUES = ['14+', '24', '10×', '99%'] as const
+const STEPS = [
+  { icon: '📷', step: '1', title: 'Vyfotit nebo nahrát', desc: 'Foť smlouvu telefonem nebo nahraj PDF/DOCX soubor.' },
+  { icon: '🤖', step: '2', title: 'AI analyzuje', desc: 'Claude AI prochází každou klauzuli a hledá rizika za ~10 sekund.' },
+  { icon: '🛡️', step: '3', title: 'Jasný výsledek', desc: 'Verdikt + seznam rizik + chat. Žádné právní hantýrky.' },
+]
 
-const SAVINGS_PRICES = [
-  { you: '€1', saving: '98%' },
-  { you: '€2', saving: '97%' },
-  { you: '€2', saving: '94%' },
-  { you: '€2', saving: '99%' },
+const FEATURES = [
+  { icon: '🔒', title: 'Bez ukládání dat', desc: 'Vše probíhá v paměti prohlížeče. Po zavření stránky zmizí vše.' },
+  { icon: '🧠', title: 'Claude AI', desc: 'Pohání ho nejlepší AI pro porozumění právním textům.' },
+  { icon: '⚡', title: 'Analýza za 10s', desc: 'Výsledky do 10 sekund — ne hodiny čekání na advokáta.' },
+  { icon: '💬', title: 'Chat s dokumentem', desc: 'Po analýze se doptávej na cokoliv ohledně smlouvy.' },
 ]
 
 const PLANS = [
-  { name: 'Starter', credits: 10, price: '€4', per: '€0.40 / credit' },
-  { name: 'Pro', credits: 40, price: '€14', per: '€0.35 / credit', highlight: true },
-  { name: 'Business', credits: 120, price: '€40', per: '€0.33 / credit' },
+  { name: 'Starter', credits: 10, price: '€4', per: '€0.40 / analýza' },
+  { name: 'Pro', credits: 40, price: '€14', per: '€0.35 / analýza', highlight: true },
+  { name: 'Business', credits: 120, price: '€40', per: '€0.33 / analýza' },
 ]
 
-export default function LandingPage() {
+export default function DocGuardLanding() {
   const router = useRouter()
-  const { t, lang } = useLanguage()
-  const l = t.landing
+  const observerRef = useRef<IntersectionObserver | null>(null)
 
   useEffect(() => {
     const els = document.querySelectorAll('[data-anim]')
-    const obs = new IntersectionObserver(
-      (entries) => entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add(styles.visible)
-          obs.unobserve(e.target)
-        }
-      }),
-      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    observerRef.current = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add(styles.visible)
+            observerRef.current?.unobserve(e.target)
+          }
+        }),
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
     )
-    els.forEach(el => {
+    els.forEach((el) => {
       el.classList.remove(styles.visible)
-      obs.observe(el)
+      observerRef.current?.observe(el)
     })
-    return () => obs.disconnect()
-  }, [lang])
+    return () => observerRef.current?.disconnect()
+  }, [])
 
   return (
     <div className={styles.wrap}>
-      <div className={styles.ambientOrb1} />
-      <div className={styles.ambientOrb2} />
-      <div className={styles.ambientOrb3} />
+      {/* Ambient orbs */}
+      <div className={styles.orb1} />
+      <div className={styles.orb2} />
+      <div className={styles.orb3} />
 
+      {/* NAV */}
       <nav className={styles.nav}>
         <div className={styles.logo}>
-          <div className={styles.logoDot} />
-          docthink
+          <span className={styles.logoShield}>🛡️</span>
+          <span className={styles.logoWord}>DocGuard</span>
         </div>
         <div className={styles.navRight}>
           <SignedOut>
-            <button className={styles.signInBtn} onClick={() => router.push('/sign-in')}>{t.hero.signIn}</button>
-            <button className={styles.ctaBtn} onClick={() => router.push('/sign-up')}>{t.hero.tryFree}</button>
+            <button className={styles.navLink} onClick={() => router.push('/sign-in')}>
+              Přihlásit se
+            </button>
+            <button className={styles.navCta} onClick={() => router.push('/sign-up')}>
+              Spustit DocGuard
+            </button>
           </SignedOut>
           <SignedIn>
-            <button className={styles.ctaBtn} onClick={() => router.push('/app')}>{t.hero.openApp}</button>
-            <UserButton afterSignOutUrl='/' />
+            <button className={styles.navCta} onClick={() => router.push('/app')}>
+              Spustit DocGuard
+            </button>
+            <UserButton afterSignOutUrl="/" />
           </SignedIn>
         </div>
       </nav>
 
       {/* HERO */}
-      <div className={styles.hero}>
-        <div className={styles.badge}>✨ {l.badge}</div>
-        <h1 className={styles.title}>
-          {l.title1}<br />
-          <span className={styles.titleAccent}>{l.title2}</span>
+      <section className={styles.hero}>
+        <div className={styles.heroBadge}>🛡️ Chráním tvé zájmy</div>
+        <h1 className={styles.heroTitle}>
+          Chráním tě před
+          <br />
+          <span className={styles.heroAccent}>špatnou smlouvou.</span>
         </h1>
-        <p className={styles.sub}>{l.sub}</p>
+        <p className={styles.heroSub}>
+          Vyfot nebo nahraj smlouvu. Za 10 sekund dostaneš verdikt, seznam rizik
+          a doporučení — bez advokáta, bez čekání.
+        </p>
         <div className={styles.heroActions}>
           <SignedOut>
             <button className={styles.heroCta} onClick={() => router.push('/sign-up')}>
-              {t.hero.tryFree}
+              Začít zdarma →
             </button>
             <button className={styles.heroSecondary} onClick={() => router.push('/sign-in')}>
-              {t.hero.signIn}
+              Přihlásit se
             </button>
           </SignedOut>
           <SignedIn>
             <button className={styles.heroCta} onClick={() => router.push('/app')}>
-              {t.hero.openApp}
+              Spustit DocGuard →
             </button>
           </SignedIn>
         </div>
 
-        {/* Hero floating UI mockup */}
-        <div className={styles.heroVisual}>
-          <div className={styles.heroCard}>
-            <div className={styles.heroCardHeader}>
-              <div className={styles.heroCardDots}>
-                <span /><span /><span />
-              </div>
-              <span className={styles.heroCardTitle}>contract_q3.pdf</span>
+        {/* Hero mockup */}
+        <div className={styles.heroMockup}>
+          <div className={styles.mockupCard}>
+            <div className={styles.mockupHeader}>
+              <span className={styles.mockupDot} style={{ background: '#ef4444' }} />
+              <span className={styles.mockupDot} style={{ background: '#eab308' }} />
+              <span className={styles.mockupDot} style={{ background: '#22c55e' }} />
+              <span className={styles.mockupFilename}>najemni_smlouva.pdf</span>
             </div>
-            <div className={styles.heroCardBody}>
-              <div className={styles.heroCardRow}>
-                <span className={styles.heroTagRisk}>{l.heroCard.riskLabel}</span>
-                <span className={styles.heroCardText}>{l.heroCard.riskText}</span>
-              </div>
-              <div className={styles.heroCardRow}>
-                <span className={styles.heroTagAction}>{l.heroCard.actionLabel}</span>
-                <span className={styles.heroCardText}>{l.heroCard.actionText}</span>
-              </div>
-              <div className={styles.heroCardRow}>
-                <span className={styles.heroTagFinance}>{l.heroCard.financeLabel}</span>
-                <span className={styles.heroCardText}>{l.heroCard.financeText}</span>
+            <div className={styles.mockupVerdict}>
+              <div className={styles.mockupVerdictCircle}>⚠️</div>
+              <div>
+                <div className={styles.mockupVerdictLabel}>Doporučuji upravit</div>
+                <div className={styles.mockupVerdictSub}>3 rizika nalezena</div>
               </div>
             </div>
-            <div className={styles.heroCardFooter}>
-              <div className={styles.heroCardAiBadge}>⚡ {l.heroCard.aiComplete}</div>
+            <div className={styles.mockupRisk}>
+              <span className={styles.mockupRiskDot} style={{ background: '#ef4444' }} />
+              <span className={styles.mockupRiskText}>Jednostranné vypovězení bez důvodu</span>
+            </div>
+            <div className={styles.mockupRisk}>
+              <span className={styles.mockupRiskDot} style={{ background: '#eab308' }} />
+              <span className={styles.mockupRiskText}>Chybí kauce — výše není specifikována</span>
             </div>
           </div>
-          <div className={styles.heroCardGlow} />
+          <div className={styles.mockupGlow} />
         </div>
-      </div>
+      </section>
 
-      {/* TRUST BADGES */}
-      <div className={`${styles.trustStrip} ${styles.animate}`} data-anim>
-        {l.trust.map((b, i) => (
-          <div key={i} className={styles.trustBadge}>
-            <span className={styles.trustIcon}>{b.icon}</span>
-            <span className={styles.trustLabel}>{b.label}</span>
-            <span className={styles.trustSub}>{b.sub}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* STATS STRIP */}
-      <div className={`${styles.stats} ${styles.animate}`} data-anim>
-        {STAT_VALUES.map((value, i) => (
-          <div key={i} className={styles.statItem}>
-            <div className={styles.statValue}>{value}</div>
-            <div className={styles.statLabel}>{l.statsLabels[i]}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* TESTIMONIALS */}
-      <div className={`${styles.testimonials} ${styles.animate}`} data-anim>
-        <div className={styles.sectionLabel}>{l.testimonialsLabel}</div>
-        <div className={styles.testimonialsGrid}>
-          {l.testimonials.map((item, i) => (
-            <div key={i} className={styles.testimonialCard} style={{ '--delay': `${i * 0.08}s` } as React.CSSProperties}>
-              <div className={styles.testimonialText}>"{item.text}"</div>
-              <div className={styles.testimonialAuthor}>
-                <div className={styles.testimonialAvatar}>{item.name.charAt(0)}</div>
-                <div>
-                  <div className={styles.testimonialName}>{item.name}</div>
-                  <div className={styles.testimonialRole}>{item.role}</div>
-                </div>
-              </div>
+      {/* HOW IT WORKS */}
+      <section className={`${styles.steps} ${styles.animate}`} data-anim>
+        <div className={styles.sectionLabel}>Jak to funguje</div>
+        <div className={styles.stepsGrid}>
+          {STEPS.map((s, i) => (
+            <div
+              key={i}
+              className={styles.stepCard}
+              style={{ '--delay': `${i * 0.1}s` } as React.CSSProperties}
+            >
+              <div className={styles.stepNum}>{s.step}</div>
+              <div className={styles.stepIcon}>{s.icon}</div>
+              <div className={styles.stepTitle}>{s.title}</div>
+              <div className={styles.stepDesc}>{s.desc}</div>
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* FEATURES */}
-      <div className={styles.featuresWrap}>
-        <div className={`${styles.sectionLabel} ${styles.animate}`} data-anim>{l.featuresLabel}</div>
-        <div className={styles.features}>
-          {l.features.map((f, i) => (
+      <section className={`${styles.features} ${styles.animate}`} data-anim>
+        <div className={styles.sectionLabel}>Proč DocGuard</div>
+        <div className={styles.featuresGrid}>
+          {FEATURES.map((f, i) => (
             <div
               key={i}
-              className={`${styles.featureCard} ${styles.animate}`}
-              data-anim
-              style={{ '--delay': `${i * 0.06}s` } as React.CSSProperties}
+              className={styles.featureCard}
+              style={{ '--delay': `${i * 0.08}s` } as React.CSSProperties}
             >
               <div className={styles.featureIcon}>{f.icon}</div>
               <div className={styles.featureTitle}>{f.title}</div>
@@ -179,58 +170,40 @@ export default function LandingPage() {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* SAVINGS STRIP */}
-      <div className={`${styles.savings} ${styles.animate}`} data-anim>
-        <div className={styles.sectionLabel}>{l.savingsLabel}</div>
-        <div className={styles.savingsGrid}>
-          {l.savings.map((s, i) => (
-            <div
-              key={i}
-              className={styles.savingsItem}
-              style={{ '--delay': `${i * 0.08}s` } as React.CSSProperties}
-            >
-              <div className={styles.savingsLabel}>{s.label}</div>
-              <div className={styles.savingsAlt}>{s.alt}</div>
-              <div className={styles.savingsArrow}>↓</div>
-              <div className={styles.savingsYou}>{SAVINGS_PRICES[i].you}</div>
-              <div className={styles.savingsPct}>−{SAVINGS_PRICES[i].saving}</div>
-            </div>
-          ))}
-        </div>
-      </div>
+      </section>
 
       {/* PRICING */}
-      <div className={`${styles.pricing} ${styles.animate}`} data-anim>
-        <div className={styles.sectionLabel}>{l.pricingLabel}</div>
-        <h2 className={styles.pricingTitle}>{l.pricingTitle}</h2>
-        <p className={styles.pricingSub}>{l.pricingSub}</p>
-        <div className={styles.plans}>
+      <section className={`${styles.pricing} ${styles.animate}`} data-anim>
+        <div className={styles.sectionLabel}>Ceník</div>
+        <h2 className={styles.pricingTitle}>Jeden kredit = jedna analýza</h2>
+        <p className={styles.pricingSub}>Žádné předplatné. Platíš jen za to, co použiješ.</p>
+        <div className={styles.plansGrid}>
           {PLANS.map((p, i) => (
             <div
               key={p.name}
-              className={`${styles.plan} ${p.highlight ? styles.planHighlight : ''}`}
-              style={{ '--delay': `${i * 0.1}s` } as React.CSSProperties}
+              className={`${styles.planCard} ${p.highlight ? styles.planHighlight : ''}`}
+              style={{ '--delay': `${i * 0.08}s` } as React.CSSProperties}
             >
-              {p.highlight && <div className={styles.planBadge}>{l.mostPopular}</div>}
+              {p.highlight && <div className={styles.planBadge}>Nejoblíbenější</div>}
               <div className={styles.planName}>{p.name}</div>
               <div className={styles.planPrice}>{p.price}</div>
-              <div className={styles.planCredits}>{p.credits} credits</div>
+              <div className={styles.planCredits}>{p.credits} analýz</div>
               <div className={styles.planPer}>{p.per}</div>
             </div>
           ))}
         </div>
         <button className={styles.heroCta} onClick={() => router.push('/koupit')}>
-          {l.viewPlans}
+          Koupit kredity →
         </button>
-      </div>
+      </section>
 
+      {/* FOOTER */}
       <footer className={styles.footer}>
-        <div className={styles.logo}><div className={styles.logoDot} />docthink</div>
-        <div className={styles.footerLinks}>
-          <span>{l.footer}</span>
+        <div className={styles.logo}>
+          <span className={styles.logoShield}>🛡️</span>
+          <span className={styles.logoWord}>DocGuard</span>
         </div>
+        <p className={styles.footerSub}>© 2025 DocGuard. Všechna práva vyhrazena.</p>
       </footer>
     </div>
   )

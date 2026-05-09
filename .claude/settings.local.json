@@ -3,7 +3,36 @@
     "allow": [
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\s3run\\\\Desktop\\\\docmind_final\\\\docmind\\\\components\" -Recurse | Where-Object { !$_.PSIsContainer } | Select-Object FullName, LastWriteTime | Sort-Object LastWriteTime -Descending | Select-Object -First 20)",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(git commit *)",
+      "Bash(npm uninstall *)",
+      "Bash(xargs grep -l \"stripe\\\\|webhook\\\\|checkout\")",
+      "Bash(git rm *)",
+      "Bash(dir C:\\\\Users\\\\s3run\\\\Desktop\\\\docmind_final\\\\docmind\\\\app\\\\app *)",
+      "Bash(dir C:\\\\Users\\\\s3run\\\\Desktop\\\\docmind_final\\\\docmind\\\\components *)",
+      "Bash(dir /s /b \"C:\\\\Users\\\\s3run\\\\Desktop\\\\docmind_final\\\\docmind\\\\app\")",
+      "Bash(dir \"C:\\\\Users\\\\s3run\\\\Desktop\\\\docmind_final\\\\docmind\")",
+      "Bash(Get-ChildItem *)",
+      "Bash(npx next *)",
+      "Bash(nslookup -type=NS docthink.app 8.8.8.8)",
+      "Bash(nslookup -type=CNAME accounts.docthink.app 8.8.8.8)",
+      "Bash(nslookup -type=CNAME clerk.docthink.app 8.8.8.8)",
+      "Bash(nslookup -type=CNAME clk._domainkey.docthink.app 8.8.8.8)",
+      "Bash(nslookup -type=CNAME clk2._domainkey.docthink.app 8.8.8.8)",
+      "Bash(Select-Object FullName)",
+      "Bash(Sort-Object FullName)",
+      "Bash(python -c \"import sys,json; p=json.load\\(sys.stdin\\); print\\(json.dumps\\({**p.get\\('dependencies',{}\\), **p.get\\('devDependencies',{}\\)}, indent=2\\)\\)\")",
+      "PowerShell(\\(Get-Content \"C:\\\\Users\\\\s3run\\\\Desktop\\\\docmind_final\\\\docmind\\\\components\\\\Analyzer.module.css\" | Measure-Object -Line\\).Lines)",
+      "Bash(node -e ' *)",
+      "Bash(Select-Object -ExpandProperty Name)",
+      "Bash(Select-Object -First 50)",
+      "Bash(Format-Table FullName)",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\s3run\\\\Desktop\\\\docmind_final\\\\docmind\\\\app\" -Recurse -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })",
+      "PowerShell(cd \"C:\\\\Users\\\\s3run\\\\Desktop\\\\docmind_final\\\\docmind\" ; & npx tsc --noEmit 2>&1 | Where-Object { $_ -match \"error TS\" } | Select-Object -First 30)"
     ]
   }
 }
