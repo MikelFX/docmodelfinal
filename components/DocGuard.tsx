@@ -1,7 +1,21 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useUser } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation'
 import styles from './DocGuard.module.css'
+
+const FREE_LIMIT = 3
+const FREE_KEY = 'docguard_free_uses'
+
+function getFreeUses(): number {
+  if (typeof window === 'undefined') return 0
+  return parseInt(localStorage.getItem(FREE_KEY) ?? '0', 10)
+}
+
+function incrementFreeUses() {
+  localStorage.setItem(FREE_KEY, (getFreeUses() + 1).toString())
+}
 
 type Screen = 'home' | 'analyzing' | 'result'
 type Verdict = 'sign' | 'modify' | 'reject'
@@ -82,6 +96,8 @@ async function extractTextFromFile(file: File): Promise<{ text?: string; imageBa
 }
 
 export default function DocGuard() {
+  const { isSignedIn } = useUser()
+  const router = useRouter()
   const [screen, setScreen] = useState<Screen>('home')
   const [analysis, setAnalysis] = useState<Analysis | null>(null)
   const [docContent, setDocContent] = useState<string>('')
@@ -93,6 +109,12 @@ export default function DocGuard() {
   const [chatInput, setChatInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
   const [analyzeStep, setAnalyzeStep] = useState(0)
+  const [showPaywall, setShowPaywall] = useState(false)
+  const [freeUsesLeft, setFreeUsesLeft] = useState(FREE_LIMIT)
+
+  useEffect(() => {
+    setFreeUsesLeft(Math.max(0, FREE_LIMIT - getFreeUses()))
+  }, [])
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
@@ -119,6 +141,12 @@ export default function DocGuard() {
     imageBase64?: string,
     imageType?: string
   ) => {
+    // Paywall check — not signed in AND out of free uses
+    if (!isSignedIn && getFreeUses() >= FREE_LIMIT) {
+      setShowPaywall(true)
+      return
+    }
+
     setScreen('analyzing')
     setAnalyzeStep(0)
     setError('')
@@ -145,6 +173,11 @@ export default function DocGuard() {
 
       setAnalysis(data)
       setScreen('result')
+      // Count free uses only for non-signed-in users
+      if (!isSignedIn) {
+        incrementFreeUses()
+        setFreeUsesLeft(Math.max(0, FREE_LIMIT - getFreeUses()))
+      }
     } catch (err: any) {
       setError(err.message ?? 'Síťová chyba. Zkontrolujte připojení.')
       setScreen('home')
@@ -350,6 +383,19 @@ export default function DocGuard() {
               📁 Nahrát soubor
             </button>
           </div>
+
+          {!isSignedIn && freeUsesLeft > 0 && (
+            <p className={styles.freeUsesNote}>
+              {freeUsesLeft === FREE_LIMIT
+                ? `${FREE_LIMIT} bezplatné analýzy · bez registrace`
+                : `Zbývá ${freeUsesLeft} z ${FREE_LIMIT} bezplatných analýz`}
+            </p>
+          )}
+          {!isSignedIn && freeUsesLeft === 0 && (
+            <p className={styles.freeUsesNote} style={{ color: '#ef4444' }}>
+              Bezplatné analýzy vyčerpány
+            </p>
+          )}
         </div>
       )}
 
@@ -496,6 +542,51 @@ export default function DocGuard() {
                 {chatLoading ? '⏳' : '↑'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── PAYWALL MODAL ── */}
+      {showPaywall && (
+        <div className={styles.paywallOverlay} onClick={() => setShowPaywall(false)}>
+          <div className={styles.paywallModal} onClick={e => e.stopPropagation()}>
+            <div className={styles.paywallShield}>🛡️</div>
+            <h2 className={styles.paywallTitle}>Líbí se ti DocGuard?</h2>
+            <p className={styles.paywallSub}>
+              Využil jsi {FREE_LIMIT} bezplatné analýzy. Zaregistruj se zdarma a pokračuj dál.
+            </p>
+
+            <div className={styles.paywallFeatures}>
+              {[
+                { icon: '⚡', text: 'Neomezené analýzy smluv' },
+                { icon: '💬', text: 'Chat s každým dokumentem' },
+                { icon: '🛡️', text: 'Ochrana před rizikovými klauzulemi' },
+              ].map((f, i) => (
+                <div key={i} className={styles.paywallFeature}>
+                  <span className={styles.paywallFeatureIcon}>{f.icon}</span>
+                  <span>{f.text}</span>
+                </div>
+              ))}
+            </div>
+
+            <button
+              className={styles.paywallCta}
+              onClick={() => router.push('/sign-up')}
+            >
+              Zaregistrovat se zdarma
+            </button>
+            <button
+              className={styles.paywallLogin}
+              onClick={() => router.push('/sign-in')}
+            >
+              Už mám účet — přihlásit se
+            </button>
+            <button
+              className={styles.paywallClose}
+              onClick={() => setShowPaywall(false)}
+            >
+              Zavřít
+            </button>
           </div>
         </div>
       )}
