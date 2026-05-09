@@ -111,10 +111,19 @@ export default function DocGuard() {
   const [analyzeStep, setAnalyzeStep] = useState(0)
   const [showPaywall, setShowPaywall] = useState(false)
   const [freeUsesLeft, setFreeUsesLeft] = useState(FREE_LIMIT)
+  const [credits, setCredits] = useState<number | null>(null)
 
   useEffect(() => {
     setFreeUsesLeft(Math.max(0, FREE_LIMIT - getFreeUses()))
   }, [])
+
+  useEffect(() => {
+    if (!isSignedIn) return
+    fetch('/api/credits')
+      .then(r => r.json())
+      .then(d => { if (d.credits !== undefined) setCredits(d.credits) })
+      .catch(() => {})
+  }, [isSignedIn])
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
@@ -173,10 +182,12 @@ export default function DocGuard() {
 
       setAnalysis(data)
       setScreen('result')
-      // Count free uses only for non-signed-in users
       if (!isSignedIn) {
         incrementFreeUses()
         setFreeUsesLeft(Math.max(0, FREE_LIMIT - getFreeUses()))
+      } else {
+        // Refresh credits after analysis
+        fetch('/api/credits').then(r => r.json()).then(d => { if (d.credits !== undefined) setCredits(d.credits) }).catch(() => {})
       }
     } catch (err: any) {
       setError(err.message ?? 'Síťová chyba. Zkontrolujte připojení.')
@@ -333,14 +344,40 @@ export default function DocGuard() {
         onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = '' }}
       />
 
+      {/* ── GLOBAL NAV (all screens) ── */}
+      <nav className={styles.nav}>
+        <div className={styles.navLogo}>
+          <span className={styles.navLogoIcon}>🛡️</span>
+          <span className={styles.navLogoText}>DocGuard</span>
+        </div>
+        <div className={styles.navRight}>
+          {isSignedIn && credits !== null && (
+            <button
+              className={`${styles.creditsChip} ${credits <= 3 ? styles.creditsChipLow : ''}`}
+              onClick={() => router.push('/koupit')}
+              title="Koupit kredity"
+            >
+              <span className={styles.creditsNum}>{credits}</span>
+              <span className={styles.creditsLabel}>kr</span>
+            </button>
+          )}
+          {isSignedIn && (
+            <button className={styles.buyBtn} onClick={() => router.push('/koupit')}>
+              + Kredity
+            </button>
+          )}
+          {!isSignedIn && (
+            <button className={styles.loginBtn} onClick={() => router.push('/sign-in')}>
+              Přihlásit
+            </button>
+          )}
+        </div>
+      </nav>
+
       {/* ── HOME ── */}
       {screen === 'home' && (
         <div className={styles.homeScreen}>
           <div className={styles.homeHeader}>
-            <div className={styles.logo}>
-              <span className={styles.logoIcon}>🛡️</span>
-              <span className={styles.logoText}>DocGuard</span>
-            </div>
             <p className={styles.tagline}>Chráním tě před špatnou smlouvou</p>
           </div>
 
@@ -444,7 +481,17 @@ export default function DocGuard() {
               ← Nová
             </button>
             <span className={styles.topBarTitle}>Výsledek analýzy</span>
-            <div style={{ width: 64 }} />
+            {isSignedIn && credits !== null ? (
+              <button
+                className={`${styles.creditsChip} ${credits <= 3 ? styles.creditsChipLow : ''}`}
+                onClick={() => router.push('/koupit')}
+              >
+                <span className={styles.creditsNum}>{credits}</span>
+                <span className={styles.creditsLabel}>kr</span>
+              </button>
+            ) : (
+              <div style={{ width: 56 }} />
+            )}
           </div>
 
           {/* Scrollable body */}
