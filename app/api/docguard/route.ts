@@ -1,5 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@clerk/nextjs/server'
 import { anthropic, MODEL } from '@/lib/anthropic'
+import { Redis } from '@upstash/redis'
+
+const redis = process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN
+  ? new Redis({ url: process.env.KV_REST_API_URL, token: process.env.KV_REST_API_TOKEN })
+  : null
+
+const DEFAULT_CREDITS = 10
+const ANALYZE_COST = 1
+
+async function spendCredit(userId: string): Promise<{ ok: boolean; credits: number }> {
+  if (!redis) return { ok: true, credits: DEFAULT_CREDITS }
+  const current = (await redis.get<number>(`credits:${userId}`)) ?? DEFAULT_CREDITS
+  if (current < ANALYZE_COST) return { ok: false, credits: current }
+  const newVal = current - ANALYZE_COST
+  await redis.set(`credits:${userId}`, newVal)
+  return { ok: true, credits: newVal }
+}
 
 const SYSTEM_ANALYZE = `Jsi DocGuard — AI právní asistent. Analyzuješ smlouvy a dokumenty a chráníš uživatele před rizikovými podmínkami.
 
@@ -110,6 +128,15 @@ export async function POST(req: NextRequest) {
   // ANALYZE MODE
   if (!content && !imageBase64) {
     return NextResponse.json({ error: 'Missing content or image.' }, { status: 400 })
+  }
+
+  // Deduct credit for signed-in users
+  const { userId } = await auth()
+  if (userId) {
+    const spend = await spendCredit(userId)
+    if (!spend.ok) {
+      return NextResponse.json({ error: 'Nedostatek kreditů. Kupte si kredity a pokračujte.' }, { status: 402 })
+    }
   }
 
   try {
