@@ -161,10 +161,11 @@ export default function DocGuard() {
   const analyze = useCallback(async (
     text?: string,
     imageBase64?: string,
-    imageType?: string
+    imageType?: string,
+    signedIn?: boolean
   ) => {
-    // Paywall check — not signed in AND out of free uses
-    if (!isSignedIn && getFreeUses() >= FREE_LIMIT) {
+    // Paywall check
+    if (!signedIn && getFreeUses() >= FREE_LIMIT) {
       setShowPaywall(true)
       return
     }
@@ -188,20 +189,19 @@ export default function DocGuard() {
       const data = await res.json()
 
       if (!res.ok) {
-        if (res.status === 401 || res.status === 403) {
-          setScreen('home')
-          setShowPaywall(true)
-          return
-        }
-        setError(data.error ?? 'Analýza selhala. Zkuste znovu.')
         setScreen('home')
+        if (!signedIn) {
+          setShowPaywall(true)
+        } else {
+          setError(data.error ?? 'Analýza selhala. Zkuste znovu.')
+        }
         return
       }
 
       const { _credits, ...analysis } = data
       setAnalysis(analysis)
       setScreen('result')
-      if (!isSignedIn) {
+      if (!signedIn) {
         incrementFreeUses()
         setFreeUsesLeft(Math.max(0, FREE_LIMIT - getFreeUses()))
       } else if (_credits !== null && _credits !== undefined) {
@@ -224,7 +224,7 @@ export default function DocGuard() {
         setDocContent('')
         setDocImageBase64(result.imageBase64)
         setDocImageType(result.imageType ?? 'image/jpeg')
-        await analyze(undefined, result.imageBase64, result.imageType)
+        await analyze(undefined, result.imageBase64, result.imageType, !!isSignedIn)
       } else if (result.text) {
         const trimmed = result.text.trim()
         if (!trimmed) {
@@ -234,7 +234,7 @@ export default function DocGuard() {
         setDocContent(trimmed)
         setDocImageBase64('')
         setDocImageType('')
-        await analyze(trimmed)
+        await analyze(trimmed, undefined, undefined, !!isSignedIn)
       } else {
         setError('Nepodporovaný formát souboru.')
       }
