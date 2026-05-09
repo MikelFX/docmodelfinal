@@ -1080,3 +1080,106 @@
   transition: background 0.15s;
 }
 .userMenuItem:hover { background: rgba(127,119,221,0.15); }
+
+/* ── MULTI-PAGE PHOTOS ── */
+.pagesWrap {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pagesRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pageThumb {
+  position: relative;
+  width: 72px;
+  height: 96px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1.5px solid rgba(127,119,221,0.35);
+  background: rgba(127,119,221,0.08);
+  flex-shrink: 0;
+}
+
+.pageThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pageNum {
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(7,7,13,0.75);
+  color: #AFA9EC;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.pageRemove {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(220,60,60,0.85);
+  border: none;
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.pagesActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btnAddPage {
+  background: rgba(127,119,221,0.1);
+  border: 1px dashed rgba(127,119,221,0.4);
+  border-radius: 10px;
+  color: #AFA9EC;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btnAddPage:hover { background: rgba(127,119,221,0.18); border-color: rgba(127,119,221,0.7); }
+
+.btnAnalyze {
+  flex: 1;
+  background: linear-gradient(135deg, #7F77DD, #9D97E8);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: 0 2px 16px rgba(127,119,221,0.4);
+  min-width: 140px;
+}
+.btnAnalyze:hover { transform: translateY(-1px); box-shadow: 0 4px 22px rgba(127,119,221,0.55); }
+.btnAnalyze:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+

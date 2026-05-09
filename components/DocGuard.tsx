@@ -120,6 +120,7 @@ export default function DocGuard() {
   const [docContent, setDocContent] = useState<string>('')
   const [docImageBase64, setDocImageBase64] = useState<string>('')
   const [docImageType, setDocImageType] = useState<string>('')
+  const [pages, setPages] = useState<{ base64: string; type: string }[]>([])
   const [error, setError] = useState<string>('')
   const [isDragging, setIsDragging] = useState(false)
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
@@ -166,7 +167,8 @@ export default function DocGuard() {
     text?: string,
     imageBase64?: string,
     imageType?: string,
-    signedIn?: boolean
+    signedIn?: boolean,
+    multiPages?: { base64: string; type: string }[]
   ) => {
     // Paywall check
     if (!signedIn && getFreeUses() >= FREE_LIMIT) {
@@ -182,7 +184,11 @@ export default function DocGuard() {
     try {
       const body: any = {}
       if (text) body.content = text
-      if (imageBase64) { body.imageBase64 = imageBase64; body.imageType = imageType }
+      if (multiPages && multiPages.length > 1) {
+        body.pages = multiPages
+      } else if (imageBase64) {
+        body.imageBase64 = imageBase64; body.imageType = imageType
+      }
 
       const res = await fetch('/api/docguard', {
         method: 'POST',
@@ -217,7 +223,7 @@ export default function DocGuard() {
     }
   }, [])
 
-  const handleFile = useCallback(async (file: File) => {
+  const handleFile = useCallback(async (file: File, addPage = false) => {
     if (!file) return
     setError('')
 
@@ -225,10 +231,19 @@ export default function DocGuard() {
       const result = await extractTextFromFile(file)
 
       if (result.imageBase64) {
-        setDocContent('')
-        setDocImageBase64(result.imageBase64)
-        setDocImageType(result.imageType ?? 'image/jpeg')
-        await analyze(undefined, result.imageBase64, result.imageType, !!isSignedIn)
+        const newPage = { base64: result.imageBase64, type: result.imageType ?? 'image/jpeg' }
+        if (addPage) {
+          // Add to existing pages
+          setPages(prev => [...prev, newPage])
+          setDocImageBase64(result.imageBase64!)
+          setDocImageType(result.imageType ?? 'image/jpeg')
+        } else {
+          // First page
+          setPages([newPage])
+          setDocContent('')
+          setDocImageBase64(result.imageBase64)
+          setDocImageType(result.imageType ?? 'image/jpeg')
+        }
       } else if (result.text) {
         const trimmed = result.text.trim()
         if (!trimmed) {
@@ -238,6 +253,7 @@ export default function DocGuard() {
         setDocContent(trimmed)
         setDocImageBase64('')
         setDocImageType('')
+        setPages([])
         await analyze(trimmed, undefined, undefined, !!isSignedIn)
       } else {
         setError(dg.errUnsupported)
@@ -245,7 +261,7 @@ export default function DocGuard() {
     } catch (err: any) {
       setError(dg.errRead)
     }
-  }, [analyze])
+  }, [analyze, isSignedIn, dg])
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -329,6 +345,7 @@ export default function DocGuard() {
     setDocContent('')
     setDocImageBase64('')
     setDocImageType('')
+    setPages([])
     setError('')
     setChatMessages([])
     setChatInput('')
@@ -363,7 +380,7 @@ export default function DocGuard() {
         accept="image/*"
         capture="environment"
         style={{ display: 'none' }}
-        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = '' }}
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f, pages.length > 0); e.target.value = '' }}
       />
 
       {/* ── GLOBAL NAV (all screens) ── */}
@@ -452,7 +469,39 @@ export default function DocGuard() {
             </div>
           )}
 
-          <div className={styles.uploadActions}>
+          {/* Page thumbnails */}
+          {pages.length > 0 && (
+            <div className={styles.pagesWrap}>
+              <div className={styles.pagesRow}>
+                {pages.map((p, i) => (
+                  <div key={i} className={styles.pageThumb}>
+                    <img src={`data:${p.type};base64,${p.base64}`} alt={`Strana ${i + 1}`} />
+                    <button
+                      className={styles.pageRemove}
+                      onClick={() => setPages(prev => prev.filter((_, j) => j !== i))}
+                    >×</button>
+                    <span className={styles.pageNum}>{i + 1}</span>
+                  </div>
+                ))}
+              </div>
+              <div className={styles.pagesActions}>
+                <button
+                  className={styles.btnAddPage}
+                  onClick={() => cameraInputRef.current?.click()}
+                >
+                  📷 + další strana
+                </button>
+                <button
+                  className={styles.btnAnalyze}
+                  onClick={() => analyze(undefined, pages[0].base64, pages[0].type, !!isSignedIn, pages)}
+                >
+                  🔍 Analyzovat ({pages.length} {pages.length === 1 ? 'strana' : pages.length < 5 ? 'strany' : 'stran'})
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className={styles.uploadActions} style={{ display: pages.length > 0 ? 'none' : undefined }}>
             <button
               className={styles.btnCamera}
               onClick={() => cameraInputRef.current?.click()}

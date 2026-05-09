@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid request.' }, { status: 400 })
   }
 
-  const { content, imageBase64, imageType, chatHistory, userMessage } = body
+  const { content, imageBase64, imageType, chatHistory, userMessage, pages } = body
 
   // ── CHAT MODE ──────────────────────────────────────────────────────────────
   if (userMessage !== undefined) {
@@ -182,17 +182,30 @@ export async function POST(req: NextRequest) {
   // ── ANALYZE MODE ───────────────────────────────────────────────────────────
   const validContent = content !== undefined ? validateContent(content) : null
   const hasImage = imageBase64 !== undefined
+  const hasPages = Array.isArray(pages) && pages.length > 0
 
-  if (!validContent && !hasImage) {
+  if (!validContent && !hasImage && !hasPages) {
     return NextResponse.json({ error: 'Missing content or image.' }, { status: 400 })
   }
 
-  if (hasImage) {
+  if (hasImage && !hasPages) {
     if (!validateBase64(imageBase64)) {
       return NextResponse.json({ error: 'Invalid image data.' }, { status: 400 })
     }
     if (!ALLOWED_IMAGE_TYPES.includes(String(imageType))) {
       return NextResponse.json({ error: 'Unsupported image type.' }, { status: 400 })
+    }
+  }
+
+  if (hasPages) {
+    const pagesArr = pages as { base64: string; type: string }[]
+    if (pagesArr.length > 10) {
+      return NextResponse.json({ error: 'Maximum 10 pages allowed.' }, { status: 400 })
+    }
+    for (const p of pagesArr) {
+      if (!validateBase64(p.base64) || !ALLOWED_IMAGE_TYPES.includes(p.type)) {
+        return NextResponse.json({ error: 'Invalid image data.' }, { status: 400 })
+      }
     }
   }
 
@@ -207,7 +220,20 @@ export async function POST(req: NextRequest) {
   try {
     let messageContent: any
 
-    if (hasImage) {
+    if (hasPages) {
+      const pagesArr = pages as { base64: string; type: string }[]
+      messageContent = [
+        ...pagesArr.map((p, i) => ({
+          type: 'image',
+          source: {
+            type: 'base64',
+            media_type: p.type as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
+            data: p.base64,
+          },
+        })),
+        { type: 'text', text: `Analyzuj tuto smlouvu/dokument (${pagesArr.length} stran) a vrať výsledek jako JSON. Analyzuj všechny strany dohromady jako jeden celek.` },
+      ]
+    } else if (hasImage) {
       messageContent = [
         {
           type: 'image',
