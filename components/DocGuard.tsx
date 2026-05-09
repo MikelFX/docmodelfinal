@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { useUser } from '@clerk/nextjs'
+import { useUser, useClerk } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import styles from './DocGuard.module.css'
 
@@ -96,8 +96,10 @@ async function extractTextFromFile(file: File): Promise<{ text?: string; imageBa
 }
 
 export default function DocGuard() {
-  const { isSignedIn } = useUser()
+  const { isSignedIn, user } = useUser()
+  const { signOut } = useClerk()
   const router = useRouter()
+  const [showUserMenu, setShowUserMenu] = useState(false)
   const [screen, setScreen] = useState<Screen>('home')
   const [analysis, setAnalysis] = useState<Analysis | null>(null)
   const [docContent, setDocContent] = useState<string>('')
@@ -365,6 +367,30 @@ export default function DocGuard() {
             <button className={styles.buyBtn} onClick={() => router.push('/koupit')}>
               + Kredity
             </button>
+          )}
+          {isSignedIn && (
+            <div className={styles.userMenuWrap}>
+              <button
+                className={styles.userAvatarBtn}
+                onClick={() => setShowUserMenu(v => !v)}
+              >
+                {user?.imageUrl
+                  ? <img src={user.imageUrl} className={styles.userAvatar} alt="avatar" />
+                  : <span className={styles.userAvatarInitial}>{user?.firstName?.[0] ?? user?.emailAddresses?.[0]?.emailAddress?.[0] ?? '?'}</span>
+                }
+              </button>
+              {showUserMenu && (
+                <div className={styles.userMenu}>
+                  <div className={styles.userMenuEmail}>{user?.emailAddresses?.[0]?.emailAddress}</div>
+                  <button className={styles.userMenuItem} onClick={() => { setShowUserMenu(false); router.push('/koupit') }}>
+                    💳 Koupit kredity
+                  </button>
+                  <button className={styles.userMenuItem} onClick={() => { setShowUserMenu(false); signOut(() => router.push('/')) }}>
+                    🚪 Odhlásit se
+                  </button>
+                </div>
+              )}
+            </div>
           )}
           {!isSignedIn && (
             <button className={styles.loginBtn} onClick={() => router.push('/sign-in')}>
