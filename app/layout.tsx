@@ -37,6 +37,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <meta name="apple-mobile-web-app-title" content="DocThink" />
         </head>
         <body className={geist.className}>
+          <script dangerouslySetInnerHTML={{ __html: `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}` }} />
           <LanguageProvider>
             {children}
             <LanguageSwitcher />
