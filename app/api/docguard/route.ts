@@ -134,11 +134,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing content or image.' }, { status: 400 })
   }
 
-  // Deduct credit for signed-in users
-  const { userId } = await auth()
+  // Check credits for signed-in users (don't deduct yet)
+  let userId: string | null = null
+  try {
+    const session = await auth()
+    userId = session.userId ?? null
+  } catch { /* not signed in */ }
+
   if (userId) {
-    const spend = await spendCredit(userId)
-    if (!spend.ok) {
+    const current = redis ? ((await redis.get<number>(`credits:${userId}`)) ?? DEFAULT_CREDITS) : DEFAULT_CREDITS
+    if (current < ANALYZE_COST) {
       return NextResponse.json({ error: 'Nedostatek kreditů. Kupte si kredity a pokračujte.' }, { status: 402 })
     }
   }
@@ -174,13 +179,18 @@ export async function POST(req: NextRequest) {
 
     const rawText = response.content[0].type === 'text' ? response.content[0].text : ''
 
-    // Extract JSON from response
     const jsonMatch = rawText.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
       return NextResponse.json({ error: 'AI returned invalid response. Please try again.' }, { status: 502 })
     }
 
     const analysis = JSON.parse(jsonMatch[0])
+
+    // Deduct credit only after successful analysis
+    if (userId) {
+      await spendCredit(userId)
+    }
+
     return NextResponse.json(analysis)
   } catch (err: any) {
     console.error('[DocGuard] analyze error:', err.message)

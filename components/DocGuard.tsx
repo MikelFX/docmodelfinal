@@ -188,6 +188,11 @@ export default function DocGuard() {
       const data = await res.json()
 
       if (!res.ok) {
+        if (res.status === 401 || res.status === 403) {
+          setScreen('home')
+          setShowPaywall(true)
+          return
+        }
         setError(data.error ?? 'Analýza selhala. Zkuste znovu.')
         setScreen('home')
         return
@@ -635,9 +640,13 @@ export default function DocGuard() {
         <div className={styles.paywallOverlay} onClick={() => setShowPaywall(false)}>
           <div className={styles.paywallModal} onClick={e => e.stopPropagation()}>
             <div className={styles.paywallShield}>🛡️</div>
-            <h2 className={styles.paywallTitle}>Líbí se ti DocThink?</h2>
+            <h2 className={styles.paywallTitle}>
+              {freeUsesLeft === 0 ? 'Přihlas se a pokračuj! 🔐' : 'Líbí se ti DocThink?'}
+            </h2>
             <p className={styles.paywallSub}>
-              Využil jsi {FREE_LIMIT} bezplatné analýzy. Zaregistruj se zdarma a pokračuj dál.
+              {freeUsesLeft === 0
+                ? `Využil jsi ${FREE_LIMIT} bezplatné analýzy. Zaregistruj se zdarma a získej další.`
+                : 'Zaregistruj se zdarma a pokračuj v analýzách smluv.'}
             </p>
 
             <div className={styles.paywallFeatures}>
