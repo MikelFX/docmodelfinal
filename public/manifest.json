@@ -1,14 +1,20 @@
 {
+  "id": "/",
   "name": "DocThink",
   "short_name": "DocThink",
-  "description": "Chráním tě před špatnou smlouvou",
-  "start_url": "/app",
+  "description": "AI contract analysis — protect yourself from bad contracts",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#07070d",
   "theme_color": "#7F77DD",
   "orientation": "portrait",
+  "lang": "cs",
+  "categories": ["business", "productivity", "legal"],
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
-  ]
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [],
+  "shortcuts": []
 }
