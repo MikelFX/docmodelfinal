@@ -6,7 +6,7 @@ import { UserButton, useUser } from '@clerk/nextjs'
 import { useLanguage } from '@/contexts/LanguageContext'
 import styles from './Analyzer.module.css'
 
-type Mode = 'chat' | 'summary' | 'actions' | 'risks' | 'clauses' | 'deadlines' | 'rewrite' | 'translate' | 'template' | 'interview' | 'compare' | 'email' | 'batch' | 'finance'
+type Mode = 'chat' | 'summary' | 'actions' | 'risks' | 'clauses' | 'deadlines' | 'rewrite' | 'translate' | 'template' | 'compare' | 'email' | 'finance'
 
 interface HistoryItem {
   id: string
@@ -16,7 +16,6 @@ interface HistoryItem {
   date: string
 }
 
-interface ChatMsg { role: 'ai' | 'user'; text: string }
 interface ChatMessage { role: 'user' | 'assistant'; content: string; streaming?: boolean }
 
 const MODES: { id: Mode; icon: string; credits: number; group: 'chat' | 'analyze' | 'tools'; desc: string }[] = [
@@ -31,9 +30,7 @@ const MODES: { id: Mode; icon: string; credits: number; group: 'chat' | 'analyze
   { id: 'translate', icon: '🌍', credits: 2, group: 'tools',   desc: 'Překlad jazyka'     },
   { id: 'template',  icon: '📝', credits: 2, group: 'tools',   desc: 'Šablona dokumentu'  },
   { id: 'email',     icon: '📧', credits: 2, group: 'tools',   desc: 'Napsat email'       },
-  { id: 'interview', icon: '🤖', credits: 5, group: 'tools',   desc: 'AI interview'       },
   { id: 'compare',   icon: '🔍', credits: 2, group: 'tools',   desc: 'Porovnat verze'     },
-  { id: 'batch',     icon: '📦', credits: 1, group: 'tools',   desc: 'Hromadná analýza'   },
 ]
 
 const SERVICE_DETAIL: Record<Mode, string> = {
@@ -48,9 +45,7 @@ const SERVICE_DETAIL: Record<Mode, string> = {
   translate: 'Přeloží celý dokument do libovolného jazyka s zachováním struktury.',
   template:  'Vygeneruje šablonu dokumentu na základě tvého popisu.',
   email:     'Napíše profesionální email na základě obsahu dokumentu.',
-  interview: 'AI interview k vytvoření dokumentu krok za krokem.',
   compare:   'Porovná dvě verze dokumentu a zobrazí všechny změny a jejich dopad.',
-  batch:     'Analyzuje 10–25 dokumentů najednou a zobrazí výsledky jednotlivě.',
 }
 
 const DEMO_TEXT = `DocThink Demo: Toto je ukázkový analytický dokument.
@@ -128,14 +123,6 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
   const [templateDesc, setTemplateDesc] = useState('')
   const [templateLang, setTemplateLang] = useState('en')
 
-  const [interviewType, setInterviewType] = useState('')
-  const [interviewStarted, setInterviewStarted] = useState(false)
-  const [interviewChat, setInterviewChat] = useState<ChatMsg[]>([])
-  const [interviewHistory, setInterviewHistory] = useState<{ role: string; content: string }[]>([])
-  const [interviewInput, setInterviewInput] = useState('')
-  const [interviewDoc, setInterviewDoc] = useState('')
-  const [interviewLoading, setInterviewLoading] = useState(false)
-
   // Chat
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
   const [chatHistory, setChatHistory] = useState<{ role: string; content: string }[]>([])
@@ -167,15 +154,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
   // Save to project
   const [showSaveModal, setShowSaveModal] = useState(false)
 
-  // Batch
-  const [batchFiles, setBatchFiles] = useState<File[]>([])
-  const [batchAnalysisMode, setBatchAnalysisMode] = useState<'summary' | 'actions' | 'risks' | 'deadlines'>('summary')
-  const [batchResults, setBatchResults] = useState<{ name: string; result: string; status: 'pending' | 'processing' | 'done' | 'error'; expanded: boolean }[]>([])
-  const [batchRunning, setBatchRunning] = useState(false)
-  const [batchProgress, setBatchProgress] = useState(0)
-
   const fileRef = useRef<HTMLInputElement>(null)
-  const batchFileRef = useRef<HTMLInputElement>(null)
   const chatBottomRef = useRef<HTMLDivElement>(null)
   const chatThreadRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
@@ -421,67 +400,6 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
     }
   }
 
-  // ── INTERVIEW ──
-  async function startInterview() {
-    if (!interviewType.trim()) return
-    const cost = currentMode.credits
-    setInterviewLoading(true)
-    if (!(await spendCredits(cost))) { setInterviewLoading(false); return }
-    setInterviewStarted(true)
-    setInterviewChat([])
-    setInterviewHistory([])
-    setInterviewDoc('')
-    try {
-      const res = await fetch('/api/interview', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ docType: interviewType, history: [], userAnswer: null, lang }),
-      })
-      const data = await res.json()
-      if (data.error) throw new Error(data.error)
-      if (data.question) {
-        setInterviewChat([{ role: 'ai', text: data.question }])
-        setInterviewHistory([{ role: 'assistant', content: data.question }])
-      }
-    } catch (err: any) {
-      setInterviewChat([{ role: 'ai', text: 'Chyba: ' + (err.message || 'Zkus znovu.') }])
-      restoreCredits(cost)
-    } finally {
-      setInterviewLoading(false)
-    }
-  }
-
-  async function sendInterviewAnswer() {
-    if (!interviewInput.trim() || interviewLoading) return
-    const answer = interviewInput.trim()
-    setInterviewInput('')
-    const newChat: ChatMsg[] = [...interviewChat, { role: 'user', text: answer }]
-    setInterviewChat(newChat)
-    const newHistory = [...interviewHistory, { role: 'user', content: answer }]
-    setInterviewLoading(true)
-    try {
-      const res = await fetch('/api/interview', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ docType: interviewType, history: newHistory, lang }),
-      })
-      const data = await res.json()
-      if (data.error) throw new Error(data.error)
-      if (data.isFinished && data.document) {
-        setInterviewDoc(data.document)
-        setInterviewChat([...newChat, { role: 'ai', text: t.interview.start.includes('🚀') ? '✅ Dokument je hotov! Viz výsledek níže.' : '✅ Document ready! See result below.' }])
-        saveToHistory(data.document, interviewType, mode)
-      } else if (data.question) {
-        setInterviewChat([...newChat, { role: 'ai', text: data.question }])
-        setInterviewHistory([...newHistory, { role: 'assistant', content: data.question }])
-      }
-    } catch (err: any) {
-      setInterviewChat([...newChat, { role: 'ai', text: 'Chyba: ' + (err.message || 'Zkus znovu.') }])
-    } finally {
-      setInterviewLoading(false)
-    }
-  }
-
   // ── CHAT ──
   async function sendChatMessage(text?: string) {
     const msg = (text ?? chatInput).trim()
@@ -597,61 +515,6 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
     }
   }
 
-  // ── BATCH ──
-  async function readFileContent(file: File): Promise<string> {
-    if (file.name.toLowerCase().endsWith('.pdf')) {
-      try {
-        const pdfjsLib = await import('pdfjs-dist')
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`
-        const arrayBuffer = await file.arrayBuffer()
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
-        let text = ''
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i)
-          const tc = await page.getTextContent()
-          text += tc.items.map((item: any) => ('str' in item ? item.str : '')).join(' ') + '\n'
-        }
-        return text.trim() || 'PDF neobsahuje čitelný text.'
-      } catch { return 'Nepodařilo se načíst PDF.' }
-    }
-    return new Promise(resolve => {
-      const reader = new FileReader()
-      reader.onload = e => resolve(e.target?.result as string || '')
-      reader.readAsText(file)
-    })
-  }
-
-  async function runBatchAnalysis() {
-    if (batchFiles.length === 0 || batchRunning) return
-    const total = batchFiles.length
-    setBatchRunning(true)
-    setBatchProgress(0)
-    setBatchResults(batchFiles.map(f => ({ name: f.name, result: '', status: 'pending', expanded: false })))
-    if (!(await spendCredits(total))) { setBatchRunning(false); return }
-
-    let refunded = 0
-    for (let i = 0; i < batchFiles.length; i++) {
-      setBatchResults(prev => prev.map((r, idx) => idx === i ? { ...r, status: 'processing' } : r))
-      try {
-        const content = await readFileContent(batchFiles[i])
-        const res = await fetch('/api/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content: content.slice(0, 3000), mode: batchAnalysisMode, lang }),
-        })
-        const data = await res.json()
-        if (data.error) throw new Error(data.error)
-        setBatchResults(prev => prev.map((r, idx) => idx === i ? { ...r, result: data.result, status: 'done', expanded: true } : r))
-      } catch (err: any) {
-        setBatchResults(prev => prev.map((r, idx) => idx === i ? { ...r, result: err.message || 'Chyba', status: 'error' } : r))
-        refunded++
-      }
-      setBatchProgress(i + 1)
-    }
-    if (refunded > 0) restoreCredits(refunded)
-    setBatchRunning(false)
-  }
-
   // ── Q&A follow-up ──
   async function askQuestion() {
     if (!question.trim() || !result) return
@@ -676,14 +539,14 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
 
   // ── EXPORT ──
   function copyResult() {
-    const text = mode === 'interview' && interviewDoc ? interviewDoc : stripHtml(result) + answers.map(a => `\n\nQ: ${a.q}\nA: ${a.a}`).join('')
+    const text = stripHtml(result) + answers.map(a => `\n\nQ: ${a.q}\nA: ${a.a}`).join('')
     navigator.clipboard.writeText(text)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
   function exportTxt() {
-    const text = mode === 'interview' && interviewDoc ? interviewDoc : stripHtml(result)
+    const text = stripHtml(result)
     const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -694,9 +557,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
   }
 
   function exportPdf() {
-    const content = mode === 'interview' && interviewDoc
-      ? `<pre style="white-space:pre-wrap;font-family:Arial">${interviewDoc}</pre>`
-      : result
+    const content = result
     const win = window.open('', '_blank')
     if (!win) return
     const modeName = (t.modes as any)[mode] || mode
@@ -713,7 +574,6 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
     setTimeout(() => { win.print(); win.close() }, 500)
   }
 
-  const hasResult = result || (mode === 'interview' && interviewDoc)
   const showUpload = needsFile
 
   return (
@@ -797,7 +657,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
               className={`${styles.modeBtn} ${styles.sidebarIn} ${mode === m.id ? styles.modeBtnActive : ''}`}
               data-group="tools"
               style={{ '--delay': `${(i + 7) * 0.05}s` } as React.CSSProperties}
-              onClick={() => { setMode(m.id); setResult(''); setAnswers([]); setInterviewStarted(false) }}>
+              onClick={() => { setMode(m.id); setResult(''); setAnswers([]) }}>
               <span className={styles.modeIcon}>{m.icon}</span>
               <div className={styles.modeLabelWrap}>
                 <span className={styles.modeLabelText}>{(t.modes as any)[m.id]}</span>
@@ -838,7 +698,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
 
           {/* ── CHAT ── */}
           {mode === 'chat' && (
-            <div className={styles.chatWrap}>
+            <div className={styles.chatWrap} style={{ flex: 1, minHeight: 0 }}>
               {chatMessages.length === 0 ? (
                 <div className={styles.chatWelcome}>
                   <div className={styles.chatWelcomeIcon}>
@@ -913,8 +773,10 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
             </div>
           )}
 
+          {mode !== 'chat' && <div className={styles.contentInner}>
+
           {/* ── SERVICE CONTEXT CARD ── */}
-          {mode !== 'chat' && SERVICE_DETAIL[mode] && (
+          {SERVICE_DETAIL[mode] && (
             <div className={styles.serviceCtx}>
               <div className={styles.serviceCtxIcon}>{currentMode.icon}</div>
               <div className={styles.serviceCtxBody}>
@@ -1074,61 +936,6 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
             </div>
           )}
 
-          {/* ── INTERVIEW START ── */}
-          {mode === 'interview' && !interviewStarted && (
-            <div className={styles.toolCard}>
-              <div className={styles.toolCardTitle}>🤖 {t.modes.interview} <span className={styles.creditBadge}>5 kreditů</span></div>
-              <p className={styles.toolCardDesc}>{t.interview.desc}</p>
-              <input className={styles.textInput} placeholder={t.interview.placeholder}
-                value={interviewType} onChange={e => setInterviewType(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && startInterview()} />
-              <button className={styles.analyzeBtn} onClick={startInterview} disabled={interviewLoading || !interviewType.trim()}>
-                {interviewLoading ? <span className={styles.loadingDots}><span /><span /><span /></span> : t.interview.start}
-              </button>
-            </div>
-          )}
-
-          {/* ── INTERVIEW CHAT ── */}
-          {mode === 'interview' && interviewStarted && (
-            <div className={styles.interviewBox}>
-              <div className={styles.interviewHeader}>
-                <span className={styles.resultLabel}>🤖 {t.modes.interview} — {interviewType}</span>
-                <button className={styles.actionBtn} onClick={() => { setInterviewStarted(false); setInterviewDoc('') }}>{t.interview.newBtn}</button>
-              </div>
-              <div className={styles.chatArea}>
-                {interviewChat.map((msg, i) => (
-                  <div key={i} className={msg.role === 'ai' ? styles.chatAi : styles.chatUser}>{msg.text}</div>
-                ))}
-                {interviewLoading && (
-                  <div className={styles.chatAi}>
-                    <div className={styles.loadingRow}><div className={styles.dot} /><div className={styles.dot} /><div className={styles.dot} /></div>
-                  </div>
-                )}
-              </div>
-              {!interviewDoc && (
-                <div className={styles.questionBar}>
-                  <input className={styles.questionInput} placeholder={t.interview.answerPlaceholder}
-                    value={interviewInput} onChange={e => setInterviewInput(e.target.value)}
-                    onKeyDown={e => e.key === 'Enter' && sendInterviewAnswer()} disabled={interviewLoading} />
-                  <button className={styles.questionBtn} onClick={sendInterviewAnswer} disabled={interviewLoading}>{t.interview.send}</button>
-                </div>
-              )}
-              {interviewDoc && (
-                <div className={styles.interviewResult}>
-                  <div className={styles.interviewResultHeader}>
-                    <span style={{ color: '#5DCAA5', fontSize: 12 }}>✅ Dokument vygenerován</span>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      <button className={styles.actionBtn} onClick={copyResult}>{copied ? t.result.copied : t.result.copy}</button>
-                      <button className={styles.actionBtn} onClick={exportTxt}>{t.result.txt}</button>
-                      <button className={styles.actionBtn} onClick={exportPdf}>{t.result.pdf}</button>
-                    </div>
-                  </div>
-                  <pre className={styles.interviewDoc}>{interviewDoc}</pre>
-                </div>
-              )}
-            </div>
-          )}
-
           {/* ── CLAUSES ── */}
           {mode === 'clauses' && (
             <div className={styles.toolCard}>
@@ -1155,128 +962,6 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
             </div>
           )}
 
-          {/* ── BATCH ── */}
-          {mode === 'batch' && (
-            <div className={styles.toolCard}>
-              <div className={styles.toolCardTitle}>
-                📦 {t.modes.batch}
-                <span className={styles.creditBadge}>1 kredit / dokument</span>
-                <span className={styles.teamBadge}>Team</span>
-              </div>
-              <p className={styles.toolCardDesc}>
-                Nahraj 10–25 dokumentů a AI je analyzuje všechny najednou. Výsledky jsou zobrazeny jednotlivě a lze je exportovat.
-              </p>
-
-              <div className={styles.batchUploadZone} onClick={() => batchFileRef.current?.click()}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7F77DD" strokeWidth="1.5" strokeLinecap="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                  <polyline points="14 2 14 8 20 8"/>
-                  <line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
-                </svg>
-                <span>Přidat dokumenty (max 25) — PDF · Word · TXT</span>
-                <input ref={batchFileRef} type="file" multiple accept=".pdf,.txt,.doc,.docx"
-                  style={{ display: 'none' }}
-                  onChange={e => {
-                    const added = Array.from(e.target.files || [])
-                    setBatchFiles(prev => [...prev, ...added].slice(0, 25))
-                    e.target.value = ''
-                  }} />
-              </div>
-
-              {batchFiles.length > 0 && (
-                <div className={styles.batchFileList}>
-                  <div className={styles.batchFileListHeader}>
-                    <span className={styles.batchFileCount}>{batchFiles.length} / 25 dokumentů</span>
-                    <button className={styles.pasteClear} onClick={() => setBatchFiles([])}>Vymazat vše</button>
-                  </div>
-                  {batchFiles.map((f, i) => (
-                    <div key={i} className={styles.batchFileItem}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7F77DD" strokeWidth="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                      <span className={styles.batchFileItemName}>{f.name}</span>
-                      <button className={styles.fileRemove} onClick={() => setBatchFiles(prev => prev.filter((_, idx) => idx !== i))}>×</button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div className={styles.optionRow}>
-                <span className={styles.optionLabel}>Typ analýzy:</span>
-                {(['summary', 'actions', 'risks', 'deadlines'] as const).map(m => (
-                  <button key={m}
-                    className={`${styles.optionBtn} ${batchAnalysisMode === m ? styles.optionBtnActive : ''}`}
-                    onClick={() => setBatchAnalysisMode(m)}>
-                    {(t.modes as any)[m]}
-                  </button>
-                ))}
-              </div>
-
-              {batchRunning && (
-                <div className={styles.batchProgressWrap}>
-                  <div className={styles.batchProgressBar}>
-                    <div className={styles.batchProgressFill}
-                      style={{ width: `${batchFiles.length > 0 ? (batchProgress / batchFiles.length) * 100 : 0}%` }} />
-                  </div>
-                  <span className={styles.batchProgressText}>
-                    Zpracovávám {batchProgress} / {batchFiles.length} dokumentů…
-                  </span>
-                </div>
-              )}
-
-              <button className={styles.analyzeBtn} onClick={runBatchAnalysis}
-                disabled={batchRunning || batchFiles.length === 0}>
-                {batchRunning
-                  ? <span className={styles.loadingDots}><span /><span /><span /></span>
-                  : `📦 Analyzovat ${batchFiles.length > 0 ? `${batchFiles.length} dokumentů` : 'dokumenty'} — ${batchFiles.length} kreditů`}
-              </button>
-
-              {batchResults.length > 0 && (
-                <div className={styles.batchResults}>
-                  <div className={styles.batchResultsHeader}>
-                    <span className={styles.batchResultsTitle}>
-                      Výsledky — {batchResults.filter(r => r.status === 'done').length}/{batchResults.length} hotovo
-                    </span>
-                    {batchResults.some(r => r.status === 'done') && (
-                      <button className={styles.actionBtn} onClick={() => {
-                        const all = batchResults
-                          .filter(r => r.status === 'done')
-                          .map(r => `=== ${r.name} ===\n${stripHtml(r.result)}`)
-                          .join('\n\n')
-                        const blob = new Blob([all], { type: 'text/plain;charset=utf-8' })
-                        const a = document.createElement('a')
-                        a.href = URL.createObjectURL(blob)
-                        a.download = `docthink-batch-${Date.now()}.txt`
-                        a.click()
-                      }}>⬇ Stáhnout vše (.txt)</button>
-                    )}
-                  </div>
-                  {batchResults.map((r, i) => (
-                    <div key={i} className={styles.batchResultItem}>
-                      <div className={styles.batchResultHeader}
-                        onClick={() => setBatchResults(prev => prev.map((item, idx) => idx === i ? { ...item, expanded: !item.expanded } : item))}>
-                        <div className={styles.batchResultName}>
-                          <span className={
-                            r.status === 'done' ? styles.batchStatusDone :
-                            r.status === 'error' ? styles.batchStatusError :
-                            r.status === 'processing' ? styles.batchStatusProcessing :
-                            styles.batchStatusPending}>
-                            {r.status === 'done' ? '✓' : r.status === 'error' ? '✗' : r.status === 'processing' ? (
-                              <span className={styles.batchSpinner} />
-                            ) : '○'}
-                          </span>
-                          <span>{r.name}</span>
-                        </div>
-                        {r.status === 'done' && <span className={styles.batchChevron}>{r.expanded ? '▲' : '▼'}</span>}
-                      </div>
-                      {r.expanded && r.result && (
-                        <div className={styles.batchResultBody}
-                          dangerouslySetInnerHTML={{ __html: r.result }} />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
 
           {/* ── ANALYZE BUTTON ── */}
           {showAnalyzeBtn && (
@@ -1292,7 +977,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
           )}
 
           {/* ── RESULT BOX ── */}
-          {(result || loading) && mode !== 'interview' && (
+          {(result || loading) && (
             <div className={styles.resultBox}>
               <div className={styles.resultHeader}>
                 <span className={styles.resultLabel}>{(t.modes as any)[mode]}</span>
@@ -1342,6 +1027,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
               )}
             </div>
           )}
+          </div>}
         </div>
       </div>
 
@@ -1468,7 +1154,7 @@ export default function Analyzer({ initialContent, initialFileName, initialFileS
                 {MODES.filter(m => m.group === 'tools').map(m => (
                   <button key={m.id}
                     className={`${styles.mobileGridItem} ${mode === m.id ? styles.mobileGridItemActive : ''}`}
-                    onClick={() => { setMode(m.id); setResult(''); setAnswers([]); setInterviewStarted(false); setMobileSheetOpen(false) }}>
+                    onClick={() => { setMode(m.id); setResult(''); setAnswers([]); setMobileSheetOpen(false) }}>
                     <span className={styles.mobileGridIcon}>{m.icon}</span>
                     <span className={styles.mobileGridLabel}>{(t.modes as any)[m.id]}</span>
                     <span className={styles.mobileGridCost}>{m.credits}k</span>
