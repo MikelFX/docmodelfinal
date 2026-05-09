@@ -187,11 +187,13 @@ export async function POST(req: NextRequest) {
     const analysis = JSON.parse(jsonMatch[0])
 
     // Deduct credit only after successful analysis
+    let remainingCredits: number | null = null
     if (userId) {
-      await spendCredit(userId)
+      const spent = await spendCredit(userId)
+      remainingCredits = spent.credits
     }
 
-    return NextResponse.json(analysis)
+    return NextResponse.json({ ...analysis, _credits: remainingCredits })
   } catch (err: any) {
     console.error('[DocGuard] analyze error:', err.message)
     if (err instanceof SyntaxError) {

@@ -198,14 +198,14 @@ export default function DocGuard() {
         return
       }
 
-      setAnalysis(data)
+      const { _credits, ...analysis } = data
+      setAnalysis(analysis)
       setScreen('result')
       if (!isSignedIn) {
         incrementFreeUses()
         setFreeUsesLeft(Math.max(0, FREE_LIMIT - getFreeUses()))
-      } else {
-        // Refresh credits after analysis
-        fetch('/api/credits').then(r => r.json()).then(d => { if (d.credits !== undefined) setCredits(d.credits) }).catch(() => {})
+      } else if (_credits !== null && _credits !== undefined) {
+        setCredits(_credits)
       }
     } catch (err: any) {
       setError(err.message ?? 'Síťová chyba. Zkontrolujte připojení.')
