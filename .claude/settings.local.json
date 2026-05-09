@@ -32,7 +32,9 @@
       "Bash(Select-Object -First 50)",
       "Bash(Format-Table FullName)",
       "PowerShell(Get-ChildItem \"C:\\\\Users\\\\s3run\\\\Desktop\\\\docmind_final\\\\docmind\\\\app\" -Recurse -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })",
-      "PowerShell(cd \"C:\\\\Users\\\\s3run\\\\Desktop\\\\docmind_final\\\\docmind\" ; & npx tsc --noEmit 2>&1 | Where-Object { $_ -match \"error TS\" } | Select-Object -First 30)"
+      "PowerShell(cd \"C:\\\\Users\\\\s3run\\\\Desktop\\\\docmind_final\\\\docmind\" ; & npx tsc --noEmit 2>&1 | Where-Object { $_ -match \"error TS\" } | Select-Object -First 30)",
+      "Bash(Remove-Item -Recurse -Force .next -ErrorAction SilentlyContinue)",
+      "Bash(curl *)"
     ]
   }
 }
