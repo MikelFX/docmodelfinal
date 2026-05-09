@@ -4,6 +4,8 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useUser, useClerk } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 import styles from './DocGuard.module.css'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { getDGT } from '@/lib/i18n-dg'
 
 const FREE_LIMIT = 3
 const FREE_KEY = 'docguard_free_uses'
@@ -110,6 +112,8 @@ export default function DocGuard() {
   const { isSignedIn, user } = useUser()
   const { signOut } = useClerk()
   const router = useRouter()
+  const { lang } = useLanguage()
+  const dg = getDGT(lang)
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [screen, setScreen] = useState<Screen>('home')
   const [analysis, setAnalysis] = useState<Analysis | null>(null)
@@ -228,7 +232,7 @@ export default function DocGuard() {
       } else if (result.text) {
         const trimmed = result.text.trim()
         if (!trimmed) {
-          setError('Soubor je prázdný nebo nelze přečíst.')
+          setError(dg.errEmpty)
           return
         }
         setDocContent(trimmed)
@@ -236,10 +240,10 @@ export default function DocGuard() {
         setDocImageType('')
         await analyze(trimmed, undefined, undefined, !!isSignedIn)
       } else {
-        setError('Nepodporovaný formát souboru.')
+        setError(dg.errUnsupported)
       }
     } catch (err: any) {
-      setError(err.message ?? 'Chyba při čtení souboru.')
+      setError(dg.errRead)
     }
   }, [analyze])
 
@@ -373,7 +377,7 @@ export default function DocGuard() {
             <button
               className={`${styles.creditsChip} ${credits <= 3 ? styles.creditsChipLow : ''}`}
               onClick={() => router.push('/koupit')}
-              title="Koupit kredity"
+              title={dg.buyCredits}
             >
               <span className={styles.creditsNum}>{credits}</span>
               <span className={styles.creditsLabel}>kr</span>
@@ -381,7 +385,7 @@ export default function DocGuard() {
           )}
           {isSignedIn && (
             <button className={styles.buyBtn} onClick={() => router.push('/koupit')}>
-              + Kredity
+              {dg.navBuy}
             </button>
           )}
           {isSignedIn && (
@@ -399,10 +403,10 @@ export default function DocGuard() {
                 <div className={styles.userMenu}>
                   <div className={styles.userMenuEmail}>{user?.emailAddresses?.[0]?.emailAddress}</div>
                   <button className={styles.userMenuItem} onClick={() => { setShowUserMenu(false); router.push('/koupit') }}>
-                    💳 Koupit kredity
+                    {dg.buyCredits}
                   </button>
                   <button className={styles.userMenuItem} onClick={() => { setShowUserMenu(false); signOut(() => router.push('/')) }}>
-                    🚪 Odhlásit se
+                    {dg.signOut}
                   </button>
                 </div>
               )}
@@ -410,7 +414,7 @@ export default function DocGuard() {
           )}
           {!isSignedIn && (
             <button className={styles.loginBtn} onClick={() => router.push('/sign-in')}>
-              Přihlásit
+              {dg.navLogin}
             </button>
           )}
         </div>
@@ -420,7 +424,7 @@ export default function DocGuard() {
       {screen === 'home' && (
         <div className={styles.homeScreen}>
           <div className={styles.homeHeader}>
-            <p className={styles.tagline}>Chráním tě před špatnou smlouvou</p>
+            <p className={styles.tagline}>{dg.tagline}</p>
           </div>
 
           <div
@@ -432,8 +436,8 @@ export default function DocGuard() {
           >
             <div className={styles.uploadZoneOrb} />
             <div className={styles.uploadIcon}>📄</div>
-            <p className={styles.uploadTitle}>Přetáhni sem dokument</p>
-            <p className={styles.uploadSub}>nebo klikni pro výběr souboru</p>
+            <p className={styles.uploadTitle}>{dg.uploadTitle}</p>
+            <p className={styles.uploadSub}>{dg.uploadSub}</p>
             <div className={styles.uploadFormats}>
               {['PDF', 'DOCX', 'TXT', 'JPG', 'PNG'].map(f => (
                 <span key={f} className={styles.formatBadge}>{f}</span>
@@ -453,26 +457,24 @@ export default function DocGuard() {
               className={styles.btnCamera}
               onClick={() => cameraInputRef.current?.click()}
             >
-              📷 Vyfotit smlouvu
+              {dg.btnCamera}
             </button>
             <button
               className={styles.btnUpload}
               onClick={() => fileInputRef.current?.click()}
             >
-              📁 Nahrát soubor
+              {dg.btnUpload}
             </button>
           </div>
 
           {!isSignedIn && freeUsesLeft > 0 && (
             <p className={styles.freeUsesNote}>
-              {freeUsesLeft === FREE_LIMIT
-                ? `${FREE_LIMIT} bezplatné analýzy · bez registrace`
-                : `Zbývá ${freeUsesLeft} z ${FREE_LIMIT} bezplatných analýz`}
+              {freeUsesLeft === FREE_LIMIT ? dg.freeStart : dg.freeLeft(freeUsesLeft)}
             </p>
           )}
           {!isSignedIn && freeUsesLeft === 0 && (
             <p className={styles.freeUsesNote} style={{ color: '#ef4444' }}>
-              Bezplatné analýzy vyčerpány
+              {dg.freeExhausted}
             </p>
           )}
         </div>
@@ -492,16 +494,12 @@ export default function DocGuard() {
           </div>
 
           <div className={styles.analyzingText}>
-            <h2 className={styles.analyzingTitle}>Analyzuji dokument...</h2>
-            <p className={styles.analyzingSubtitle}>Claude AI kontroluje každou klauzuli</p>
+            <h2 className={styles.analyzingTitle}>{dg.analyzingTitle}</h2>
+            <p className={styles.analyzingSubtitle}>{dg.analyzingSub}</p>
           </div>
 
           <div className={styles.analyzingSteps}>
-            {[
-              'Čtení a parsování dokumentu',
-              'Identifikace rizikových klauzulí',
-              'Generování doporučení',
-            ].map((step, i) => (
+            {dg.steps.map((step, i) => (
               <div
                 key={i}
                 className={`${styles.stepItem} ${analyzeStep >= i ? styles.stepItemActive : ''}`}
@@ -520,9 +518,9 @@ export default function DocGuard() {
           {/* Top bar */}
           <div className={styles.resultTopBar}>
             <button className={styles.newAnalysisBtn} onClick={resetAll}>
-              ← Nová
+              {dg.newBtn}
             </button>
-            <span className={styles.topBarTitle}>Výsledek analýzy</span>
+            <span className={styles.topBarTitle}>{dg.resultTitle}</span>
             {isSignedIn && credits !== null ? (
               <button
                 className={`${styles.creditsChip} ${credits <= 3 ? styles.creditsChipLow : ''}`}
@@ -552,7 +550,7 @@ export default function DocGuard() {
             {/* Recommendation */}
             {analysis.recommendation && (
               <div className={styles.recommendationCard}>
-                <p className={styles.recommendationTitle}>💡 Doporučení</p>
+                <p className={styles.recommendationTitle}>{dg.recommendationTitle}</p>
                 <p className={styles.recommendationText}>{analysis.recommendation}</p>
               </div>
             )}
@@ -560,7 +558,7 @@ export default function DocGuard() {
             {/* Risks */}
             {analysis.risks.length > 0 && (
               <div className={styles.risksSection}>
-                <p className={styles.sectionTitle}>Rizika ({analysis.risks.length})</p>
+                <p className={styles.sectionTitle}>{dg.risksTitle} ({analysis.risks.length})</p>
                 {analysis.risks.map((risk, i) => (
                   <div
                     key={i}
@@ -580,7 +578,7 @@ export default function DocGuard() {
             {/* Missing */}
             {analysis.missing.length > 0 && (
               <div className={styles.missingSection}>
-                <p className={styles.sectionTitle}>Chybějící klauzule</p>
+                <p className={styles.sectionTitle}>{dg.missingTitle}</p>
                 {analysis.missing.map((item, i) => (
                   <div
                     key={i}
@@ -617,7 +615,7 @@ export default function DocGuard() {
               <input
                 ref={chatInputRef}
                 className={styles.chatInput}
-                placeholder="Zeptej se na smlouvu..."
+                placeholder={dg.chatPlaceholder}
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat() } }}
@@ -641,23 +639,16 @@ export default function DocGuard() {
           <div className={styles.paywallModal} onClick={e => e.stopPropagation()}>
             <div className={styles.paywallShield}>🛡️</div>
             <h2 className={styles.paywallTitle}>
-              {freeUsesLeft === 0 ? 'Přihlas se a pokračuj! 🔐' : 'Líbí se ti DocThink?'}
+              {freeUsesLeft === 0 ? dg.paywallTitleLogin : dg.paywallTitle}
             </h2>
             <p className={styles.paywallSub}>
-              {freeUsesLeft === 0
-                ? `Využil jsi ${FREE_LIMIT} bezplatné analýzy. Zaregistruj se zdarma a získej další.`
-                : 'Zaregistruj se zdarma a pokračuj v analýzách smluv.'}
+              {freeUsesLeft === 0 ? dg.paywallSubLogin : dg.paywallSub}
             </p>
 
             <div className={styles.paywallFeatures}>
-              {[
-                { icon: '⚡', text: 'Neomezené analýzy smluv' },
-                { icon: '💬', text: 'Chat s každým dokumentem' },
-                { icon: '🛡️', text: 'Ochrana před rizikovými klauzulemi' },
-              ].map((f, i) => (
+              {dg.paywallFeatures.map((text, i) => (
                 <div key={i} className={styles.paywallFeature}>
-                  <span className={styles.paywallFeatureIcon}>{f.icon}</span>
-                  <span>{f.text}</span>
+                  <span>{text}</span>
                 </div>
               ))}
             </div>
@@ -666,19 +657,19 @@ export default function DocGuard() {
               className={styles.paywallCta}
               onClick={() => router.push('/sign-up')}
             >
-              Zaregistrovat se zdarma
+              {dg.paywallCta}
             </button>
             <button
               className={styles.paywallLogin}
               onClick={() => router.push('/sign-in')}
             >
-              Už mám účet — přihlásit se
+              {dg.paywallLogin}
             </button>
             <button
               className={styles.paywallClose}
               onClick={() => setShowPaywall(false)}
             >
-              Zavřít
+              {dg.paywallClose}
             </button>
           </div>
         </div>
