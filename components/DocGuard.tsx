@@ -784,26 +784,27 @@ export default function DocGuard() {
       )}
 
       {/* ── PWA INSTALL BANNER ── */}
-      {showInstallBanner && (
+      {showInstallBanner && !showIosHint && (
         <div className={styles.installBanner}>
-          <div className={styles.installBannerInner}>
-            <div className={styles.installIcon}>🛡️</div>
-            <div className={styles.installText}>
-              <strong>Stáhni DocThink</strong>
-              <span>{isIos ? 'Přidej na plochu a mej vždy po ruce' : 'Nainstaluj aplikaci zdarma'}</span>
-            </div>
-            <button className={styles.installBtn} onClick={handleInstall}>
-              {isIos ? 'Jak na to' : 'Instalovat'}
-            </button>
-            <button className={styles.installClose} onClick={dismissInstall}>×</button>
+          <button className={styles.installBannerInner} onClick={handleInstall}>
+            <span className={styles.installIcon}>⬇️</span>
+            <span className={styles.installText}>
+              <strong>{isIos ? 'Přidat na plochu' : 'Stáhnout aplikaci'}</strong>
+              <span>{isIos ? 'Klepni sem pro návod' : 'Zdarma • funguje offline'}</span>
+            </span>
+          </button>
+          <button className={styles.installClose} onClick={dismissInstall}>×</button>
+        </div>
+      )}
+      {showIosHint && (
+        <div className={styles.installBanner}>
+          <div className={styles.iosHint}>
+            <strong style={{color:'#e8e6f0', fontSize:14}}>Jak přidat na plochu:</strong>
+            <p>1. Klepni na <strong>Sdílet</strong> ⎙ dole v Safari</p>
+            <p>2. Vyber <strong>„Přidat na plochu"</strong></p>
+            <p>3. Potvrď tlačítkem <strong>„Přidat"</strong></p>
           </div>
-          {showIosHint && (
-            <div className={styles.iosHint}>
-              <p>1. Klepni na <strong>Sdílet</strong> <span style={{fontSize:'1.1em'}}>⎙</span> ve spodní liště Safari</p>
-              <p>2. Vyber <strong>„Přidat na plochu"</strong></p>
-              <p>3. Potvrď tlačítkem <strong>„Přidat"</strong></p>
-            </div>
-          )}
+          <button className={styles.installClose} onClick={dismissInstall}>×</button>
         </div>
       )}
     </div>
