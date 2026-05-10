@@ -131,6 +131,10 @@ export default function DocGuard() {
   const [showPaywall, setShowPaywall] = useState(false)
   const [freeUsesLeft, setFreeUsesLeft] = useState(FREE_LIMIT)
   const [credits, setCredits] = useState<number | null>(null)
+  const [installPrompt, setInstallPrompt] = useState<any>(null)
+  const [showInstallBanner, setShowInstallBanner] = useState(false)
+  const [isIos, setIsIos] = useState(false)
+  const [showIosHint, setShowIosHint] = useState(false)
 
   useEffect(() => {
     setFreeUsesLeft(Math.max(0, FREE_LIMIT - getFreeUses()))
@@ -143,6 +147,41 @@ export default function DocGuard() {
       .then(d => { if (d.credits !== undefined) setCredits(d.credits) })
       .catch(() => {})
   }, [isSignedIn])
+
+  useEffect(() => {
+    // Already installed as PWA
+    if (window.matchMedia('(display-mode: standalone)').matches) return
+    const dismissed = sessionStorage.getItem('install_dismissed')
+    if (dismissed) return
+
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) && !(window.navigator as any).standalone
+    if (ios) {
+      setIsIos(true)
+      setTimeout(() => setShowInstallBanner(true), 3000)
+      return
+    }
+
+    const handler = (e: Event) => {
+      e.preventDefault()
+      setInstallPrompt(e)
+      setTimeout(() => setShowInstallBanner(true), 3000)
+    }
+    window.addEventListener('beforeinstallprompt', handler as any)
+    return () => window.removeEventListener('beforeinstallprompt', handler as any)
+  }, [])
+
+  const handleInstall = async () => {
+    if (isIos) { setShowIosHint(true); return }
+    if (!installPrompt) return
+    installPrompt.prompt()
+    const { outcome } = await installPrompt.userChoice
+    if (outcome === 'accepted') setShowInstallBanner(false)
+  }
+
+  const dismissInstall = () => {
+    setShowInstallBanner(false)
+    sessionStorage.setItem('install_dismissed', '1')
+  }
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
@@ -741,6 +780,30 @@ export default function DocGuard() {
               {dg.paywallClose}
             </button>
           </div>
+        </div>
+      )}
+
+      {/* ── PWA INSTALL BANNER ── */}
+      {showInstallBanner && (
+        <div className={styles.installBanner}>
+          <div className={styles.installBannerInner}>
+            <div className={styles.installIcon}>🛡️</div>
+            <div className={styles.installText}>
+              <strong>Stáhni DocThink</strong>
+              <span>{isIos ? 'Přidej na plochu a mej vždy po ruce' : 'Nainstaluj aplikaci zdarma'}</span>
+            </div>
+            <button className={styles.installBtn} onClick={handleInstall}>
+              {isIos ? 'Jak na to' : 'Instalovat'}
+            </button>
+            <button className={styles.installClose} onClick={dismissInstall}>×</button>
+          </div>
+          {showIosHint && (
+            <div className={styles.iosHint}>
+              <p>1. Klepni na <strong>Sdílet</strong> <span style={{fontSize:'1.1em'}}>⎙</span> ve spodní liště Safari</p>
+              <p>2. Vyber <strong>„Přidat na plochu"</strong></p>
+              <p>3. Potvrď tlačítkem <strong>„Přidat"</strong></p>
+            </div>
+          )}
         </div>
       )}
     </div>
