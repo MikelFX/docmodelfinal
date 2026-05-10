@@ -66,7 +66,7 @@ async function extractTextFromPDF(file: File): Promise<string> {
   return text
 }
 
-async function resizeImage(file: File, maxWidth = 1600, quality = 0.82): Promise<{ imageBase64: string; imageType: string }> {
+async function resizeImage(file: File, maxWidth = 1200, quality = 0.70): Promise<{ imageBase64: string; imageType: string }> {
   return new Promise((resolve, reject) => {
     const img = new Image()
     const url = URL.createObjectURL(file)
