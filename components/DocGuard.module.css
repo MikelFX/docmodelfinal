@@ -1183,3 +1183,29 @@
 .btnAnalyze:hover { transform: translateY(-1px); box-shadow: 0 4px 22px rgba(127,119,221,0.55); }
 .btnAnalyze:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
+.stagedFilesList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stagedFileChip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: rgba(127,119,221,0.08);
+  border: 1px solid rgba(127,119,221,0.2);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 13px;
+  color: #AFA9EC;
+  overflow: hidden;
+}
+
+.stagedFileChip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+

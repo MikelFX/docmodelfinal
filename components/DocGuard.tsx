@@ -121,6 +121,7 @@ export default function DocGuard() {
   const [docImageBase64, setDocImageBase64] = useState<string>('')
   const [docImageType, setDocImageType] = useState<string>('')
   const [pages, setPages] = useState<{ base64: string; type: string }[]>([])
+  const [stagedFiles, setStagedFiles] = useState<string[]>([])
   const [error, setError] = useState<string>('')
   const [isDragging, setIsDragging] = useState(false)
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
@@ -223,7 +224,7 @@ export default function DocGuard() {
     }
   }, [])
 
-  const handleFile = useCallback(async (file: File, addPage = false) => {
+  const handleFile = useCallback(async (file: File) => {
     if (!file) return
     setError('')
 
@@ -232,36 +233,23 @@ export default function DocGuard() {
 
       if (result.imageBase64) {
         const newPage = { base64: result.imageBase64, type: result.imageType ?? 'image/jpeg' }
-        if (addPage) {
-          // Add to existing pages
-          setPages(prev => [...prev, newPage])
-          setDocImageBase64(result.imageBase64!)
-          setDocImageType(result.imageType ?? 'image/jpeg')
-        } else {
-          // First page
-          setPages([newPage])
-          setDocContent('')
-          setDocImageBase64(result.imageBase64)
-          setDocImageType(result.imageType ?? 'image/jpeg')
-        }
+        setPages(prev => [...prev, newPage])
       } else if (result.text) {
         const trimmed = result.text.trim()
         if (!trimmed) {
           setError(dg.errEmpty)
           return
         }
-        setDocContent(trimmed)
-        setDocImageBase64('')
-        setDocImageType('')
-        setPages([])
-        await analyze(trimmed, undefined, undefined, !!isSignedIn)
+        // Append text from multiple documents
+        setDocContent(prev => prev ? prev + '\n\n---\n\n' + trimmed : trimmed)
+        setStagedFiles(prev => [...prev, file.name])
       } else {
         setError(dg.errUnsupported)
       }
     } catch (err: any) {
       setError(dg.errRead)
     }
-  }, [analyze, isSignedIn, dg])
+  }, [dg])
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -346,6 +334,7 @@ export default function DocGuard() {
     setDocImageBase64('')
     setDocImageType('')
     setPages([])
+    setStagedFiles([])
     setError('')
     setChatMessages([])
     setChatInput('')
@@ -371,8 +360,13 @@ export default function DocGuard() {
         ref={fileInputRef}
         type="file"
         accept=".pdf,.txt,.docx,image/*"
+        multiple
         style={{ display: 'none' }}
-        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = '' }}
+        onChange={(e) => {
+          const files = Array.from(e.target.files ?? [])
+          files.forEach(f => handleFile(f))
+          e.target.value = ''
+        }}
       />
       <input
         ref={cameraInputRef}
@@ -380,7 +374,7 @@ export default function DocGuard() {
         accept="image/*"
         capture="environment"
         style={{ display: 'none' }}
-        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f, pages.length > 0); e.target.value = '' }}
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = '' }}
       />
 
       {/* ── GLOBAL NAV (all screens) ── */}
@@ -469,39 +463,65 @@ export default function DocGuard() {
             </div>
           )}
 
-          {/* Page thumbnails */}
-          {pages.length > 0 && (
+          {/* Staged content — photos + documents */}
+          {(pages.length > 0 || stagedFiles.length > 0) && (
             <div className={styles.pagesWrap}>
-              <div className={styles.pagesRow}>
-                {pages.map((p, i) => (
-                  <div key={i} className={styles.pageThumb}>
-                    <img src={`data:${p.type};base64,${p.base64}`} alt={`Strana ${i + 1}`} />
-                    <button
-                      className={styles.pageRemove}
-                      onClick={() => setPages(prev => prev.filter((_, j) => j !== i))}
-                    >×</button>
-                    <span className={styles.pageNum}>{i + 1}</span>
-                  </div>
-                ))}
-              </div>
+              {pages.length > 0 && (
+                <div className={styles.pagesRow}>
+                  {pages.map((p, i) => (
+                    <div key={i} className={styles.pageThumb}>
+                      <img src={`data:${p.type};base64,${p.base64}`} alt={`Strana ${i + 1}`} />
+                      <button
+                        className={styles.pageRemove}
+                        onClick={() => setPages(prev => prev.filter((_, j) => j !== i))}
+                      >×</button>
+                      <span className={styles.pageNum}>{i + 1}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {stagedFiles.length > 0 && (
+                <div className={styles.stagedFilesList}>
+                  {stagedFiles.map((name, i) => (
+                    <div key={i} className={styles.stagedFileChip}>
+                      <span>📄 {name}</span>
+                      <button
+                        className={styles.pageRemove}
+                        style={{ position: 'static', width: 16, height: 16, fontSize: 10 }}
+                        onClick={() => {
+                          setStagedFiles(prev => prev.filter((_, j) => j !== i))
+                          // Rebuild docContent without this file is complex; just clear all text if removing
+                          if (stagedFiles.length === 1) setDocContent('')
+                        }}
+                      >×</button>
+                    </div>
+                  ))}
+                </div>
+              )}
               <div className={styles.pagesActions}>
                 <button
                   className={styles.btnAddPage}
                   onClick={() => cameraInputRef.current?.click()}
                 >
-                  📷 + další strana
+                  📷 + foto
+                </button>
+                <button
+                  className={styles.btnAddPage}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  📎 + dokument
                 </button>
                 <button
                   className={styles.btnAnalyze}
-                  onClick={() => analyze(undefined, pages[0].base64, pages[0].type, !!isSignedIn, pages)}
+                  onClick={() => analyze(docContent || undefined, undefined, undefined, !!isSignedIn, pages.length > 0 ? pages : undefined)}
                 >
-                  🔍 Analyzovat ({pages.length} {pages.length === 1 ? 'strana' : pages.length < 5 ? 'strany' : 'stran'})
+                  🔍 Analyzovat {pages.length + stagedFiles.length > 1 ? `(${pages.length + stagedFiles.length})` : ''}
                 </button>
               </div>
             </div>
           )}
 
-          <div className={styles.uploadActions} style={{ display: pages.length > 0 ? 'none' : undefined }}>
+          <div className={styles.uploadActions} style={{ display: (pages.length > 0 || stagedFiles.length > 0) ? 'none' : undefined }}>
             <button
               className={styles.btnCamera}
               onClick={() => cameraInputRef.current?.click()}
