@@ -184,7 +184,7 @@ export default function DocGuard() {
     try {
       const body: any = {}
       if (text) body.content = text
-      if (multiPages && multiPages.length > 1) {
+      if (multiPages && multiPages.length >= 1) {
         body.pages = multiPages
       } else if (imageBase64) {
         body.imageBase64 = imageBase64; body.imageType = imageType
