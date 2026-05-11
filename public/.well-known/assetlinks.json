@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.docthink.app",
+    "sha256_cert_fingerprints": ["84:EB:6A:A1:E8:B4:08:45:D4:EA:77:C3:44:41:49:E9:EF:B2:5C:AD:73:5A:3A:E1:F2:5A:EE:69:AB:A6:48:88"]
+  }
+}]

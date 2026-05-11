@@ -5,11 +5,18 @@ const nextConfig = {
       bodySizeLimit: '10mb',
     },
   },
-  // Increase API route body size limit
   api: {
     bodyParser: {
       sizeLimit: '10mb',
     },
+  },
+  async headers() {
+    return [
+      {
+        source: '/.well-known/assetlinks.json',
+        headers: [{ key: 'Content-Type', value: 'application/json' }],
+      },
+    ]
   },
 }
 module.exports = nextConfig
