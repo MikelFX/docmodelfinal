@@ -6,12 +6,16 @@ const nextConfig = {
     },
   },
   async rewrites() {
-    return [
-      {
-        source: '/.well-known/assetlinks.json',
-        destination: '/api/assetlinks',
-      },
-    ]
+    return {
+      beforeFiles: [
+        {
+          source: '/.well-known/assetlinks.json',
+          destination: '/api/assetlinks',
+        },
+      ],
+      afterFiles: [],
+      fallback: [],
+    }
   },
   async headers() {
     return [
