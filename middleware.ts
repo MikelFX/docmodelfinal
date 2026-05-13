@@ -18,10 +18,11 @@ const assetlinks = [
 export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname === '/.well-known/assetlinks.json') {
     return new NextResponse(JSON.stringify(assetlinks), {
+      status: 200,
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'public, max-age=3600',
+        'Cache-Control': 'no-store',
       },
     })
   }
@@ -29,5 +30,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/.well-known/assetlinks.json'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 }
