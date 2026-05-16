@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation'
 import styles from './DocGuard.module.css'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { getDGT } from '@/lib/i18n-dg'
+import ShareButtons from './ShareButtons'
+import HistoryScreen from './HistoryScreen'
+import { saveToHistory } from '@/lib/analysisHistory'
 
 const FREE_LIMIT = 3
 const FREE_KEY = 'docguard_free_uses'
@@ -135,6 +138,10 @@ export default function DocGuard() {
   const [showInstallBanner, setShowInstallBanner] = useState(false)
   const [isIos, setIsIos] = useState(false)
   const [showIosHint, setShowIosHint] = useState(false)
+  const [docName, setDocName] = useState('')
+  const [docThumbnail, setDocThumbnail] = useState('')
+  const [showHistory, setShowHistory] = useState(false)
+  const [historySaved, setHistorySaved] = useState(false)
 
   useEffect(() => {
     setFreeUsesLeft(Math.max(0, FREE_LIMIT - getFreeUses()))
@@ -251,6 +258,7 @@ export default function DocGuard() {
       const { _credits, ...analysis } = data
       setAnalysis(analysis)
       setScreen('result')
+      setHistorySaved(false)
       if (!signedIn) {
         incrementFreeUses()
         setFreeUsesLeft(Math.max(0, FREE_LIMIT - getFreeUses()))
@@ -272,7 +280,11 @@ export default function DocGuard() {
 
       if (result.imageBase64) {
         const newPage = { base64: result.imageBase64, type: result.imageType ?? 'image/jpeg' }
-        setPages(prev => [...prev, newPage])
+        setPages(prev => {
+          if (prev.length === 0) setDocThumbnail(result.imageBase64!)
+          return [...prev, newPage]
+        })
+        if (!docName) setDocName(file.name || 'Photo')
       } else if (result.text) {
         const trimmed = result.text.trim()
         if (!trimmed) {
@@ -282,6 +294,7 @@ export default function DocGuard() {
         // Append text from multiple documents
         setDocContent(prev => prev ? prev + '\n\n---\n\n' + trimmed : trimmed)
         setStagedFiles(prev => [...prev, file.name])
+        if (!docName) setDocName(file.name || 'Document')
       } else {
         setError(dg.errUnsupported)
       }
@@ -366,6 +379,15 @@ export default function DocGuard() {
     }
   }, [chatInput, chatLoading, chatMessages, docContent, docImageBase64, docImageType])
 
+  // Auto-save every completed analysis to IndexedDB history
+  useEffect(() => {
+    if (screen !== 'result' || !analysis || historySaved) return
+    const name = docName || stagedFiles[0] || 'Contract'
+    setHistorySaved(true)
+    saveToHistory(analysis, { documentName: name, thumbnailBase64: docThumbnail, language: lang }).catch(() => {})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen, analysis])
+
   const resetAll = useCallback(() => {
     setScreen('home')
     setAnalysis(null)
@@ -378,6 +400,9 @@ export default function DocGuard() {
     setChatMessages([])
     setChatInput('')
     setAnalyzeStep(0)
+    setDocName('')
+    setDocThumbnail('')
+    setHistorySaved(false)
   }, [])
 
   const verdictColorClass = analysis ? {
@@ -415,6 +440,9 @@ export default function DocGuard() {
         style={{ display: 'none' }}
         onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = '' }}
       />
+
+      {/* ── HISTORY OVERLAY ── */}
+      {showHistory && <HistoryScreen onBack={() => setShowHistory(false)} />}
 
       {/* ── GLOBAL NAV (all screens) ── */}
       <nav className={styles.nav}>
@@ -462,6 +490,13 @@ export default function DocGuard() {
               )}
             </div>
           )}
+          <button
+            className={styles.historyBtn}
+            onClick={() => setShowHistory(true)}
+            title={dg.history}
+          >
+            🕐
+          </button>
           {!isSignedIn && (
             <button className={styles.loginBtn} onClick={() => router.push('/sign-in')}>
               {dg.navLogin}
@@ -702,6 +737,12 @@ export default function DocGuard() {
 
             <div style={{ height: 8 }} />
           </div>
+
+          {/* Share row */}
+          <ShareButtons
+            analysis={analysis}
+            docName={docName || stagedFiles[0] || undefined}
+          />
 
           {/* Chat section */}
           <div className={styles.chatSection}>

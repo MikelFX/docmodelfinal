@@ -1,0 +1,126 @@
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.wrap {
+  padding: 12px 14px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: fadeIn 0.3s ease both;
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(127,119,221,0.08);
+  border: 0.5px solid rgba(127,119,221,0.2);
+  border-radius: 10px;
+  font-size: 12px;
+  color: #AFA9EC;
+}
+
+.spinner {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 2px solid rgba(127,119,221,0.25);
+  border-top-color: #7F77DD;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+.mainRow {
+  display: flex;
+  gap: 7px;
+}
+
+.btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 2px 9px;
+  border-radius: 12px;
+  border: 0.5px solid rgba(127,119,221,0.2);
+  background: rgba(127,119,221,0.06);
+  color: #c8c4e8;
+  font-size: 10px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.btn:active {
+  transform: scale(0.94);
+  background: rgba(127,119,221,0.12);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btnSuccess {
+  border-color: rgba(34,197,94,0.4) !important;
+  background: rgba(34,197,94,0.08) !important;
+  color: #22c55e !important;
+}
+
+.icon {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.chipsRow {
+  display: flex;
+  gap: 8px;
+}
+
+.chip {
+  flex: 1;
+  text-align: center;
+  padding: 8px 2px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.chip:active {
+  transform: scale(0.95);
+  opacity: 0.75;
+}
+
+.chipWa {
+  background: rgba(37,211,102,0.1);
+  color: #25D366;
+  border: 0.5px solid rgba(37,211,102,0.28);
+}
+
+.chipEmail {
+  background: rgba(127,119,221,0.08);
+  color: #AFA9EC;
+  border: 0.5px solid rgba(127,119,221,0.2);
+}
+
+.chipTg {
+  background: rgba(38,165,211,0.1);
+  color: #26A5D3;
+  border: 0.5px solid rgba(38,165,211,0.28);
+}

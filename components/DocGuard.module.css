@@ -1006,6 +1006,24 @@
 
 .loginBtn:hover { background: rgba(127,119,221,0.18); }
 
+.historyBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 0.5px solid rgba(127,119,221,0.2);
+  background: rgba(127,119,221,0.06);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.historyBtn:hover { background: rgba(127,119,221,0.14); }
+.historyBtn:active { background: rgba(127,119,221,0.2); }
+
 /* ── USER MENU ── */
 .userMenuWrap {
   position: relative;

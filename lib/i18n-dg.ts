@@ -33,6 +33,7 @@ export interface DGTranslations {
   errRead: string
   signOut: string
   buyCredits: string
+  history: string
 }
 
 const DG: Record<LangKey, DGTranslations> = {
@@ -69,6 +70,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Chyba při čtení souboru.',
     signOut: '🚪 Odhlásit se',
     buyCredits: '💳 Koupit kredity',
+    history: 'Historie',
   },
   en: {
     tagline: 'Protecting you from bad contracts',
@@ -103,6 +105,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Error reading file.',
     signOut: '🚪 Sign out',
     buyCredits: '💳 Buy credits',
+    history: 'History',
   },
   de: {
     tagline: 'Ich schütze dich vor schlechten Verträgen',
@@ -137,6 +140,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Fehler beim Lesen der Datei.',
     signOut: '🚪 Abmelden',
     buyCredits: '💳 Credits kaufen',
+    history: 'Verlauf',
   },
   sk: {
     tagline: 'Chránim ťa pred zlou zmluvou',
@@ -171,6 +175,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Chyba pri čítaní súboru.',
     signOut: '🚪 Odhlásiť sa',
     buyCredits: '💳 Kúpiť kredity',
+    history: 'História',
   },
   fr: {
     tagline: 'Je vous protège des mauvais contrats',
@@ -205,6 +210,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Erreur lors de la lecture du fichier.',
     signOut: '🚪 Se déconnecter',
     buyCredits: '💳 Acheter des crédits',
+    history: 'Historique',
   },
   es: {
     tagline: 'Te protejo de los contratos perjudiciales',
@@ -239,6 +245,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Error al leer el archivo.',
     signOut: '🚪 Cerrar sesión',
     buyCredits: '💳 Comprar créditos',
+    history: 'Historial',
   },
   it: {
     tagline: 'Ti proteggo dai contratti sfavorevoli',
@@ -273,6 +280,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Errore nella lettura del file.',
     signOut: '🚪 Esci',
     buyCredits: '💳 Acquista crediti',
+    history: 'Cronologia',
   },
   pl: {
     tagline: 'Chronię cię przed niekorzystnymi umowami',
@@ -307,6 +315,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Błąd podczas odczytu pliku.',
     signOut: '🚪 Wyloguj się',
     buyCredits: '💳 Kup kredyty',
+    history: 'Historia',
   },
   nl: {
     tagline: 'Ik bescherm je tegen slechte contracten',
@@ -341,6 +350,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Fout bij het lezen van het bestand.',
     signOut: '🚪 Uitloggen',
     buyCredits: '💳 Credits kopen',
+    history: 'Geschiedenis',
   },
   pt: {
     tagline: 'Protejo você de contratos desfavoráveis',
@@ -375,6 +385,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Erro ao ler o arquivo.',
     signOut: '🚪 Sair',
     buyCredits: '💳 Comprar créditos',
+    history: 'Histórico',
   },
   ro: {
     tagline: 'Te protejez de contractele defavorabile',
@@ -409,6 +420,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Eroare la citirea fișierului.',
     signOut: '🚪 Deconectare',
     buyCredits: '💳 Cumpără credite',
+    history: 'Istoric',
   },
   hu: {
     tagline: 'Megvédem a rossz szerződésektől',
@@ -443,6 +455,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Hiba a fájl olvasásakor.',
     signOut: '🚪 Kijelentkezés',
     buyCredits: '💳 Kreditek vásárlása',
+    history: 'Előzmények',
   },
   sv: {
     tagline: 'Jag skyddar dig från dåliga avtal',
@@ -477,6 +490,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Fel vid läsning av filen.',
     signOut: '🚪 Logga ut',
     buyCredits: '💳 Köp credits',
+    history: 'Historik',
   },
   da: {
     tagline: 'Jeg beskytter dig mod dårlige kontrakter',
@@ -511,6 +525,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Fejl ved læsning af filen.',
     signOut: '🚪 Log ud',
     buyCredits: '💳 Køb credits',
+    history: 'Historik',
   },
   fi: {
     tagline: 'Suojaan sinua huonoilta sopimuksilta',
@@ -545,6 +560,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Virhe tiedoston lukemisessa.',
     signOut: '🚪 Kirjaudu ulos',
     buyCredits: '💳 Osta krediittejä',
+    history: 'Historia',
   },
   el: {
     tagline: 'Σας προστατεύω από ανεπιθύμητα συμβόλαια',
@@ -579,6 +595,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Σφάλμα κατά την ανάγνωση του αρχείου.',
     signOut: '🚪 Αποσύνδεση',
     buyCredits: '💳 Αγορά credits',
+    history: 'Ιστορικό',
   },
   hr: {
     tagline: 'Štitim vas od loših ugovora',
@@ -613,6 +630,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Greška pri čitanju datoteke.',
     signOut: '🚪 Odjava',
     buyCredits: '💳 Kupi kredite',
+    history: 'Povijest',
   },
   bg: {
     tagline: 'Защитавам ви от неизгодни договори',
@@ -647,6 +665,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Грешка при четене на файла.',
     signOut: '🚪 Изход',
     buyCredits: '💳 Купете кредити',
+    history: 'История',
   },
   sl: {
     tagline: 'Ščitim vas pred slabimi pogodbami',
@@ -681,6 +700,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Napaka pri branju datoteke.',
     signOut: '🚪 Odjava',
     buyCredits: '💳 Kupi kredite',
+    history: 'Zgodovina',
   },
   et: {
     tagline: 'Kaitse sind halbade lepingute eest',
@@ -715,6 +735,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Viga faili lugemisel.',
     signOut: '🚪 Logi välja',
     buyCredits: '💳 Osta krediite',
+    history: 'Ajalugu',
   },
   lv: {
     tagline: 'Es aizsargāju jūs no nelabvēlīgiem līgumiem',
@@ -749,6 +770,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Kļūda lasot failu.',
     signOut: '🚪 Izrakstīties',
     buyCredits: '💳 Pirkt kredītus',
+    history: 'Vēsture',
   },
   lt: {
     tagline: 'Saugau jus nuo nepalankių sutarčių',
@@ -783,6 +805,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Klaida skaitant failą.',
     signOut: '🚪 Atsijungti',
     buyCredits: '💳 Pirkti kreditus',
+    history: 'Istorija',
   },
   mt: {
     tagline: 'Inħarsek minn kuntratti ħżiena',
@@ -817,6 +840,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Żball fil-qari tal-fajl.',
     signOut: '🚪 Oħroġ',
     buyCredits: '💳 Ixtri krediti',
+    history: 'Storja',
   },
   ga: {
     tagline: 'Cosnaím thú ar dhrochconarthaí',
@@ -851,6 +875,7 @@ const DG: Record<LangKey, DGTranslations> = {
     errRead: 'Earráid agus an comhad á léamh.',
     signOut: '🚪 Sínigh amach',
     buyCredits: '💳 Ceannaigh creidmheasanna',
+    history: 'Stair',
   },
 }
 
