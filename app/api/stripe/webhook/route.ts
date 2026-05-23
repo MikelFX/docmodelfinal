@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { addCredits } from '@/app/api/credits/route'
+import { addCredits } from '@/lib/credits'
 import { Redis } from '@upstash/redis'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)

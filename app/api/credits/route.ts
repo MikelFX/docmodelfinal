@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@clerk/nextjs/server'
 import { Redis } from '@upstash/redis'
+import { kvGet, kvSet } from '@/lib/credits'
 
 const DEFAULT_CREDITS = 10
-const MAX_SPEND = 25 // max credits in a single operation (batch analysis limit)
-const REFUND_WINDOW_MS = 5 * 60 * 1000 // 5 minutes
+const MAX_SPEND = 25
+const REFUND_WINDOW_MS = 5 * 60 * 1000
 
 const REST_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL
 const REST_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN
@@ -12,16 +13,6 @@ const REST_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_RE
 const redis = REST_URL && REST_TOKEN
   ? new Redis({ url: REST_URL, token: REST_TOKEN })
   : null
-
-async function kvGet(key: string): Promise<number | null> {
-  if (!redis) return null
-  try { return await redis.get<number>(key) } catch { return null }
-}
-
-async function kvSet(key: string, value: number): Promise<void> {
-  if (!redis) return
-  try { await redis.set(key, value) } catch { /* silent */ }
-}
 
 function validateAmount(amount: unknown): number | null {
   const n = Number(amount)
@@ -52,7 +43,6 @@ export async function POST(req: NextRequest) {
 
   const { action, amount } = body
 
-  // ── SPEND ──────────────────────────────────────────────────────────
   if (action === 'spend') {
     const amt = validateAmount(amount)
     if (amt === null) {
@@ -68,7 +58,6 @@ export async function POST(req: NextRequest) {
     const newVal = current - amt
     await kvSet(`credits:${userId}`, newVal)
 
-    // Record spend for potential refund within the time window
     try {
       await redis.set(`lastspend:${userId}`, `${amt}:${Date.now()}`, { ex: Math.ceil(REFUND_WINDOW_MS / 1000) })
     } catch { /* non-critical */ }
@@ -76,7 +65,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ credits: newVal })
   }
 
-  // ── REFUND (error recovery only — validates against last recorded spend) ──
   if (action === 'refund') {
     const amt = validateAmount(amount)
     if (amt === null) {
@@ -107,24 +95,14 @@ export async function POST(req: NextRequest) {
     const newVal = current + amt
     await kvSet(`credits:${userId}`, newVal)
 
-    // Consume the refund token — one refund per spend
     try { await redis.del(`lastspend:${userId}`) } catch { /* ignore */ }
 
     return NextResponse.json({ credits: newVal })
   }
 
-  // ── ADD (server-side only, blocked for clients) ────────────────────
   if (action === 'add') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   return NextResponse.json({ error: 'Unknown action' }, { status: 400 })
-}
-
-// Server-side only — called from webhook and verify endpoints
-export async function addCredits(userId: string, amount: number): Promise<number> {
-  const current = (await kvGet(`credits:${userId}`)) ?? DEFAULT_CREDITS
-  const newVal = current + amount
-  await kvSet(`credits:${userId}`, newVal)
-  return newVal
 }
