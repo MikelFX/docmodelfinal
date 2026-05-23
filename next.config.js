@@ -1,6 +1,13 @@
+const path = require('path')
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   serverExternalPackages: ['pdfjs-dist'],
+  turbopack: {
+    resolveAlias: {
+      'fflate': path.resolve(__dirname, 'node_modules/fflate/esm/browser.js'),
+    },
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: '10mb',
