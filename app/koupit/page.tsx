@@ -197,11 +197,14 @@ export default function KoupitPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plan: selected }),
       })
-      const data = await res.json()
+      const text = await res.text()
+      if (!text) throw new Error(lang === 'cs' ? 'Nejste přihlášeni.' : 'Not authenticated.')
+      let data: any
+      try { data = JSON.parse(text) } catch { throw new Error(lang === 'cs' ? 'Chyba serveru. Zkuste to znovu.' : 'Server error. Please try again.') }
       if (data.error) throw new Error(data.error)
       window.location.href = data.url
     } catch (err: any) {
-      setError(err.message || 'Payment failed. Please try again.')
+      setError(err.message || (lang === 'cs' ? 'Platba selhala. Zkuste to znovu.' : 'Payment failed. Please try again.'))
       setLoading(false)
     }
   }

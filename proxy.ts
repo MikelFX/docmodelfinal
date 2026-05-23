@@ -23,6 +23,7 @@ const isPublicRoute = createRouteMatcher([
   '/sign-up(.*)',
   '/koupit(.*)',
   '/api/docguard(.*)',
+  '/api/stripe/checkout(.*)',
   '/api/stripe/webhook(.*)',
   '/api/stripe/verify(.*)',
   '/manifest.json',
