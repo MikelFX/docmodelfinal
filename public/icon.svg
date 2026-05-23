@@ -1,46 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#1a1830"/>
-      <stop offset="100%" style="stop-color:#0d0c1a"/>
+      <stop offset="0%" stop-color="#13111e"/>
+      <stop offset="100%" stop-color="#08070f"/>
     </linearGradient>
-    <linearGradient id="ring" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#9f98f0"/>
-      <stop offset="100%" style="stop-color:#6058c4"/>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7F77DD" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#a89ef5"/>
+      <stop offset="100%" stop-color="#7F77DD" stop-opacity="0"/>
     </linearGradient>
   </defs>
 
-  <!-- Background circle -->
-  <circle cx="256" cy="256" r="256" fill="url(#bg)"/>
+  <!-- Background: rounded square (modern app icon standard) -->
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
 
-  <!-- Outer ring -->
-  <circle cx="256" cy="256" r="220" fill="none" stroke="url(#ring)" stroke-width="6" opacity="0.4"/>
-
-  <!-- Inner glow ring -->
-  <circle cx="256" cy="256" r="190" fill="none" stroke="#7F77DD" stroke-width="2" opacity="0.2"/>
-
-  <!-- DT text -->
+  <!-- DT: bold, tight, centered -->
   <text
     x="256"
-    y="300"
+    y="316"
     text-anchor="middle"
     font-family="'SF Pro Display', 'Helvetica Neue', Arial, sans-serif"
-    font-size="160"
-    font-weight="700"
-    letter-spacing="-8"
+    font-size="208"
+    font-weight="800"
+    letter-spacing="-10"
     fill="white"
   >DT</text>
 
-  <!-- Subtle bottom label -->
-  <text
-    x="256"
-    y="380"
-    text-anchor="middle"
-    font-family="'SF Pro Display', 'Helvetica Neue', Arial, sans-serif"
-    font-size="36"
-    font-weight="300"
-    letter-spacing="12"
-    fill="#7F77DD"
-    opacity="0.8"
-  >DOCTHINK</text>
+  <!-- Single purple fade-in/out underline accent -->
+  <rect x="118" y="348" width="276" height="5" rx="2.5" fill="url(#accent)"/>
 </svg>
