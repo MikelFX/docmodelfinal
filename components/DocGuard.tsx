@@ -620,6 +620,16 @@ export default function DocGuard() {
               {dg.freeExhausted}
             </p>
           )}
+
+          <div className={styles.footerLinks}>
+            <a href="/disclaimer" className={styles.footerLink}>
+              ⚠️ AI není právní poradce
+            </a>
+            <span className={styles.footerDot}>·</span>
+            <a href="/privacy" className={styles.footerLink}>
+              Ochrana osobních údajů
+            </a>
+          </div>
         </div>
       )}
 

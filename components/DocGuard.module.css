@@ -767,6 +767,33 @@
   letter-spacing: 0.02em;
 }
 
+/* ── FOOTER LINKS ── */
+.footerLinks {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding-bottom: 8px;
+}
+
+.footerLink {
+  font-size: 11px;
+  color: #4a4668;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: color 0.2s;
+}
+
+.footerLink:hover {
+  color: #7F77DD;
+}
+
+.footerDot {
+  font-size: 11px;
+  color: #2e2b45;
+}
+
 /* ── PAYWALL MODAL ── */
 .paywallOverlay {
   position: fixed;
