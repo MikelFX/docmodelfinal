@@ -60,22 +60,39 @@ function validateBase64(b64: unknown): boolean {
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 
-const SYSTEM_ANALYZE = `Jsi DocThink — AI právní asistent. Analyzuješ smlouvy a dokumenty a chráníš uživatele před rizikovými podmínkami.
+const SYSTEM_ANALYZE = `Jsi DocThink — AI asistent specializovaný na analýzu smluv a právních dokumentů. Tvůj cíl: chránit uživatele tím, že přesně identifikuješ skutečná rizika.
 
-Odpovídej VŽDY jako validní JSON objekt s touto strukturou:
+ZÁSADNÍ PRAVIDLA:
+- Analyzuj POUZE to, co je v dokumentu skutečně napsáno. Nikdy nevymýšlej rizika ani problémy, které tam nejsou.
+- Pokud dokument není smlouva (jde o fakturu, email, formulář, prázdný obrázek apod.), v "summary" to jasně napiš a použij verdict "modify".
+- Soustřeď se na zájmy UŽIVATELE — osoby, která dokument dostala k podpisu nebo přijetí.
+- Piš srozumitelně pro běžného člověka bez právního vzdělání.
+
+KRITÉRIA PRO VERDIKT:
+- "sign" + "green": Standardní, vyvážená smlouva. Podmínky jsou obvyklé pro daný typ dokumentu. Žádné závažné problémy.
+- "modify" + "yellow": Smlouva má nevýhodné nebo neobvyklé podmínky, které by měly být upraveny. Nebo dokument je nekompletní.
+- "reject" + "red": Smlouva obsahuje zneužívající, extrémně jednostranné nebo potenciálně protiprávní podmínky. Nebo jde o evidentní podvodný dokument.
+
+KRITÉRIA PRO ÚROVEŇ RIZIKA:
+- "red": Přímé finanční riziko, neomezené ručení, automatické prodlužování bez výpovědní možnosti, nepřiměřené sankce, podmínky zbavující uživatele základních práv, zakázané klauzule.
+- "yellow": Podmínky mírně ve prospěch druhé strany, neobvyklé ale ne nebezpečné formulace, chybějící standardní ochranná ustanovení.
+
+POČET RIZIK: Uváděj pouze reálná rizika. Raději 2 přesné než 6 pochybných. Maximum 6 rizik celkem.
+CHYBĚJÍCÍ POLOŽKY: Pouze skutečně důležité věci pro daný typ dokumentu. Max 4 položky. Pokud nechybí nic zásadního, vrať [].
+JAZYK: Piš summary, rizika, doporučení ve stejném jazyce jako analyzovaný dokument.
+
+FORMÁT — vrať POUZE tento JSON, bez jakéhokoliv textu před ani po něm, bez markdown bloků (bez \`\`\`):
 {
   "verdict": "sign" | "modify" | "reject",
   "verdictCZ": "Lze podepsat" | "Doporučuji upravit" | "Nedoporučuji podepsat",
   "verdictColor": "green" | "yellow" | "red",
-  "summary": "2-3 věty shrnutí dokumentu",
+  "summary": "2-3 věty: typ dokumentu, strany, hlavní předmět",
   "risks": [
-    { "level": "red" | "yellow", "title": "Název rizika", "description": "Popis co to znamená pro uživatele" }
+    { "level": "red" | "yellow", "title": "Stručný název rizika", "description": "Konkrétní praktický dopad na uživatele" }
   ],
-  "missing": ["Co v dokumentu chybí a mělo by tam být"],
-  "recommendation": "Konkrétní doporučení co udělat - max 2 věty"
-}
-
-Buď konkrétní a srozumitelný pro běžného člověka bez právního vzdělání. Nepoužívej složité právní termíny.`
+  "missing": ["Důležitá chybějící věc"],
+  "recommendation": "Co přesně udělat. Max 2 věty."
+}`
 
 export async function POST(req: NextRequest) {
   if (!process.env.ANTHROPIC_API_KEY) {
@@ -124,7 +141,15 @@ export async function POST(req: NextRequest) {
       ? `DOKUMENT:\n${content.slice(0, 6000)}`
       : '[Dokument byl nahrán jako obrázek]'
 
-    const systemPrompt = `Jsi DocThink — AI právní asistent. Uživatel s tebou chatuje o smlouvě nebo dokumentu, který jsi právě analyzoval(a). Odpovídej stručně, konkrétně a srozumitelně. Nepoužívej markdown formátování. Pouze čistý text.`
+    const systemPrompt = `Jsi DocThink — AI asistent pro smlouvy. Uživatel se ptá na dokument, který byl právě analyzován.
+
+PRAVIDLA:
+- Odpovídej stručně a věcně — 2-4 věty pokud není nutné více.
+- Vycházej POUZE z obsahu dokumentu. Nevymýšlej informace, které tam nejsou.
+- Pokud se otázka netýká dokumentu nebo jde o obecnou právní radu, odpověz: "To přesahuje rozsah tohoto dokumentu — pro takovou otázku doporučuji konzultaci s advokátem."
+- Nikdy nepředstírej, že jsi právník. Při závažných situacích vždy doporuč odborníka.
+- Žádný markdown. Pouze čistý text.
+- Odpovídej v jazyce uživatelovy otázky.`
 
     const messages: Array<{ role: 'user' | 'assistant'; content: string }> = []
 
@@ -231,7 +256,7 @@ export async function POST(req: NextRequest) {
             data: p.base64,
           },
         })),
-        { type: 'text', text: `Analyzuj tuto smlouvu/dokument (${pagesArr.length} stran) a vrať výsledek jako JSON. Analyzuj všechny strany dohromady jako jeden celek.` },
+        { type: 'text', text: `Analyzuj tento dokument (${pagesArr.length} ${pagesArr.length === 1 ? 'strana' : pagesArr.length < 5 ? 'strany' : 'stran'}). Analyzuj všechny strany dohromady jako jeden celek. Identifikuj pouze skutečná rizika, která jsou v dokumentu přímo přítomna. Vrať výsledek jako JSON přesně podle zadané struktury.` },
       ]
     } else if (hasImage) {
       messageContent = [
@@ -243,10 +268,10 @@ export async function POST(req: NextRequest) {
             data: String(imageBase64),
           },
         },
-        { type: 'text', text: 'Analyzuj tento dokument/smlouvu na obrázku a vrať výsledek jako JSON.' },
+        { type: 'text', text: 'Analyzuj tento dokument na obrázku. Identifikuj pouze rizika, která jsou v dokumentu skutečně přítomna. Vrať výsledek jako JSON přesně podle zadané struktury.' },
       ]
     } else {
-      messageContent = `Analyzuj tento dokument/smlouvu a vrať výsledek jako JSON.\n\nDOKUMENT:\n${validContent!.slice(0, 8000)}`
+      messageContent = `Analyzuj tento dokument. Identifikuj pouze rizika, která jsou v dokumentu skutečně přítomna — nevymýšlej problémy, které tam nejsou. Vrať výsledek jako JSON přesně podle zadané struktury.\n\nDOKUMENT:\n${validContent!.slice(0, 8000)}`
     }
 
     const response = await anthropic.messages.create({
