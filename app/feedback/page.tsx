@@ -1,8 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { getFeedback } from '@/lib/i18n-legal'
 
 export default function FeedbackPage() {
+  const { lang } = useLanguage()
+  const l = getFeedback(lang)
+
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [error, setError] = useState('')
   const [form, setForm] = useState({ name: '', email: '', message: '' })
@@ -23,7 +28,7 @@ export default function FeedbackPage() {
       }
       setStatus('sent')
     } catch (err: any) {
-      setError(err.message ?? 'Něco se pokazilo. Zkuste to znovu.')
+      setError(err.message ?? 'Something went wrong. Please try again.')
       setStatus('error')
     }
   }
@@ -44,35 +49,35 @@ export default function FeedbackPage() {
     <main style={s.page}>
       <div style={s.success}>
         <div style={{ fontSize: 48, marginBottom: 16 }}>✓</div>
-        <h2 style={{ color: '#fff' }}>Díky za zpětnou vazbu!</h2>
-        <p style={{ color: '#888', marginTop: 8 }}>Odpovíme na {form.email}</p>
-        <a href="/" style={{ display: 'inline-block', marginTop: 32, color: '#7F77DD', textDecoration: 'none' }}>← Zpět do aplikace</a>
+        <h2 style={{ color: '#fff' }}>{l.successTitle}</h2>
+        <p style={{ color: '#888', marginTop: 8 }}>{l.successSub} {form.email}</p>
+        <a href="/" style={{ display: 'inline-block', marginTop: 32, color: '#7F77DD', textDecoration: 'none' }}>{l.back}</a>
       </div>
     </main>
   )
 
   return (
     <main style={s.page}>
-      <h1 style={s.h1}>Zpětná vazba</h1>
-      <span style={s.sub}>Nahlaste chybu nebo sdílejte nápad jak DocThink vylepšit.</span>
+      <h1 style={s.h1}>{l.title}</h1>
+      <span style={s.sub}>{l.sub}</span>
       {status === 'error' && <div style={s.errorBox}>{error}</div>}
       <form onSubmit={handleSubmit}>
-        <label style={s.label}>Jméno</label>
-        <input style={s.input} required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Vaše jméno" disabled={status === 'sending'} />
-        <label style={s.label}>Email</label>
-        <input style={s.input} type="email" required value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="vas@email.cz" disabled={status === 'sending'} />
-        <label style={s.label}>Zpráva</label>
-        <textarea style={s.textarea} required value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} placeholder="Co máte na mysli..." disabled={status === 'sending'} />
+        <label style={s.label}>{l.nameLabel}</label>
+        <input style={s.input} required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder={l.namePlaceholder} disabled={status === 'sending'} />
+        <label style={s.label}>{l.emailLabel}</label>
+        <input style={s.input} type="email" required value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder={l.emailPlaceholder} disabled={status === 'sending'} />
+        <label style={s.label}>{l.messageLabel}</label>
+        <textarea style={s.textarea} required value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} placeholder={l.messagePlaceholder} disabled={status === 'sending'} />
         <button
           style={{ ...s.btn, ...(status === 'sending' ? { opacity: 0.6, cursor: 'not-allowed' } : {}) }}
           type="submit"
           disabled={status === 'sending'}
         >
-          {status === 'sending' ? 'Odesílám…' : 'Odeslat zpětnou vazbu'}
+          {status === 'sending' ? l.sendingBtn : l.sendBtn}
         </button>
       </form>
       <div style={{ marginTop: 32, paddingTop: 24, borderTop: '1px solid #222', textAlign: 'center' }}>
-        <a href="/" style={{ color: '#555', textDecoration: 'none', fontSize: 14 }}>← Zpět do aplikace</a>
+        <a href="/" style={{ color: '#555', textDecoration: 'none', fontSize: 14 }}>{l.back}</a>
       </div>
     </main>
   )
