@@ -622,13 +622,13 @@ export default function DocGuard() {
           )}
 
           <div className={styles.footerLinks}>
-            <a href="/disclaimer" className={styles.footerLink}>⚠️ AI není právní poradce</a>
+            <a href="/disclaimer" className={styles.footerLink}>{dg.footerDisclaimer}</a>
             <span className={styles.footerDot}>·</span>
-            <a href="/terms" className={styles.footerLink}>Podmínky</a>
+            <a href="/terms" className={styles.footerLink}>{dg.footerTerms}</a>
             <span className={styles.footerDot}>·</span>
-            <a href="/privacy" className={styles.footerLink}>Soukromí</a>
+            <a href="/privacy" className={styles.footerLink}>{dg.footerPrivacy}</a>
             <span className={styles.footerDot}>·</span>
-            <a href="/feedback" className={styles.footerLink}>Zpětná vazba</a>
+            <a href="/feedback" className={styles.footerLink}>{dg.footerFeedback}</a>
           </div>
         </div>
       )}

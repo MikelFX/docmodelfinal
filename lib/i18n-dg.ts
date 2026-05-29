@@ -34,6 +34,10 @@ export interface DGTranslations {
   signOut: string
   buyCredits: string
   history: string
+  footerDisclaimer: string
+  footerTerms: string
+  footerPrivacy: string
+  footerFeedback: string
 }
 
 const DG: Record<LangKey, DGTranslations> = {
@@ -71,6 +75,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Odhlásit se',
     buyCredits: '💳 Koupit kredity',
     history: 'Historie',
+    footerDisclaimer: '⚠️ AI není právní poradce',
+    footerTerms: 'Podmínky',
+    footerPrivacy: 'Soukromí',
+    footerFeedback: 'Zpětná vazba',
   },
   en: {
     tagline: 'Protecting you from bad contracts',
@@ -106,6 +114,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Sign out',
     buyCredits: '💳 Buy credits',
     history: 'History',
+    footerDisclaimer: '⚠️ AI is not a legal advisor',
+    footerTerms: 'Terms',
+    footerPrivacy: 'Privacy',
+    footerFeedback: 'Feedback',
   },
   de: {
     tagline: 'Ich schütze dich vor schlechten Verträgen',
@@ -141,6 +153,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Abmelden',
     buyCredits: '💳 Credits kaufen',
     history: 'Verlauf',
+    footerDisclaimer: '⚠️ KI ist kein Rechtsberater',
+    footerTerms: 'Bedingungen',
+    footerPrivacy: 'Datenschutz',
+    footerFeedback: 'Feedback',
   },
   sk: {
     tagline: 'Chránim ťa pred zlou zmluvou',
@@ -176,6 +192,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Odhlásiť sa',
     buyCredits: '💳 Kúpiť kredity',
     history: 'História',
+    footerDisclaimer: '⚠️ AI nie je právny poradca',
+    footerTerms: 'Podmienky',
+    footerPrivacy: 'Súkromie',
+    footerFeedback: 'Spätná väzba',
   },
   fr: {
     tagline: 'Je vous protège des mauvais contrats',
@@ -211,6 +231,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Se déconnecter',
     buyCredits: '💳 Acheter des crédits',
     history: 'Historique',
+    footerDisclaimer: '⚠️ L\'IA n\'est pas un conseiller juridique',
+    footerTerms: 'Conditions',
+    footerPrivacy: 'Confidentialité',
+    footerFeedback: 'Retour',
   },
   es: {
     tagline: 'Te protejo de los contratos perjudiciales',
@@ -246,6 +270,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Cerrar sesión',
     buyCredits: '💳 Comprar créditos',
     history: 'Historial',
+    footerDisclaimer: '⚠️ La IA no es asesora legal',
+    footerTerms: 'Términos',
+    footerPrivacy: 'Privacidad',
+    footerFeedback: 'Opiniones',
   },
   it: {
     tagline: 'Ti proteggo dai contratti sfavorevoli',
@@ -281,6 +309,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Esci',
     buyCredits: '💳 Acquista crediti',
     history: 'Cronologia',
+    footerDisclaimer: '⚠️ L\'IA non è un consulente legale',
+    footerTerms: 'Termini',
+    footerPrivacy: 'Privacy',
+    footerFeedback: 'Feedback',
   },
   pl: {
     tagline: 'Chronię cię przed niekorzystnymi umowami',
@@ -316,6 +348,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Wyloguj się',
     buyCredits: '💳 Kup kredyty',
     history: 'Historia',
+    footerDisclaimer: '⚠️ AI nie jest doradcą prawnym',
+    footerTerms: 'Warunki',
+    footerPrivacy: 'Prywatność',
+    footerFeedback: 'Opinia',
   },
   nl: {
     tagline: 'Ik bescherm je tegen slechte contracten',
@@ -351,6 +387,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Uitloggen',
     buyCredits: '💳 Credits kopen',
     history: 'Geschiedenis',
+    footerDisclaimer: '⚠️ AI is geen juridisch adviseur',
+    footerTerms: 'Voorwaarden',
+    footerPrivacy: 'Privacy',
+    footerFeedback: 'Feedback',
   },
   pt: {
     tagline: 'Protejo você de contratos desfavoráveis',
@@ -386,6 +426,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Sair',
     buyCredits: '💳 Comprar créditos',
     history: 'Histórico',
+    footerDisclaimer: '⚠️ A IA não é consultora jurídica',
+    footerTerms: 'Termos',
+    footerPrivacy: 'Privacidade',
+    footerFeedback: 'Feedback',
   },
   ro: {
     tagline: 'Te protejez de contractele defavorabile',
@@ -421,6 +465,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Deconectare',
     buyCredits: '💳 Cumpără credite',
     history: 'Istoric',
+    footerDisclaimer: '⚠️ AI nu este consultant juridic',
+    footerTerms: 'Termeni',
+    footerPrivacy: 'Confidențialitate',
+    footerFeedback: 'Feedback',
   },
   hu: {
     tagline: 'Megvédem a rossz szerződésektől',
@@ -456,6 +504,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Kijelentkezés',
     buyCredits: '💳 Kreditek vásárlása',
     history: 'Előzmények',
+    footerDisclaimer: '⚠️ Az AI nem jogi tanácsadó',
+    footerTerms: 'Feltételek',
+    footerPrivacy: 'Adatvédelem',
+    footerFeedback: 'Visszajelzés',
   },
   sv: {
     tagline: 'Jag skyddar dig från dåliga avtal',
@@ -491,6 +543,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Logga ut',
     buyCredits: '💳 Köp credits',
     history: 'Historik',
+    footerDisclaimer: '⚠️ AI är inte en juridisk rådgivare',
+    footerTerms: 'Villkor',
+    footerPrivacy: 'Integritet',
+    footerFeedback: 'Feedback',
   },
   da: {
     tagline: 'Jeg beskytter dig mod dårlige kontrakter',
@@ -526,6 +582,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Log ud',
     buyCredits: '💳 Køb credits',
     history: 'Historik',
+    footerDisclaimer: '⚠️ AI er ikke juridisk rådgiver',
+    footerTerms: 'Vilkår',
+    footerPrivacy: 'Privatliv',
+    footerFeedback: 'Feedback',
   },
   fi: {
     tagline: 'Suojaan sinua huonoilta sopimuksilta',
@@ -561,6 +621,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Kirjaudu ulos',
     buyCredits: '💳 Osta krediittejä',
     history: 'Historia',
+    footerDisclaimer: '⚠️ AI ei ole oikeudellinen neuvonantaja',
+    footerTerms: 'Ehdot',
+    footerPrivacy: 'Tietosuoja',
+    footerFeedback: 'Palaute',
   },
   el: {
     tagline: 'Σας προστατεύω από ανεπιθύμητα συμβόλαια',
@@ -596,6 +660,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Αποσύνδεση',
     buyCredits: '💳 Αγορά credits',
     history: 'Ιστορικό',
+    footerDisclaimer: '⚠️ Η ΤΝ δεν είναι νομικός σύμβουλος',
+    footerTerms: 'Όροι',
+    footerPrivacy: 'Απόρρητο',
+    footerFeedback: 'Σχόλια',
   },
   hr: {
     tagline: 'Štitim vas od loših ugovora',
@@ -631,6 +699,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Odjava',
     buyCredits: '💳 Kupi kredite',
     history: 'Povijest',
+    footerDisclaimer: '⚠️ AI nije pravni savjetnik',
+    footerTerms: 'Uvjeti',
+    footerPrivacy: 'Privatnost',
+    footerFeedback: 'Povratne informacije',
   },
   bg: {
     tagline: 'Защитавам ви от неизгодни договори',
@@ -666,6 +738,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Изход',
     buyCredits: '💳 Купете кредити',
     history: 'История',
+    footerDisclaimer: '⚠️ ИИ не е правен съветник',
+    footerTerms: 'Условия',
+    footerPrivacy: 'Поверителност',
+    footerFeedback: 'Обратна връзка',
   },
   sl: {
     tagline: 'Ščitim vas pred slabimi pogodbami',
@@ -701,6 +777,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Odjava',
     buyCredits: '💳 Kupi kredite',
     history: 'Zgodovina',
+    footerDisclaimer: '⚠️ AI ni pravni svetovalec',
+    footerTerms: 'Pogoji',
+    footerPrivacy: 'Zasebnost',
+    footerFeedback: 'Povratne informacije',
   },
   et: {
     tagline: 'Kaitse sind halbade lepingute eest',
@@ -736,6 +816,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Logi välja',
     buyCredits: '💳 Osta krediite',
     history: 'Ajalugu',
+    footerDisclaimer: '⚠️ AI ei ole õigusnõustaja',
+    footerTerms: 'Tingimused',
+    footerPrivacy: 'Privaatsus',
+    footerFeedback: 'Tagasiside',
   },
   lv: {
     tagline: 'Es aizsargāju jūs no nelabvēlīgiem līgumiem',
@@ -771,6 +855,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Izrakstīties',
     buyCredits: '💳 Pirkt kredītus',
     history: 'Vēsture',
+    footerDisclaimer: '⚠️ AI nav juridiskais padomnieks',
+    footerTerms: 'Noteikumi',
+    footerPrivacy: 'Privātums',
+    footerFeedback: 'Atsauksmes',
   },
   lt: {
     tagline: 'Saugau jus nuo nepalankių sutarčių',
@@ -806,6 +894,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Atsijungti',
     buyCredits: '💳 Pirkti kreditus',
     history: 'Istorija',
+    footerDisclaimer: '⚠️ AI nėra teisinis patarėjas',
+    footerTerms: 'Sąlygos',
+    footerPrivacy: 'Privatumas',
+    footerFeedback: 'Atsiliepimai',
   },
   mt: {
     tagline: 'Inħarsek minn kuntratti ħżiena',
@@ -841,6 +933,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Oħroġ',
     buyCredits: '💳 Ixtri krediti',
     history: 'Storja',
+    footerDisclaimer: '⚠️ AI mhux konsulent legali',
+    footerTerms: 'Termini',
+    footerPrivacy: 'Privatezza',
+    footerFeedback: 'Feedback',
   },
   ga: {
     tagline: 'Cosnaím thú ar dhrochconarthaí',
@@ -876,6 +972,10 @@ const DG: Record<LangKey, DGTranslations> = {
     signOut: '🚪 Sínigh amach',
     buyCredits: '💳 Ceannaigh creidmheasanna',
     history: 'Stair',
+    footerDisclaimer: '⚠️ Ní comhairleoir dlí é an AI',
+    footerTerms: 'Téarmaí',
+    footerPrivacy: 'Príobháideacht',
+    footerFeedback: 'Aiseolas',
   },
 }
 
