@@ -9,15 +9,15 @@ const redis = process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN
 
 const VERDICT_EMOJI: Record<string, string> = { sign: '✅', modify: '⚠️', reject: '🚫' }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Analýza smlouvy — DocThink',
     description: 'Zobrazit výsledek AI analýzy smlouvy.',
   }
 }
 
-export default async function SharePage({ params }: { params: { id: string } }) {
-  const { id } = params
+export default async function SharePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
 
   if (!redis || !/^[a-f0-9]{12}$/.test(id)) notFound()
 
