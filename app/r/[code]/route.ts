@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export function GET(req: NextRequest, { params }: { params: { code: string } }) {
-  const { code } = params
+export async function GET(req: NextRequest, { params }: { params: Promise<{ code: string }> }) {
+  const { code } = await params
   if (!/^[a-zA-Z0-9_-]{6,32}$/.test(code)) {
     return NextResponse.redirect(new URL('/sign-up', req.nextUrl.origin))
   }
