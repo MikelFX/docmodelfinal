@@ -296,6 +296,18 @@ PRAVIDLA:
       remainingCredits = spent.credits
     }
 
+    // Track usage stats
+    if (redis) {
+      const today = new Date().toISOString().slice(0, 10)
+      await Promise.all([
+        redis.incr('stats:analyses:total'),
+        redis.incr(`stats:analyses:date:${today}`),
+        userId
+          ? redis.sadd(`stats:users:active:${today}`, userId)
+          : Promise.resolve(0),
+      ]).catch(() => {})
+    }
+
     return NextResponse.json({ ...analysis, _credits: remainingCredits })
   } catch (err: any) {
     if (err instanceof SyntaxError) {

@@ -142,6 +142,7 @@ export default function DocGuard() {
   const [docThumbnail, setDocThumbnail] = useState('')
   const [showHistory, setShowHistory] = useState(false)
   const [historySaved, setHistorySaved] = useState(false)
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
 
   useEffect(() => {
     setFreeUsesLeft(Math.max(0, FREE_LIMIT - getFreeUses()))
@@ -388,6 +389,25 @@ export default function DocGuard() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screen, analysis])
 
+  const handleShareLink = useCallback(async (): Promise<string | null> => {
+    if (!analysis) return null
+    if (shareUrl) return shareUrl
+    try {
+      const res = await fetch('/api/share', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ analysis, docName: docName || stagedFiles[0] || undefined }),
+      })
+      const data = await res.json()
+      if (data.id) {
+        const url = `${window.location.origin}/share/${data.id}`
+        setShareUrl(url)
+        return url
+      }
+    } catch {}
+    return null
+  }, [analysis, docName, stagedFiles, shareUrl])
+
   const resetAll = useCallback(() => {
     setScreen('home')
     setAnalysis(null)
@@ -403,6 +423,7 @@ export default function DocGuard() {
     setDocName('')
     setDocThumbnail('')
     setHistorySaved(false)
+    setShareUrl(null)
   }, [])
 
   const verdictColorClass = analysis ? {
@@ -482,6 +503,15 @@ export default function DocGuard() {
                   <div className={styles.userMenuEmail}>{user?.emailAddresses?.[0]?.emailAddress}</div>
                   <button className={styles.userMenuItem} onClick={() => { setShowUserMenu(false); router.push('/koupit') }}>
                     {dg.buyCredits}
+                  </button>
+                  <button className={styles.userMenuItem} onClick={async () => {
+                    setShowUserMenu(false)
+                    if (!user?.id) return
+                    const link = `${window.location.origin}/r/${user.id.slice(5)}`
+                    await navigator.clipboard.writeText(link).catch(() => {})
+                    alert(`Referral link zkopírován:\n${link}`)
+                  }}>
+                    🎁 Kopírovat referral link
                   </button>
                   <button className={styles.userMenuItem} onClick={() => { setShowUserMenu(false); signOut(() => router.push('/')) }}>
                     {dg.signOut}
@@ -752,6 +782,7 @@ export default function DocGuard() {
           <ShareButtons
             analysis={analysis}
             docName={docName || stagedFiles[0] || undefined}
+            onShareLink={handleShareLink}
           />
 
           {/* Chat section */}

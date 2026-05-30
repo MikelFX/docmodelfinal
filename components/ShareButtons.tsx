@@ -9,13 +9,15 @@ interface Props {
   analysis: Analysis
   docName?: string
   onSave?: () => Promise<void>
+  onShareLink?: () => Promise<string | null>
 }
 
-export default function ShareButtons({ analysis, docName, onSave }: Props) {
+export default function ShareButtons({ analysis, docName, onSave, onShareLink }: Props) {
   const [pdfState, setPdfState] = useState<'idle' | 'generating'>('idle')
   const [pdfMsg, setPdfMsg] = useState('')
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle')
   const [saveState, setSaveState] = useState<'idle' | 'saved' | 'saving'>('idle')
+  const [linkState, setLinkState] = useState<'idle' | 'loading' | 'copied'>('idle')
 
   const summaryText = getAnalysisSummaryText(analysis, docName)
   const encodedText = encodeURIComponent(summaryText)
@@ -50,6 +52,23 @@ export default function ShareButtons({ analysis, docName, onSave }: Props) {
       setCopyState('copied')
       setTimeout(() => setCopyState('idle'), 2200)
     } catch {}
+  }
+
+  const handleShareLink = async () => {
+    if (!onShareLink || linkState !== 'idle') return
+    setLinkState('loading')
+    try {
+      const url = await onShareLink()
+      if (url) {
+        await navigator.clipboard.writeText(url).catch(() => {})
+        setLinkState('copied')
+        setTimeout(() => setLinkState('idle'), 2200)
+      } else {
+        setLinkState('idle')
+      }
+    } catch {
+      setLinkState('idle')
+    }
   }
 
   const handleSave = async () => {
@@ -87,6 +106,17 @@ export default function ShareButtons({ analysis, docName, onSave }: Props) {
           <span className={styles.icon}>↗</span>
           <span>Share</span>
         </button>
+
+        {onShareLink && (
+          <button
+            className={`${styles.btn} ${linkState === 'copied' ? styles.btnSuccess : ''}`}
+            onClick={handleShareLink}
+            disabled={linkState === 'loading'}
+          >
+            <span className={styles.icon}>{linkState === 'copied' ? '✓' : linkState === 'loading' ? '⏳' : '🔗'}</span>
+            <span>{linkState === 'copied' ? 'Zkopírováno!' : 'Link'}</span>
+          </button>
+        )}
 
         <button
           className={`${styles.btn} ${copyState === 'copied' ? styles.btnSuccess : ''}`}
